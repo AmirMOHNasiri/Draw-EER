@@ -1,0 +1,85 @@
+/* The preview page. Colors come from the VS Code theme. */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+  font-family: var(--vscode-font-family);
+}
+
+#viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+#viewport.dragging {
+  cursor: grabbing;
+}
+
+#canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  /* Keep text sharp while zooming. */
+  will-change: transform;
+}
+
+#canvas svg {
+  display: block;
+}
+
+#toolbar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 4px;
+  background: var(--vscode-editorWidget-background);
+  border: 1px solid var(--vscode-editorWidget-border, transparent);
+  box-shadow: 0 2px 8px var(--vscode-widget-shadow, transparent);
+}
+
+#toolbar button {
+  min-width: 28px;
+  height: 24px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--vscode-foreground);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#toolbar button:hover {
+  background: var(--vscode-toolbar-hoverBackground);
+}
+
+#toolbar button:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+}
+
+#status {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  background: var(--vscode-inputValidation-errorBackground);
+  border: 1px solid var(--vscode-inputValidation-errorBorder, transparent);
+}
+
+#status[hidden] {
+  display: none;
+}

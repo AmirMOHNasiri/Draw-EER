@@ -1,0 +1,138 @@
+{
+  "name": "draw-eer",
+  "displayName": "Draw EER",
+  "description": "Write ER/EER diagrams as text and see them live in classic Chen notation. Persian (RTL) names supported.",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "publisher": "AmirMOHNasiri",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AmirMOHNasiri/draw-eer.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Visualization"
+  ],
+  "keywords": [
+    "ER diagram",
+    "EER",
+    "Chen notation",
+    "database",
+    "Persian"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onWebviewPanel:drawEer.preview"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "eer",
+        "aliases": [
+          "EER Diagram",
+          "eer"
+        ],
+        "extensions": [
+          ".eer"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/eer-file-light.svg",
+          "dark": "./icons/eer-file-dark.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "eer",
+        "scopeName": "source.eer",
+        "path": "./syntaxes/eer.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "drawEer.openPreview",
+        "title": "Open Preview",
+        "category": "Draw EER",
+        "icon": "$(open-preview)"
+      },
+      {
+        "command": "drawEer.openPreviewToSide",
+        "title": "Open Preview to the Side",
+        "category": "Draw EER",
+        "icon": "$(open-preview)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "drawEer.openPreviewToSide",
+          "when": "editorLangId == eer",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "drawEer.openPreview",
+          "when": "resourceExtname == .eer",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "drawEer.openPreview",
+          "when": "editorLangId == eer"
+        },
+        {
+          "command": "drawEer.openPreviewToSide",
+          "when": "editorLangId == eer"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "drawEer.openPreviewToSide",
+        "key": "ctrl+k v",
+        "mac": "cmd+k v",
+        "when": "editorLangId == eer"
+      },
+      {
+        "command": "drawEer.openPreview",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "editorLangId == eer"
+      }
+    ],
+    "configuration": {
+      "title": "Draw EER",
+      "properties": {
+        "drawEer.preview.updateDelay": {
+          "type": "number",
+          "default": 300,
+          "minimum": 0,
+          "description": "How long to wait after typing stops before redrawing the preview, in milliseconds."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p webview/tsconfig.json --noEmit",
+    "smoke": "node scripts/build.mjs && node scripts/smoke.mjs",
+    "check:webview": "node scripts/build.mjs && node scripts/webview-check.mjs"
+  },
+  "dependencies": {
+    "@draw-eer/core": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "1.90.0",
+    "esbuild": "0.28.2",
+    "vscode-oniguruma": "2.0.1",
+    "vscode-textmate": "9.3.2"
+  }
+}

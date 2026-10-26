@@ -1,0 +1,8 @@
+# Only dist/, the grammar, the language configuration, icons and the manifest ship.
+src/**
+webview/**
+test/**
+scripts/**
+node_modules/**
+tsconfig.json
+**/*.map

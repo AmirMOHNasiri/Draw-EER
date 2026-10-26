@@ -24,3 +24,10 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      # Builds the extension and checks that HarfBuzz loads in the extension
+      # host and in the preview's worker, as bundled.
+      - run: npm run build
+      - run: npm run smoke -w packages/vscode
+      # The real preview page in headless Chrome (preinstalled on the Linux runners).
+      - run: node packages/vscode/scripts/webview-check.mjs --require
+        if: runner.os == 'Linux'

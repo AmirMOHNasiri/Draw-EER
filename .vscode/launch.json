@@ -1,0 +1,18 @@
+{
+  // Press F5 to start a second VS Code window with the extension loaded from
+  // packages/vscode (built first by the "build extension" task).
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/packages/vscode",
+        "${workspaceFolder}/packages/core/test/fixtures"
+      ],
+      "outFiles": ["${workspaceFolder}/packages/vscode/dist/**/*.js"],
+      "preLaunchTask": "build extension"
+    }
+  ]
+}

@@ -4,8 +4,8 @@ Write ER/EER diagrams as text in `.eer` files and see them rendered live in VS C
 classic Chen notation used in database courses (Elmasri/Navathe style). Persian (RTL) names are
 fully supported.
 
-> **Status:** early development. The parser and the renderer for basic ER diagrams are done; the
-> VS Code extension is next.
+> **Status:** early development. The parser, layout and SVG renderer for basic ER diagrams and
+> the VS Code extension with a live preview work; EER constructs, dragging and export are next.
 
 ```
 entity Student {
@@ -25,12 +25,38 @@ rel Enroll {
 
 See [docs/language.md](docs/language.md) for the full language reference.
 
+## The VS Code extension
+
+- `.eer` files get syntax highlighting, bracket matching, comment toggling and completion
+  (statements, attribute flags after `:`, entity names, cardinalities and participation).
+- Syntax errors show as red squiggles and in the Problems panel, with "did you mean" hints.
+  Nothing else is checked: whatever parses is drawn.
+- **Open Preview to the Side** (the preview button in the editor title, or `Ctrl+K V`) shows the
+  diagram, redrawn as you type (after `drawEer.preview.updateDelay` ms, 300 by default). It follows
+  the color theme. Scroll to zoom around the pointer, drag to pan, double-click or `F` to fit,
+  `0` for actual size. Open previews come back when VS Code restarts.
+
+To try it from a clone: open the repository in VS Code and press `F5` ("Run Extension"), which
+builds `packages/vscode` and opens a window with the fixtures folder.
+
+**Where the work happens.** The extension host only parses (for the squiggles), which takes a few
+milliseconds. Layout and drawing run in a Web Worker inside the preview, so a large diagram never
+blocks the editor or other extensions, and while it is busy only the newest text waits. HarfBuzz
+needs care when bundled: `harfbuzzjs` loads its WebAssembly at import time with a top-level
+`await`, which esbuild cannot emit for the extension host (CommonJS) or the worker. The build
+replaces that one line with an explicit `loadHarfBuzz({ wasmBinary })` (see
+`packages/vscode/scripts/build.mjs`), and `npm run smoke -w packages/vscode` checks that HarfBuzz
+loads, as bundled, in both places. `npm run check:webview -w packages/vscode` goes further: it loads
+the real preview page, with its Content Security Policy, in headless Chrome or Chromium, and checks
+that it draws, loads the font, zooms, pans and fits. (It found that the worker inherits the page's
+policy, which must allow `'wasm-unsafe-eval'` for HarfBuzz to compile.)
+
 ## Repository layout
 
 | Path              | Contents                                                                |
 | ----------------- | ----------------------------------------------------------------------- |
 | `packages/core`   | Parser, model, layout and SVG renderer. No DOM or VS Code dependencies. |
-| `packages/vscode` | The VS Code extension (coming next).                                    |
+| `packages/vscode` | The VS Code extension: language support and the live preview.           |
 | `packages/web`    | Browser playground (planned).                                           |
 
 ## Development
