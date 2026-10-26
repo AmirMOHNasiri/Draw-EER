@@ -1,0 +1,8 @@
+// Slide 28: (min,max) notation.
+entity دانشجو
+entity درس
+rel انتخاب {
+  دانشجو (1,N) total
+  درس (0,M)
+  attrs { ترم, سال }
+}

@@ -1,0 +1,16 @@
+// Slide 32: the faculty example.
+entity کتاب
+entity درس
+weak entity "گروه درس" {
+  (شماره, "سال-ترم"): partial
+  روز
+  ساعات
+}
+entity دانشجو
+entity استاد
+
+rel "منبع اصلی" { درس 1 total, کتاب N }
+rel پیشنیازی { درس N, درس M }
+identifying rel دارد { درس 1, "گروه درس" N total }
+rel انتخاب { دانشجو M, "گروه درس" N, attrs { نمره } }
+rel "ارائه می‌شود" { "گروه درس" N total, استاد 1 }

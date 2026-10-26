@@ -1,0 +1,21 @@
+// Slide 33: C. J. Date's manufacturing example (basic ER part).
+entity Supplier { "S#": key, SNAME, STATUS }
+entity Part { "P#": key, PNAME, COLOR, WEIGHT }
+entity Project { "J#": key, JNAME }
+entity Employee { "E#": key, ENAME }
+entity City { CNAME: key }
+entity Warehouse { "W#": key }
+
+rel SPJ {
+  Supplier M
+  Part N
+  Project K
+  attrs { Quantity }
+}
+rel "P-P" { Part N as component, Part M as assembly, attrs { Quantity } }
+rel SC { Supplier N, City 1 }
+rel PW { Part N, Warehouse M, attrs { Quantity } }
+rel CW { City 1, Warehouse N }
+rel Manages { Project 1, Employee 1 }
+rel Works { Project 1, Employee N total }
+rel EW { Employee N, Warehouse 1 }

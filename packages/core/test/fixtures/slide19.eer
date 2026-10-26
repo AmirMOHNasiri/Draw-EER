@@ -1,0 +1,10 @@
+// Slide 19: two relationships between the same entities, and a repeated
+// entity for a unary relationship.
+entity دانشجو { نام, شماره: key }
+entity درس { عنوان, شماره: key, "تعداد واحد", نوع }
+
+rel انتخاب { دانشجو, درس }
+rel حذف { دانشجو, درس }
+
+show درس again as درس_تکراری
+rel پیشنیازی { درس_تکراری, درس_تکراری }

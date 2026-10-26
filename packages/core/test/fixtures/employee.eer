@@ -1,0 +1,50 @@
+// Every basic ER construct, in English.
+entity Employee {
+  ssn: key
+  passport: key2
+  name { first, middle, last }
+  phones: multi
+  age: derived
+  address: multi { city, street { name, number } }
+}
+
+entity Department {
+  number: key
+  dname
+  locations: multi
+}
+
+entity Project { (pnumber, year): key, budget }
+
+weak entity Dependent {
+  name: partial
+  birth_date
+  relationship
+}
+
+rel Works_For {
+  Employee N total
+  Department 1
+}
+
+rel Manages {
+  Employee 1
+  Department 1 total
+  attrs { start_date }
+}
+
+rel Works_On {
+  Employee (1,N) total
+  Project (1,M) total
+  attrs { hours }
+}
+
+identifying rel Dependents_Of {
+  Employee 1
+  Dependent N total
+}
+
+rel Supervision {
+  Employee 1 as supervisor
+  Employee N as supervisee
+}
