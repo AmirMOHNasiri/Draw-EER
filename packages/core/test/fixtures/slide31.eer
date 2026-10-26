@@ -1,0 +1,53 @@
+// Slide 31: the faculty example (محیط دانشکده). Many relationships per entity.
+entity دانشجو
+entity استاد
+entity درس
+entity "گروه آموزشی"
+entity کارمند
+
+show درس again as درس_۲
+show دانشجو again as دانشجو_۲
+
+// د.ا.د.: which professor teaches which course to which student, per term.
+rel "د.ا.د." {
+  دانشجو M
+  درس N
+  استاد 1
+  attrs { "سال-ترم": multi }
+}
+
+rel پیشنیازی { درس N, درس M }
+
+rel راهنمایی {
+  دانشجو N total
+  استاد 1
+  attrs { "ترم شروع" }
+}
+
+rel مدیریت {
+  استاد N
+  "گروه آموزشی" 1 total
+  attrs { مدت: derived, از, تا }
+}
+
+rel عضویت {
+  استاد N
+  "گروه آموزشی" 1
+  attrs { از }
+}
+
+rel مدعو {
+  استاد N
+  "گروه آموزشی" M
+  درس_۲ K
+  attrs { "ترم-سال" }
+}
+
+rel تحصیل { "گروه آموزشی" 1, دانشجو_۲ N }
+rel اشتغال { "گروه آموزشی" 1, کارمند N }
+
+rel مهمان {
+  دانشجو_۲ N
+  "گروه آموزشی" M
+  attrs { مبدا, "از ترم" }
+}

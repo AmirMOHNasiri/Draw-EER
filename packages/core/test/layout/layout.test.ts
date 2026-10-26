@@ -3,9 +3,10 @@ import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { buildDiagram, layoutDiagram, parse, sizeDiagram } from '../../src';
 import type { AttributeNode, SizedDiagram, TextMeasurer } from '../../src';
-import type { Point } from '../../src/geometry/shapes';
+import { contains, type Point, type Shape } from '../../src/geometry/shapes';
 import { createNodeMeasurer } from '../../src/node';
-import { boxAround, boxesOverlap, segmentHitsBox } from '../../src/geometry/collide';
+import { STYLE } from '../../src/render/style';
+import { boxAround, segmentHitsBox } from '../../src/geometry/collide';
 
 const fixturesDir = fileURLToPath(new URL('../fixtures/', import.meta.url));
 const fixtures = readdirSync(fixturesDir).filter((f) => f.endsWith('.eer'));
@@ -43,16 +44,20 @@ describe.each(fixtures)('layout of %s', (fixture) => {
     const ids = allIds(s);
     expect([...layout.keys()].sort()).toEqual([...ids].sort());
 
-    // Bounding boxes, shrunk a little so shapes that only touch do not count.
-    const boxes = ids.map((id) => {
-      const { width, height } = s.geometry.get(id)!.shape;
-      return { id, box: boxAround(layout.get(id)!, width, height, -2) };
-    });
+    // Real outlines, shrunk a little so shapes that only touch do not count.
     const overlaps: string[] = [];
-    for (let i = 0; i < boxes.length; i++) {
-      for (let j = i + 1; j < boxes.length; j++) {
-        if (boxesOverlap(boxes[i]!.box, boxes[j]!.box))
-          overlaps.push(`${boxes[i]!.id} / ${boxes[j]!.id}`);
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        const [a, b] = [ids[i]!, ids[j]!];
+        if (
+          shapesOverlap(
+            s.geometry.get(a)!.shape,
+            layout.get(a)!,
+            s.geometry.get(b)!.shape,
+            layout.get(b)!,
+          )
+        )
+          overlaps.push(`${a} / ${b}`);
       }
     }
     expect(overlaps).toEqual([]);
@@ -156,6 +161,62 @@ describe('grid structure', () => {
   });
 });
 
+describe('overall shape', () => {
+  const library = () => sized(readFileSync(fixturesDir + 'library.eer', 'utf8'));
+
+  it('lays a larger diagram out landscape, wider than tall', async () => {
+    const s = library();
+    const layout = layoutDiagram(s);
+    let [minX, maxX, minY, maxY] = [Infinity, -Infinity, Infinity, -Infinity];
+    for (const [id, p] of layout) {
+      const { width, height } = s.geometry.get(id)!.shape;
+      minX = Math.min(minX, p.x - width / 2);
+      maxX = Math.max(maxX, p.x + width / 2);
+      minY = Math.min(minY, p.y - height / 2);
+      maxY = Math.max(maxY, p.y + height / 2);
+    }
+    expect((maxX - minX) / (maxY - minY)).toBeGreaterThan(1.3);
+  });
+
+  it('gives most straight entity–relationship lines the same target length', async () => {
+    const s = library();
+    const layout = layoutDiagram(s);
+    const target = STYLE.layout.minLine;
+    const gaps: number[] = [];
+    for (const link of new Map(
+      s.diagram.links.map((l) => [l.entity + l.relationship, l]),
+    ).values()) {
+      const [a, b] = [layout.get(link.entity)!, layout.get(link.relationship)!];
+      const [p, q] = [s.geometry.get(link.entity)!.shape, s.geometry.get(link.relationship)!.shape];
+      if (Math.abs(a.y - b.y) < 0.01) gaps.push(Math.abs(a.x - b.x) - (p.width + q.width) / 2);
+      else if (Math.abs(a.x - b.x) < 0.01)
+        gaps.push(Math.abs(a.y - b.y) - (p.height + q.height) / 2);
+    }
+    const even = gaps.filter((g) => g <= target * 1.2).length;
+    expect(even / gaps.length).toBeGreaterThanOrEqual(2 / 3);
+  });
+});
+
+describe('reading order', () => {
+  const above = (source: string, owner: string, names: string[]) => {
+    const layout = layoutDiagram(sized(source));
+    const o = layout.get(owner)!;
+    const points = names.map((n) => layout.get(`attr:${owner}/${n}`)!);
+    for (const p of points) expect(p.y).toBeLessThan(o.y);
+    return points.map((p) => p.x);
+  };
+
+  it('reads a row of attributes left to right for left-to-right names', async () => {
+    const xs = above('entity E { a, b }', 'entity:E', ['a', 'b']);
+    expect(xs[0]).toBeLessThan(xs[1]!);
+  });
+
+  it('reads a row of attributes right to left for Persian names', async () => {
+    const xs = above('entity الف { ب, پ }', 'entity:الف', ['ب', 'پ']);
+    expect(xs[0]).toBeGreaterThan(xs[1]!);
+  });
+});
+
 describe.each(fixtures)('lines in %s', (fixture) => {
   it('never run through an attribute', async () => {
     const s = sized(readFileSync(fixturesDir + fixture, 'utf8'));
@@ -167,7 +228,7 @@ describe.each(fixtures)('lines in %s', (fixture) => {
     }
     const hits: string[] = [];
     for (const link of s.diagram.links) {
-      if (counts.get(`${link.relationship}|${link.entity}`)! > 1) continue; // unary loops are drawn to corners
+      if (counts.get(`${link.relationship}|${link.entity}`)! > 1) continue; // unary loops are not center-to-center lines
       const from = layout.get(link.entity)!;
       const to = layout.get(link.relationship)!;
       for (const [id, p] of layout) {
@@ -175,6 +236,25 @@ describe.each(fixtures)('lines in %s', (fixture) => {
         const { width, height } = s.geometry.get(id)!.shape;
         if (segmentHitsBox(from, to, boxAround(p, width * 0.9, height * 0.9)))
           hits.push(`${link.id} / ${id}`);
+      }
+    }
+    expect(hits).toEqual([]);
+  });
+
+  it('never run through a shape they do not join', async () => {
+    const s = sized(readFileSync(fixturesDir + fixture, 'utf8'));
+    const layout = layoutDiagram(s);
+    const hits: string[] = [];
+    for (const link of s.diagram.links) {
+      if (link.entity === link.relationship) continue;
+      const from = layout.get(link.entity)!;
+      const to = layout.get(link.relationship)!;
+      for (const node of s.diagram.nodes) {
+        if (node.id === link.entity || node.id === link.relationship) continue;
+        const { width, height } = s.geometry.get(node.id)!.shape;
+        // Shrunk a little: a line may graze a corner.
+        if (segmentHitsBox(from, to, boxAround(layout.get(node.id)!, width * 0.8, height * 0.8)))
+          hits.push(`${link.id} / ${node.id}`);
       }
     }
     expect(hits).toEqual([]);
@@ -214,4 +294,33 @@ function cross(a: Point, b: Point, c: Point, d: Point): boolean {
   const side = (p: Point, q: Point, r: Point) =>
     (q.x - p.x) * (r.y - p.y) - (q.y - p.y) * (r.x - p.x);
   return side(c, d, a) * side(c, d, b) < -1e-6 && side(a, b, c) * side(a, b, d) < -1e-6;
+}
+
+/** Points around a shape's outline, pulled 2 px inward. */
+function outline(shape: Shape, center: Point): Point[] {
+  const a = shape.width / 2 - 2;
+  const b = shape.height / 2 - 2;
+  const points: Point[] = [];
+  for (let i = 0; i < 96; i++) {
+    const t = (i / 96) * 2 * Math.PI;
+    const [c, d] = [Math.cos(t), Math.sin(t)];
+    // Scale the direction so the point lands on the outline.
+    const scale =
+      shape.kind === 'ellipse'
+        ? 1
+        : shape.kind === 'diamond'
+          ? 1 / (Math.abs(c) + Math.abs(d))
+          : 1 / Math.max(Math.abs(c), Math.abs(d));
+    points.push({ x: center.x + a * c * scale, y: center.y + b * d * scale });
+  }
+  return points;
+}
+
+function shapesOverlap(p: Shape, pc: Point, q: Shape, qc: Point): boolean {
+  return (
+    contains(p, pc, qc) ||
+    contains(q, qc, pc) ||
+    outline(p, pc).some((point) => contains(q, qc, point)) ||
+    outline(q, qc).some((point) => contains(p, pc, point))
+  );
 }

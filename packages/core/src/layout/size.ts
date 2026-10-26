@@ -73,13 +73,13 @@ function nodeGeometry(node: MainNode, measurer: TextMeasurer): ElementGeometry {
 }
 
 function attributeGeometry(attribute: AttributeNode, measurer: TextMeasurer): ElementGeometry {
-  const { paddingX, minWidth, height, wrapWidth } = STYLE.attribute;
+  const { paddingX, paddingY, minWidth, height, wrapWidth } = STYLE.attribute;
   const label = textBlock(attribute.name, { size: STYLE.font.size }, measurer, wrapWidth);
   const extra = attribute.multivalued ? 2 * STYLE.doubleGap : 0;
   // An ellipse needs some room beyond the text width, or the text's
   // corners poke out of the curved sides.
   const width = Math.max(minWidth, label.width * 1.1 + 2 * paddingX);
-  const ellipseHeight = Math.max(height, label.height + 14);
+  const ellipseHeight = Math.max(height, label.height + 2 * paddingY);
   return {
     label,
     shape: { kind: 'ellipse', width: width + extra, height: ellipseHeight + extra },

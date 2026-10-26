@@ -1,0 +1,24 @@
+// An online shop, in English. Has a ternary relationship (Reviews), a recursive
+// one with roles (Subcategory) and a weak-entity chain (Customer → Order → Order Line).
+entity Customer {
+  id: key
+  name
+  email: key2
+  addresses: multi { street, city, zip }
+}
+entity Product { sku: key, title, price, rating: derived }
+entity Category { id: key, name }
+entity Seller { id: key, "store name" }
+
+weak entity Order { number: partial, date, total: derived }
+weak entity "Order Line" { line: partial, quantity }
+
+identifying rel Places { Customer 1, Order N total }
+identifying rel Contains { Order 1, "Order Line" N total }
+
+rel Of { "Order Line" N total, Product 1 }
+rel "Belongs to" { Product N, Category M }
+rel Subcategory { Category 1 as parent, Category N as child }
+rel Offers { Seller M, Product N, attrs { price, stock } }
+rel Reviews { Customer M, Product N, Seller K, attrs { stars, text } }
+rel Wishlist { Customer M, Product N }

@@ -1,0 +1,29 @@
+// رزرو بلیت هواپیما (airline reservations), in Persian. Has a ternary relationship
+// (رزرو), a recursive one with roles (همراه), two relationships between the same
+// pair (مبدا, مقصد) and a weak-entity chain (پرواز → پرواز روزانه → صندلی).
+entity فرودگاه { کد: key, نام, شهر }
+entity هواپیما { "شماره ثبت": key, مدل, ظرفیت }
+entity مسافر {
+  "کد ملی": key
+  نام { "نام کوچک", "نام خانوادگی" }
+  تلفن: multi
+}
+entity پرواز { "شماره پرواز": key, "شرکت هواپیمایی" }
+weak entity "پرواز روزانه" { تاریخ: partial, وضعیت }
+weak entity صندلی { "شماره صندلی": partial, کلاس }
+
+identifying rel اجرا { پرواز 1, "پرواز روزانه" N total }
+identifying rel دارای { "پرواز روزانه" 1, صندلی N total }
+
+rel مبدا { پرواز N total, فرودگاه 1 }
+rel مقصد { پرواز N total, فرودگاه 1 }
+rel تخصیص { "پرواز روزانه" N, هواپیما 1 }
+
+rel رزرو {
+  مسافر M
+  "پرواز روزانه" N
+  صندلی 1
+  attrs { "تاریخ رزرو", قیمت }
+}
+
+rel همراه { مسافر 1 as سرپرست, مسافر N as همراه }

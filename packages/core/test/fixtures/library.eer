@@ -28,7 +28,7 @@ entity بخش {
   موقعیت
 }
 
-weak entity قفسه
+weak entity قفسه { "شماره قفسه": partial }
 weak entity ردیف { "شماره ردیف": partial }
 
 rel امانت {
@@ -56,9 +56,4 @@ rel "قرار دارد" {
 
 identifying rel شامل { بخش 1, قفسه N total }
 
-// In the reference, «شماره قفسه» hangs off this relationship rather than off قفسه.
-identifying rel شامل {
-  قفسه 1
-  ردیف N total
-  attrs { "شماره قفسه": partial }
-}
+identifying rel شامل { قفسه 1, ردیف N total }

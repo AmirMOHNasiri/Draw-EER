@@ -19,11 +19,13 @@
     "build": "npm run build --workspaces --if-present",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:update-snapshots": "vitest run --update",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "render": "tsx packages/core/scripts/render.ts"
+    "render": "tsx packages/core/scripts/render.ts",
+    "bench": "tsx packages/core/scripts/bench.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

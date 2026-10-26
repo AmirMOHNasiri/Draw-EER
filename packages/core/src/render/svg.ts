@@ -1,5 +1,5 @@
 import type { Point, Shape } from '../geometry/shapes';
-import { add, exitPoint, normal } from '../geometry/shapes';
+import { add, exitPoint, normal, unaryLineEnds } from '../geometry/shapes';
 import {
   boxAround,
   boxesOverlap,
@@ -17,6 +17,7 @@ import type {
   RelationshipNode,
 } from '../model/types';
 import type { KeyKind } from '../syntax/ast';
+import { isRightToLeft } from '../text/direction';
 import type { FontData } from '../text/measure';
 import { base64 } from './base64';
 import { STYLE } from './style';
@@ -236,23 +237,22 @@ class SvgRenderer {
               ),
             );
 
-      const unary = links.length === 2;
       links.forEach((link, i) => {
         const [start, end] = segments[i]!;
         if (link.participation === 'total') {
           const n = normal(start, end);
           const half = STYLE.doubleGap / 2;
           for (const side of [-half, half]) {
-            const [from, to] = this.clipped(link, add(start, n, side), add(end, n, side));
-            // Into a diamond's corner, both strokes meet at the corner itself.
-            this.addLine(from, unary ? end : to);
+            this.addLine(...this.clipped(link, add(start, n, side), add(end, n, side)));
           }
         } else {
           this.addLine(start, end);
         }
+        // On a unary loop, a role name goes outside the loop, away from the other line.
+        const other = links.length === 2 ? segments[1 - i]! : null;
         pending.push(() => {
           if (link.cardinality !== null) this.cardinalityLabel(link.cardinality, start, end, link);
-          if (link.role !== null) this.roleLabel(link.role, start, end);
+          if (link.role !== null) this.roleLabel(link.role, start, end, other);
         });
       });
     }
@@ -272,26 +272,14 @@ class SvgRenderer {
     ];
   }
 
-  /**
-   * The two lines of a unary (recursive) relationship. They leave the entity
-   * from two separate points and end at two opposite corners of the diamond
-   * (top and bottom when the diamond is beside the entity, left and right
-   * when it is above or below), so they form a visible loop and cannot be
-   * mistaken for the double line of total participation.
-   */
+  /** The two lines of a unary (recursive) relationship (see `unaryLineEnds`). */
   private unarySegments(entityId: string, relId: string): [Point, Point][] {
-    const entity = this.position(entityId);
-    const rel = this.position(relId);
-    const entityShape = this.geometry(entityId).shape;
-    const { width, height } = this.geometry(relId).shape;
-    const sideways = Math.abs(rel.x - entity.x) >= Math.abs(rel.y - entity.y);
-    const n = sideways ? { x: 0, y: 1 } : { x: 1, y: 0 };
-    const spread = (sideways ? entityShape.height : entityShape.width) * 0.25;
-    return [-1, 1].map((sign) => {
-      const corner = add(rel, n, (sign * (sideways ? height : width)) / 2);
-      const from = add(entity, n, sign * spread);
-      return [exitPoint(entityShape, entity, from, corner), corner];
-    });
+    return unaryLineEnds(
+      this.geometry(entityId).shape,
+      this.position(entityId),
+      this.geometry(relId).shape,
+      this.position(relId),
+    );
   }
 
   /**
@@ -339,8 +327,14 @@ class SvgRenderer {
     this.plainLabel(text, center, width, height);
   }
 
-  /** A role name beside its line, past the middle toward the relationship, wherever it fits. */
-  private roleLabel(text: string, start: Point, end: Point): void {
+  /**
+   * A role name beside its line, past the middle toward the relationship,
+   * wherever it fits. On a unary loop (`other` is the loop's other line) it
+   * always goes on the outer side, next to its own line: inside the loop it
+   * would be ambiguous which line it names. If that side is busy, it moves
+   * along the line and then a little further out, but never inside.
+   */
+  private roleLabel(text: string, start: Point, end: Point, other: [Point, Point] | null): void {
     const size = STYLE.font.smallSize;
     const width = this.sized.measurer.width(text, { size });
     const height = size * STYLE.label.heightEm;
@@ -349,12 +343,23 @@ class SvgRenderer {
     const left = { x: d.y, y: -d.x };
     const across = (Math.abs(left.x) * width) / 2 + (Math.abs(left.y) * height) / 2 + 5;
 
+    let sides = [1, -1];
+    let extra = [0];
+    if (other) {
+      const middle = { x: (other[0].x + other[1].x) / 2, y: (other[0].y + other[1].y) / 2 };
+      const towardOther = (middle.x - start.x) * left.x + (middle.y - start.y) * left.y;
+      sides = [towardOther > 0 ? -1 : 1];
+      extra = [0, 8, 16, 28];
+    }
     let best: { center: Point; hits: number } | null = null;
-    for (const t of [0.6, 0.5, 0.7, 0.4, 0.8]) {
-      for (const side of [1, -1]) {
-        const center = add(add(start, d, length * t), left, side * across);
-        const hits = this.collisions(boxAround(center, width, height, 1.5));
-        if (best === null || hits < best.hits) best = { center, hits };
+    for (const out of extra) {
+      for (const t of other ? [0.6, 0.5, 0.7, 0.4, 0.8, 0.3, 0.2] : [0.6, 0.5, 0.7, 0.4, 0.8]) {
+        for (const side of sides) {
+          const center = add(add(start, d, length * t), left, side * (across + out));
+          const hits = this.collisions(boxAround(center, width, height, 1.5));
+          if (best === null || hits < best.hits) best = { center, hits };
+        }
+        if (best?.hits === 0) break;
       }
       if (best?.hits === 0) break;
     }
@@ -496,8 +501,7 @@ function ellipse(c: Point, rx: number, ry: number, cls: string): string {
 
 /** Right-to-left text gets `direction="rtl"` so neutral characters order correctly. */
 function direction(text: string): string {
-  const firstStrong = /[\p{L}\p{N}]/u.exec(text)?.[0] ?? '';
-  return /[֐-ࣿיִ-﷿ﹰ-\uFEFF]/u.test(firstStrong) ? ' direction="rtl"' : '';
+  return isRightToLeft(text) ? ' direction="rtl"' : '';
 }
 
 function fontFaces(fonts: FontData): string {

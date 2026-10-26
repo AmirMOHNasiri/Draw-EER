@@ -19,13 +19,15 @@ import type { AttributeNode, Diagram } from '../model/types';
  *   shape with two lines gets them opposite each other (a straight chain);
  * - cells next to unrelated shapes cost a little, which leaves room for
  *   attributes, and cells far from the rest cost a little, which keeps the
- *   drawing compact.
+ *   drawing compact;
+ * - the drawing pays for its area and for not being landscape (diagrams
+ *   end up in slides and reports), both while it grows and when finished.
  *
  * The greedy pass runs from a few different starting shapes. Each result is
  * then improved by rotating whole branches (parts of the diagram that hang
  * off a single line) around the shape they hang from, which folds long
- * chains into a compact drawing while keeping their lines straight. The
- * cheapest result wins. Cells become pixel positions later (see layout.ts).
+ * chains into a compact drawing while keeping their lines straight, and by
+ * turning the whole drawing. The cheapest result wins. Cells become pixel positions later (see layout.ts).
  */
 
 export interface Cell {
@@ -66,12 +68,21 @@ const COST = {
   crowding: 4,
   distance: 0.5,
   /** Per grid cell of the bounding box, for the finished drawing. */
-  area: 3,
-  /** Per unit of width/height ratio beyond `maxAspect` (either way). */
-  aspect: 30,
-  maxAspect: 1.8,
+  area: 2,
+  /**
+   * The finished drawing should be landscape, like the slides and reports
+   * diagrams end up in: between `minAspect` and `maxAspect` (width / height,
+   * estimated from the grid). Each unit of ratio outside that costs `tall`
+   * or `wide`; too tall is worse.
+   */
+  aspect: { minAspect: 1.5, maxAspect: 2.2, tall: 120, wide: 40 },
+  /**
+   * A vertical line costs this much more than a horizontal one, so that when
+   * nothing else decides, chains run left to right.
+   */
+  vertical: 2,
   /** Grid columns are wider than rows (shapes are wide), roughly by this factor. */
-  columnWidth: 1.6,
+  columnWidth: 1.2,
   /** Per degree that the widest gap between a shape's lines falls short of what its attributes need. */
   room: 1.5,
   /** Degrees of open angle each attribute (nested ones included) needs, up to `maxRoom`. */
@@ -79,16 +90,21 @@ const COST = {
   maxRoom: 270,
 };
 
-/** Grid cells for every node in each connected part of the diagram. */
-export function placeOnGrid(diagram: Diagram): Map<string, Cell>[] {
+/**
+ * Grid cells for every node in each connected part of the diagram. `quick`
+ * (for very large diagrams) tries one starting shape instead of four and
+ * fewer rounds of rotation.
+ */
+export function placeOnGrid(diagram: Diagram, quick = false): Map<string, Cell>[] {
   const graph = new Graph(diagram);
   return graph.components().map((component) => {
     let best: { cells: Map<string, Cell>; cost: number } | null = null;
-    for (const root of graph.roots(component)) {
+    for (const root of graph.roots(component).slice(0, quick ? 1 : 4)) {
       const cells = improveByRotation(
         graph,
         component,
         new GreedyPlacer(graph, component).run(root),
+        quick ? 2 : 8,
       );
       const cost = totalCost(graph, cells);
       if (best === null || cost < best.cost) best = { cells, cost };
@@ -287,6 +303,11 @@ class GreedyPlacer {
     }
     const n = this.cells.size;
     cost += COST.distance * (Math.abs(cell.col - sumCol / n) + Math.abs(cell.row - sumRow / n));
+
+    // Keep the drawing landscape as it grows, so that long chains fold
+    // here already (a chain inside a cycle cannot be folded afterwards).
+    const placed = [...this.cells.values()];
+    cost += shapeCost([...placed, cell]) - shapeCost(placed);
     return cost;
   }
 
@@ -352,35 +373,44 @@ function totalCost(graph: Graph, cells: Map<string, Cell>): number {
     }
     cost += roomCost(arms, graph.attributes.get(id)!);
   }
-  // Compact, and neither very wide nor very tall.
-  const cols = [...cells.values()].map((c) => c.col);
-  const rows = [...cells.values()].map((c) => c.row);
+  return cost + shapeCost([...cells.values()]);
+}
+
+/** Cost of the drawing's overall shape: its area, and how far it is from landscape. */
+function shapeCost(cells: Cell[]): number {
+  const cols = cells.map((c) => c.col);
+  const rows = cells.map((c) => c.row);
   const width = Math.max(...cols) - Math.min(...cols) + 1;
   const height = Math.max(...rows) - Math.min(...rows) + 1;
-  cost += COST.area * width * height;
   // The shape of the drawing only matters once it has a few shapes: a lone
   // binary relationship is naturally one short horizontal line.
   const ratio = (width * COST.columnWidth) / height;
-  const weight = Math.min(1, Math.max(0, (cells.size - 3) / 6));
-  cost += weight * COST.aspect * Math.max(0, ratio - COST.maxAspect, 1 / ratio - COST.maxAspect);
-  return cost;
+  const weight = Math.min(1, Math.max(0, (cells.length - 3) / 6));
+  const { minAspect, maxAspect, tall, wide } = COST.aspect;
+  return (
+    COST.area * width * height +
+    weight * (tall * Math.max(0, minAspect - ratio) + wide * Math.max(0, ratio - maxAspect))
+  );
 }
 
 /**
  * Local search: for every line whose removal splits the diagram in two
  * (a "bridge"), try rotating the smaller side by 90°, 180° and 270° around
- * the shape on the other end of the line. Keep any rotation that lowers the
- * total cost, and repeat until nothing improves.
+ * the shape on the other end of the line; also try turning the whole
+ * drawing (which only changes its aspect ratio and how many lines are
+ * vertical). Keep any rotation that lowers the total cost, and repeat until
+ * nothing improves.
  */
 function improveByRotation(
   graph: Graph,
   component: string[],
   start: Map<string, Cell>,
+  rounds: number,
 ): Map<string, Cell> {
   let cells = start;
   let cost = totalCost(graph, cells);
-  const bridges = findBridges(graph, component);
-  for (let round = 0; round < 8; round++) {
+  const bridges = [{ pivot: component[0]!, branch: component }, ...findBridges(graph, component)];
+  for (let round = 0; round < rounds; round++) {
     let improved = false;
     for (const { pivot, branch } of bridges) {
       for (const turns of [1, 2, 3]) {
@@ -472,7 +502,8 @@ function roomCost(arms: Cell[], attributes: number): number {
 function lineCost(a: Cell, b: Cell): number {
   const dc = Math.abs(a.col - b.col);
   const dr = Math.abs(a.row - b.row);
-  if (dc === 0 || dr === 0) return COST.extraLength * (dc + dr - 1);
+  if (dc === 0) return COST.extraLength * (dr - 1) + COST.vertical;
+  if (dr === 0) return COST.extraLength * (dc - 1);
   if (dc === dr) return COST.diagonal + COST.extraLength * (dc - 1);
   return COST.otherAngle + COST.extraLength * (dc + dr);
 }

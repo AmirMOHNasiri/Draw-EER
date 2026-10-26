@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 1134.38 816.5" width="1134.38" height="816.5">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="1134.38" height="816.5" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="339.04" y1="660.53" x2="309.3" y2="664.45"/>
+<line class="line" x1="361.49" y1="676.7" x2="309.48" y2="717.34"/>
+<line class="line" x1="398.4" y1="676.7" x2="407.67" y2="705.23"/>
+<line class="line" x1="565.62" y1="398.53" x2="478.58" y2="481.13"/>
+<line class="line" x1="583.26" y1="398.53" x2="550.19" y2="513.88"/>
+<line class="line" x1="596.67" y1="398.53" x2="640.98" y2="548.1"/>
+<line class="line" x1="613.67" y1="398.53" x2="699.99" y2="481.89"/>
+<line class="line" x1="207.93" y1="398.53" x2="161.26" y2="445.2"/>
+<line class="line" x1="238.18" y1="398.53" x2="247.2" y2="427.14"/>
+<line class="line" x1="173.81" y1="92.35" x2="144.14" y2="87.92"/>
+<line class="line" x1="197.46" y1="77.89" x2="143.07" y2="40.5"/>
+<line class="line" x1="749.19" y1="676.7" x2="752.85" y2="706.48"/>
+<line class="line" x1="985.42" y1="361.73" x2="1014.71" y2="355.24"/>
+<line class="line" x1="388.12" y1="346.33" x2="385.24" y2="316.47"/>
+<line class="line" x1="545.42" y1="224.34" x2="515.65" y2="220.69"/>
+<line class="line" x1="741.63" y1="349.42" x2="732.6" y2="320.81"/>
+<line class="line" x1="390.93" y1="630.7" x2="390.93" y2="406.33"/>
+<line class="line" x1="539.86" y1="375.53" x2="444.93" y2="375.53"/>
+<line class="line" x1="280.93" y1="375.53" x2="336.93" y2="375.53"/>
+<line class="line" x1="559.44" y1="352.53" x2="557.46" y2="242.12"/>
+<line class="line" x1="620.27" y1="352.53" x2="622.26" y2="242.12"/>
+<line class="line" x1="442.82" y1="653.7" x2="515.59" y2="653.7"/>
+<line class="line" x1="696.37" y1="653.7" x2="623.59" y2="653.7"/>
+<line class="line" x1="639.86" y1="375.53" x2="695.86" y2="375.53"/>
+<line class="line" x1="860.95" y1="375.53" x2="803.86" y2="375.53"/>
+<line class="line" x1="796.37" y1="653.7" x2="869.19" y2="653.7"/>
+<line class="line" x1="923.19" y1="398.53" x2="923.19" y2="622.9"/>
+<line class="line" x1="230.93" y1="352.53" x2="230.93" y2="241.49"/>
+<line class="line" x1="230.93" y1="123.89" x2="230.93" y2="179.89"/>
+<line class="line" x1="202.54" y1="352.53" x2="84.9" y2="257.23"/>
+<line class="line" x1="206.51" y1="123.89" x2="87.35" y2="220.41"/>
+<line class="line" x1="198.57" y1="123.89" x2="82.44" y2="217.95"/>
+<line class="line" x1="288.05" y1="100.89" x2="524.23" y2="100.89"/>
+<line class="line" x1="894.3" y1="352.53" x2="600.77" y2="118.83"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:Supplier">
+<rect class="shape" x="339.04" y="630.7" width="103.78" height="46" rx="5"/>
+<text x="390.93" y="659.14" font-size="16" font-weight="bold" text-anchor="middle">Supplier</text>
+</g>
+<g class="attribute" data-id="attr:entity:Supplier/S#">
+<ellipse class="shape" cx="273.17" cy="669.2" rx="37" ry="22"/>
+<text x="273.17" y="674.64" font-size="16" text-anchor="middle">S#</text>
+<line class="line" x1="263.49" y1="677.64" x2="282.85" y2="677.64" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:Supplier/SNAME">
+<ellipse class="shape" cx="284.95" cy="736.5" rx="50.01" ry="22"/>
+<text x="284.95" y="741.94" font-size="16" text-anchor="middle">SNAME</text>
+</g>
+<g class="attribute" data-id="attr:entity:Supplier/STATUS">
+<ellipse class="shape" cx="414.75" cy="727.02" rx="51.5" ry="22"/>
+<text x="414.75" y="732.46" font-size="16" text-anchor="middle">STATUS</text>
+</g>
+<g class="entity" data-id="entity:Part">
+<rect class="shape" x="539.86" y="352.53" width="100" height="46" rx="5"/>
+<text x="589.86" y="380.97" font-size="16" font-weight="bold" text-anchor="middle">Part</text>
+</g>
+<g class="attribute" data-id="attr:entity:Part/P#">
+<ellipse class="shape" cx="458.93" cy="499.77" rx="37" ry="22"/>
+<text x="458.93" y="505.21" font-size="16" text-anchor="middle">P#</text>
+<line class="line" x1="448.96" y1="508.21" x2="468.9" y2="508.21" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:Part/PNAME">
+<ellipse class="shape" cx="543.93" cy="535.71" rx="50.33" ry="22"/>
+<text x="543.93" y="541.15" font-size="16" text-anchor="middle">PNAME</text>
+</g>
+<g class="attribute" data-id="attr:entity:Part/COLOR">
+<ellipse class="shape" cx="647.43" cy="569.9" rx="47.72" ry="22"/>
+<text x="647.43" y="575.34" font-size="16" text-anchor="middle">COLOR</text>
+</g>
+<g class="attribute" data-id="attr:entity:Part/WEIGHT">
+<ellipse class="shape" cx="720.9" cy="502.07" rx="52.6" ry="22"/>
+<text x="720.9" y="507.51" font-size="16" text-anchor="middle">WEIGHT</text>
+</g>
+<g class="entity" data-id="entity:Project">
+<rect class="shape" x="180.93" y="352.53" width="100" height="46" rx="5"/>
+<text x="230.93" y="380.97" font-size="16" font-weight="bold" text-anchor="middle">Project</text>
+</g>
+<g class="attribute" data-id="attr:entity:Project/J#">
+<ellipse class="shape" cx="142.35" cy="464.11" rx="37" ry="22"/>
+<text x="142.35" y="469.55" font-size="16" text-anchor="middle">J#</text>
+<line class="line" x1="133.01" y1="472.55" x2="151.69" y2="472.55" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:Project/JNAME">
+<ellipse class="shape" cx="254.07" cy="448.93" rx="49.64" ry="22"/>
+<text x="254.07" y="454.37" font-size="16" text-anchor="middle">JNAME</text>
+</g>
+<g class="entity" data-id="entity:Employee">
+<rect class="shape" x="173.81" y="77.89" width="114.24" height="46" rx="5"/>
+<text x="230.93" y="106.33" font-size="16" font-weight="bold" text-anchor="middle">Employee</text>
+</g>
+<g class="attribute" data-id="attr:entity:Employee/E#">
+<ellipse class="shape" cx="108.25" cy="82.55" rx="37" ry="22"/>
+<text x="108.25" y="87.99" font-size="16" text-anchor="middle">E#</text>
+<line class="line" x1="98.78" y1="90.99" x2="117.73" y2="90.99" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:Employee/ENAME">
+<ellipse class="shape" cx="116.15" cy="22" rx="49.78" ry="22"/>
+<text x="116.15" y="27.44" font-size="16" text-anchor="middle">ENAME</text>
+</g>
+<g class="entity" data-id="entity:City">
+<rect class="shape" x="696.37" y="630.7" width="100" height="46" rx="5"/>
+<text x="746.37" y="659.14" font-size="16" font-weight="bold" text-anchor="middle">City</text>
+</g>
+<g class="attribute" data-id="attr:entity:City/CNAME">
+<ellipse class="shape" cx="755.54" cy="728.45" rx="50.51" ry="22"/>
+<text x="755.54" y="733.89" font-size="16" text-anchor="middle">CNAME</text>
+<line class="line" x1="727.81" y1="736.89" x2="783.28" y2="736.89" stroke-width="1"/>
+</g>
+<g class="entity" data-id="entity:Warehouse">
+<rect class="shape" x="860.95" y="352.53" width="124.47" height="46" rx="5"/>
+<text x="923.19" y="380.97" font-size="16" font-weight="bold" text-anchor="middle">Warehouse</text>
+</g>
+<g class="attribute" data-id="attr:entity:Warehouse/W#">
+<ellipse class="shape" cx="1049.38" cy="347.55" rx="37" ry="22"/>
+<text x="1049.38" y="352.99" font-size="16" text-anchor="middle">W#</text>
+<line class="line" x1="1037.36" y1="355.99" x2="1061.4" y2="355.99" stroke-width="1"/>
+</g>
+<g class="relationship" data-id="rel:SPJ(Supplier,Part,Project)">
+<polygon class="shape" points="390.93,344.73 444.93,375.53 390.93,406.33 336.93,375.53"/>
+<text x="390.93" y="380.97" font-size="16" font-weight="bold" text-anchor="middle">SPJ</text>
+</g>
+<g class="attribute" data-id="attr:rel:SPJ(Supplier,Part,Project)/Quantity">
+<ellipse class="shape" cx="383.13" cy="294.49" rx="52.61" ry="22"/>
+<text x="383.13" y="299.93" font-size="16" text-anchor="middle">Quantity</text>
+</g>
+<g class="relationship" data-id="rel:P-P(Part,Part)">
+<polygon class="shape" points="589.86,199 643.86,229.8 589.86,260.6 535.86,229.8"/>
+<text x="589.86" y="235.24" font-size="16" font-weight="bold" text-anchor="middle">P-P</text>
+</g>
+<g class="attribute" data-id="attr:rel:P-P(Part,Part)/Quantity">
+<ellipse class="shape" cx="465.16" cy="214.49" rx="52.61" ry="22"/>
+<text x="465.16" y="219.93" font-size="16" text-anchor="middle">Quantity</text>
+</g>
+<g class="relationship" data-id="rel:SC(Supplier,City)">
+<polygon class="shape" points="569.59,622.9 623.59,653.7 569.59,684.5 515.59,653.7"/>
+<text x="569.59" y="659.14" font-size="16" font-weight="bold" text-anchor="middle">SC</text>
+</g>
+<g class="relationship" data-id="rel:PW(Part,Warehouse)">
+<polygon class="shape" points="749.86,344.73 803.86,375.53 749.86,406.33 695.86,375.53"/>
+<text x="749.86" y="380.97" font-size="16" font-weight="bold" text-anchor="middle">PW</text>
+</g>
+<g class="attribute" data-id="attr:rel:PW(Part,Warehouse)/Quantity">
+<ellipse class="shape" cx="725.73" cy="299" rx="52.61" ry="22"/>
+<text x="725.73" y="304.44" font-size="16" text-anchor="middle">Quantity</text>
+</g>
+<g class="relationship" data-id="rel:CW(City,Warehouse)">
+<polygon class="shape" points="923.19,622.9 977.19,653.7 923.19,684.5 869.19,653.7"/>
+<text x="923.19" y="659.14" font-size="16" font-weight="bold" text-anchor="middle">CW</text>
+</g>
+<g class="relationship" data-id="rel:Manages(Project,Employee)">
+<polygon class="shape" points="230.93,179.89 313.03,210.69 230.93,241.49 148.83,210.69"/>
+<text x="230.93" y="216.13" font-size="16" font-weight="bold" text-anchor="middle">Manages</text>
+</g>
+<g class="relationship" data-id="rel:Works(Project,Employee)">
+<polygon class="shape" points="61.41,207.41 122.83,238.21 61.41,269.01 0,238.21"/>
+<text x="61.41" y="243.65" font-size="16" font-weight="bold" text-anchor="middle">Works</text>
+</g>
+<g class="relationship" data-id="rel:EW(Employee,Warehouse)">
+<polygon class="shape" points="578.23,70.09 632.23,100.89 578.23,131.69 524.23,100.89"/>
+<text x="578.23" y="106.33" font-size="16" font-weight="bold" text-anchor="middle">EW</text>
+</g>
+</g>
+<g class="labels">
+<rect class="knockout" x="381.38" y="541.67" width="19.1" height="21"/>
+<text x="390.93" y="557.27" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="498.28" y="365.03" width="16.7" height="21"/>
+<text x="506.63" y="380.63" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="292.82" y="365.03" width="15.41" height="21"/>
+<text x="300.53" y="380.63" font-size="15" text-anchor="middle">K</text>
+<rect class="knockout" x="550.4" y="303.38" width="16.7" height="21"/>
+<text x="558.75" y="318.98" font-size="15" text-anchor="middle">N</text>
+<text x="515.15" y="292.16" font-size="15" text-anchor="middle" font-style="italic">component</text>
+<rect class="knockout" x="611.42" y="303.38" width="19.1" height="21"/>
+<text x="620.97" y="318.98" font-size="15" text-anchor="middle">M</text>
+<text x="658.94" y="269.97" font-size="15" text-anchor="middle" font-style="italic">assembly</text>
+<rect class="knockout" x="459.94" y="643.2" width="16.7" height="21"/>
+<text x="468.29" y="658.8" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="663.68" y="643.2" width="14.43" height="21"/>
+<text x="670.89" y="658.8" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="651.11" y="365.03" width="16.7" height="21"/>
+<text x="659.46" y="380.63" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="831.42" y="365.03" width="19.1" height="21"/>
+<text x="840.97" y="380.63" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="814.64" y="643.2" width="14.43" height="21"/>
+<text x="821.85" y="658.8" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="914.84" y="466.56" width="16.7" height="21"/>
+<text x="923.19" y="482.16" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="223.71" y="303.16" width="14.43" height="21"/>
+<text x="230.93" y="318.76" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="223.71" y="132.99" width="14.43" height="21"/>
+<text x="230.93" y="148.59" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="154.15" y="308.67" width="14.43" height="21"/>
+<text x="161.36" y="324.27" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="153.01" y="146.74" width="16.7" height="21"/>
+<text x="161.36" y="162.34" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="362.36" y="90.39" width="16.7" height="21"/>
+<text x="370.71" y="105.99" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="784.35" y="260.23" width="14.43" height="21"/>
+<text x="791.56" y="275.83" font-size="15" text-anchor="middle">1</text>
+</g>
+</svg>

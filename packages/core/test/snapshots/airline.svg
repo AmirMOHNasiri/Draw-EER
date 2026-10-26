@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 1388.68 732.91" width="1388.68" height="732.91">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="1388.68" height="732.91" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="251.57" y1="105.96" x2="278.18" y2="92.1"/>
+<line class="line" x1="215.31" y1="105.96" x2="236.79" y2="43.55"/>
+<line class="line" x1="191.58" y1="105.96" x2="174.59" y2="81.23"/>
+<line class="line" x1="608.7" y1="111.51" x2="637.81" y2="104.25"/>
+<line class="line" x1="573.92" y1="100.98" x2="610.35" y2="45.94"/>
+<line class="line" x1="547.73" y1="100.98" x2="534.81" y2="73.9"/>
+<line class="line" x1="881.49" y1="214.2" x2="998.65" y2="188.22"/>
+<line class="line" x1="881.49" y1="220.47" x2="1110.43" y2="198.42"/>
+<line class="line" x1="1181.27" y1="186.67" x2="1204.6" y2="181.07"/>
+<line class="line" x1="1180.89" y1="203.68" x2="1227.36" y2="215.7"/>
+<line class="line" x1="881.49" y1="228.34" x2="1001.27" y2="235.66"/>
+<line class="line" x1="212.07" y1="371.61" x2="218.05" y2="401.01"/>
+<line class="line" x1="157.39" y1="365.83" x2="129.02" y2="375.59"/>
+<line class="line" x1="602.65" y1="376.61" x2="737.59" y2="462.58"/>
+<line class="line" x1="582.61" y1="376.61" x2="709.91" y2="525.65"/>
+<line class="line" x1="886.49" y1="615.43" x2="915.84" y2="609.19"/>
+<line class="line" x1="886.49" y1="638.81" x2="915.84" y2="645.05"/>
+<line class="line" x1="870.38" y1="339.99" x2="899.67" y2="333.5"/>
+<line class="line" x1="867.43" y1="358.91" x2="896.27" y2="367.18"/>
+<line class="line" x1="257.39" y1="348.61" x2="313.39" y2="348.61"/>
+<line class="line" x1="497.57" y1="351.11" x2="437.19" y2="351.11"/>
+<line class="line" x1="497.57" y1="346.11" x2="437.19" y2="346.11"/>
+<line class="line" x1="558.7" y1="376.61" x2="558.7" y2="590.56"/>
+<line class="line" x1="776.49" y1="629.62" x2="618.41" y2="629.62"/>
+<line class="line" x1="776.49" y1="624.62" x2="618.41" y2="624.62"/>
+<line class="line" x1="204.89" y1="325.61" x2="204.89" y2="268.16"/>
+<line class="line" x1="209.89" y1="325.61" x2="209.89" y2="268.16"/>
+<line class="line" x1="207.39" y1="151.96" x2="207.39" y2="207.98"/>
+<line class="line" x1="174.32" y1="325.61" x2="89.14" y2="258.16"/>
+<line class="line" x1="182.37" y1="325.61" x2="93.87" y2="255.52"/>
+<line class="line" x1="178.35" y1="151.96" x2="91.5" y2="220.73"/>
+<line class="line" x1="558.7" y1="320.61" x2="558.7" y2="264.59"/>
+<line class="line" x1="558.7" y1="146.98" x2="558.7" y2="202.99"/>
+<line class="line" x1="831.49" y1="248.28" x2="831.49" y2="317.81"/>
+<line class="line" x1="619.83" y1="348.61" x2="777.49" y2="348.61"/>
+<line class="line" x1="831.49" y1="599.12" x2="831.49" y2="379.41"/>
+<line class="line" x1="800.93" y1="202.28" x2="799.09" y2="127.8"/>
+<line class="line" x1="862.06" y1="202.28" x2="863.89" y2="127.8"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:فرودگاه">
+<rect class="shape" x="157.39" y="105.96" width="100" height="46" rx="5"/>
+<text x="207.39" y="134.4" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">فرودگاه</text>
+</g>
+<g class="attribute" data-id="attr:entity:فرودگاه/کد">
+<ellipse class="shape" cx="306.02" cy="77.61" rx="37" ry="22"/>
+<text x="306.02" y="83.05" font-size="16" text-anchor="middle" direction="rtl">کد</text>
+<line class="line" x1="298.21" y1="86.05" x2="313.82" y2="86.05" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:فرودگاه/نام">
+<ellipse class="shape" cx="244.22" cy="22" rx="37" ry="22"/>
+<text x="244.22" y="27.44" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="attribute" data-id="attr:entity:فرودگاه/شهر">
+<ellipse class="shape" cx="160.59" cy="60.87" rx="37" ry="22"/>
+<text x="160.59" y="66.31" font-size="16" text-anchor="middle" direction="rtl">شهر</text>
+</g>
+<g class="entity" data-id="entity:هواپیما">
+<rect class="shape" x="508.7" y="100.98" width="100" height="46" rx="5"/>
+<text x="558.7" y="129.42" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">هواپیما</text>
+</g>
+<g class="attribute" data-id="attr:entity:هواپیما/شماره ثبت">
+<ellipse class="shape" cx="685.69" cy="92.32" rx="57" ry="22"/>
+<text x="685.69" y="97.76" font-size="16" text-anchor="middle" direction="rtl">شماره ثبت</text>
+<line class="line" x1="652.05" y1="100.76" x2="719.33" y2="100.76" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:هواپیما/مدل">
+<ellipse class="shape" cx="623.9" cy="25.47" rx="37" ry="22"/>
+<text x="623.9" y="30.91" font-size="16" text-anchor="middle" direction="rtl">مدل</text>
+</g>
+<g class="attribute" data-id="attr:entity:هواپیما/ظرفیت">
+<ellipse class="shape" cx="524.61" cy="52.5" rx="43.92" ry="22"/>
+<text x="524.61" y="57.94" font-size="16" text-anchor="middle" direction="rtl">ظرفیت</text>
+</g>
+<g class="entity" data-id="entity:مسافر">
+<rect class="shape" x="781.49" y="202.28" width="100" height="46" rx="5"/>
+<text x="831.49" y="230.72" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">مسافر</text>
+</g>
+<g class="attribute" data-id="attr:entity:مسافر/کد ملی">
+<ellipse class="shape" cx="1038.99" cy="179.28" rx="44.15" ry="22"/>
+<text x="1038.99" y="184.72" font-size="16" text-anchor="middle" direction="rtl">کد ملی</text>
+<line class="line" x1="1017.03" y1="187.72" x2="1060.94" y2="187.72" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:مسافر/نام">
+<ellipse class="shape" cx="1146.96" cy="194.9" rx="37" ry="22"/>
+<text x="1146.96" y="200.34" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:مسافر/نام/نام کوچک">
+<ellipse class="shape" cx="1251.39" cy="169.83" rx="54.41" ry="22"/>
+<text x="1251.39" y="175.27" font-size="16" text-anchor="middle" direction="rtl">نام کوچک</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:مسافر/نام/نام خانوادگی">
+<ellipse class="shape" cx="1277.88" cy="228.76" rx="62.8" ry="22"/>
+<text x="1277.88" y="234.2" font-size="16" text-anchor="middle" direction="rtl">نام خانوادگی</text>
+</g>
+<g class="attribute" data-id="attr:entity:مسافر/تلفن">
+<ellipse class="shape" cx="1043.08" cy="238.22" rx="42" ry="27"/>
+<ellipse class="outline" cx="1043.08" cy="238.22" rx="37" ry="22"/>
+<text x="1043.08" y="243.66" font-size="16" text-anchor="middle" direction="rtl">تلفن</text>
+</g>
+<g class="entity" data-id="entity:پرواز">
+<rect class="shape" x="157.39" y="325.61" width="100" height="46" rx="5"/>
+<text x="207.39" y="354.05" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">پرواز</text>
+</g>
+<g class="attribute" data-id="attr:entity:پرواز/شماره پرواز">
+<ellipse class="shape" cx="222.51" cy="422.94" rx="58.35" ry="22"/>
+<text x="222.51" y="428.38" font-size="16" text-anchor="middle" direction="rtl">شماره پرواز</text>
+<line class="line" x1="187.65" y1="431.38" x2="257.37" y2="431.38" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:پرواز/شرکت هواپیمایی">
+<ellipse class="shape" cx="79.28" cy="392.72" rx="79.28" ry="22"/>
+<text x="79.28" y="398.16" font-size="16" text-anchor="middle" direction="rtl">شرکت هواپیمایی</text>
+</g>
+<g class="entity" data-id="entity:پرواز روزانه">
+<rect class="shape" x="497.57" y="320.61" width="122.26" height="56" rx="5"/>
+<rect class="outline" x="502.57" y="325.61" width="112.26" height="46" rx="3"/>
+<text x="558.7" y="354.05" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">پرواز روزانه</text>
+</g>
+<g class="attribute" data-id="attr:entity:پرواز روزانه/تاریخ">
+<ellipse class="shape" cx="763" cy="478.76" rx="37.5" ry="22"/>
+<text x="763" y="484.2" font-size="16" text-anchor="middle" direction="rtl">تاریخ</text>
+<line class="line" x1="747.09" y1="487.2" x2="778.9" y2="487.2" stroke-width="1" stroke-dasharray="4 3"/>
+</g>
+<g class="attribute" data-id="attr:entity:پرواز روزانه/وضعیت">
+<ellipse class="shape" cx="727.39" cy="546.12" rx="47.68" ry="22"/>
+<text x="727.39" y="551.56" font-size="16" text-anchor="middle" direction="rtl">وضعیت</text>
+</g>
+<g class="entity" data-id="entity:صندلی">
+<rect class="shape" x="776.49" y="599.12" width="110" height="56" rx="5"/>
+<rect class="outline" x="781.49" y="604.12" width="100" height="46" rx="3"/>
+<text x="831.49" y="632.56" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">صندلی</text>
+</g>
+<g class="attribute" data-id="attr:entity:صندلی/شماره صندلی">
+<ellipse class="shape" cx="971.68" cy="597.32" rx="66.32" ry="22"/>
+<text x="971.68" y="602.76" font-size="16" text-anchor="middle" direction="rtl">شماره صندلی</text>
+<line class="line" x1="929.57" y1="605.76" x2="1013.79" y2="605.76" stroke-width="1" stroke-dasharray="4 3"/>
+</g>
+<g class="attribute" data-id="attr:entity:صندلی/کلاس">
+<ellipse class="shape" cx="952.83" cy="652.91" rx="39.61" ry="22"/>
+<text x="952.83" y="658.35" font-size="16" text-anchor="middle" direction="rtl">کلاس</text>
+</g>
+<g class="relationship" data-id="rel:اجرا(پرواز,پرواز روزانه)">
+<polygon class="shape" points="377.48,312.05 441.57,348.61 377.48,385.17 313.39,348.61"/>
+<polygon class="outline" points="377.48,317.81 431.48,348.61 377.48,379.41 323.48,348.61"/>
+<text x="377.48" y="354.05" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">اجرا</text>
+</g>
+<g class="relationship" data-id="rel:دارای(پرواز روزانه,صندلی)">
+<polygon class="shape" points="558.7,590.56 622.79,627.12 558.7,663.67 494.61,627.12"/>
+<polygon class="outline" points="558.7,596.32 612.7,627.12 558.7,657.92 504.7,627.12"/>
+<text x="558.7" y="632.56" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">دارای</text>
+</g>
+<g class="relationship" data-id="rel:مبدا(پرواز,فرودگاه)">
+<polygon class="shape" points="207.39,207.98 261.39,238.78 207.39,269.58 153.39,238.78"/>
+<text x="207.39" y="244.22" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">مبدا</text>
+</g>
+<g class="relationship" data-id="rel:مقصد(پرواز,فرودگاه)">
+<polygon class="shape" points="68.71,207.98 123.79,238.78 68.71,269.58 13.63,238.78"/>
+<text x="68.71" y="244.22" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">مقصد</text>
+</g>
+<g class="relationship" data-id="rel:تخصیص(پرواز روزانه,هواپیما)">
+<polygon class="shape" points="558.7,202.99 630.72,233.79 558.7,264.59 486.68,233.79"/>
+<text x="558.7" y="239.23" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">تخصیص</text>
+</g>
+<g class="relationship" data-id="rel:رزرو(مسافر,پرواز روزانه,صندلی)">
+<polygon class="shape" points="831.49,317.81 885.49,348.61 831.49,379.41 777.49,348.61"/>
+<text x="831.49" y="354.05" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">رزرو</text>
+</g>
+<g class="attribute" data-id="attr:rel:رزرو(مسافر,پرواز روزانه,صندلی)/تاریخ رزرو">
+<ellipse class="shape" cx="946.01" cy="323.22" rx="52.41" ry="22"/>
+<text x="946.01" y="328.66" font-size="16" text-anchor="middle" direction="rtl">تاریخ رزرو</text>
+</g>
+<g class="attribute" data-id="attr:rel:رزرو(مسافر,پرواز روزانه,صندلی)/قیمت">
+<ellipse class="shape" cx="932.04" cy="377.44" rx="40.44" ry="22"/>
+<text x="932.04" y="382.88" font-size="16" text-anchor="middle" direction="rtl">قیمت</text>
+</g>
+<g class="relationship" data-id="rel:همراه(مسافر,مسافر)">
+<polygon class="shape" points="831.49,84.68 885.49,115.48 831.49,146.28 777.49,115.48"/>
+<text x="831.49" y="120.92" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">همراه</text>
+</g>
+</g>
+<g class="labels">
+<rect class="knockout" x="269.77" y="338.11" width="14.43" height="21"/>
+<text x="276.99" y="353.71" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="469.62" y="338.11" width="16.7" height="21"/>
+<text x="477.97" y="353.71" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="551.49" y="440.99" width="14.43" height="21"/>
+<text x="558.7" y="456.59" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="714.35" y="616.62" width="16.7" height="21"/>
+<text x="722.7" y="632.22" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="199.04" y="295.5" width="16.7" height="21"/>
+<text x="207.39" y="311.1" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="200.17" y="161.07" width="14.43" height="21"/>
+<text x="207.39" y="176.67" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="139.6" y="291.04" width="16.7" height="21"/>
+<text x="147.95" y="306.64" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="140.74" y="165.53" width="14.43" height="21"/>
+<text x="147.95" y="181.13" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="550.35" y="290.5" width="16.7" height="21"/>
+<text x="558.7" y="306.1" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="551.49" y="156.08" width="14.43" height="21"/>
+<text x="558.7" y="171.68" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="821.95" y="262.12" width="19.1" height="21"/>
+<text x="831.49" y="277.72" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="666.66" y="338.11" width="16.7" height="21"/>
+<text x="675.01" y="353.71" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="824.28" y="511.72" width="14.43" height="21"/>
+<text x="831.49" y="527.32" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="793.07" y="165.71" width="14.43" height="21"/>
+<text x="800.29" y="181.31" font-size="15" text-anchor="middle">1</text>
+<text x="767.88" y="156.03" font-size="15" text-anchor="middle" font-style="italic" direction="rtl">سرپرست</text>
+<rect class="knockout" x="854.35" y="165.71" width="16.7" height="21"/>
+<text x="862.7" y="181.31" font-size="15" text-anchor="middle">N</text>
+<text x="885.46" y="163.24" font-size="15" text-anchor="middle" font-style="italic" direction="rtl">همراه</text>
+</g>
+</svg>

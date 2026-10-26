@@ -1,0 +1,223 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 1202.33 855.68" width="1202.33" height="855.68">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="1202.33" height="855.68" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="430.22" y1="396.18" x2="329.53" y2="271.83"/>
+<line class="line" x1="442.68" y1="396.18" x2="391.95" y2="206.86"/>
+<line class="line" x1="436.36" y1="396.18" x2="307.52" y2="158.9"/>
+<line class="line" x1="257.83" y1="128.56" x2="211.16" y2="117.36"/>
+<line class="line" x1="275.19" y1="118.63" x2="222.1" y2="69.99"/>
+<line class="line" x1="294.3" y1="115.75" x2="288.65" y2="43.98"/>
+<line class="line" x1="454.79" y1="396.18" x2="494.85" y2="241.27"/>
+<line class="line" x1="468.14" y1="396.18" x2="570.99" y2="273.61"/>
+<line class="line" x1="461.86" y1="396.18" x2="594.81" y2="161.18"/>
+<line class="line" x1="607.67" y1="108.14" x2="605.99" y2="84.2"/>
+<line class="line" x1="647.28" y1="115.06" x2="668.47" y2="103.8"/>
+<line class="line" x1="724.94" y1="70.95" x2="745.18" y2="58.05"/>
+<line class="line" x1="740.37" y1="90.61" x2="764.32" y2="92.07"/>
+<line class="line" x1="947.13" y1="396.18" x2="970.61" y2="377.5"/>
+<line class="line" x1="982.79" y1="414.66" x2="1012.72" y2="412.57"/>
+<line class="line" x1="982.79" y1="441.41" x2="1045.19" y2="462.9"/>
+<line class="line" x1="498.84" y1="717.68" x2="540.99" y2="733.23"/>
+<line class="line" x1="498.84" y1="710.03" x2="640.59" y2="740.63"/>
+<line class="line" x1="498.84" y1="689.06" x2="528.24" y2="683.08"/>
+<line class="line" x1="121.68" y1="693.62" x2="91.7" y2="692.57"/>
+<line class="line" x1="124.63" y1="723.92" x2="97.22" y2="736.12"/>
+<line class="line" x1="190.96" y1="723.92" x2="194.61" y2="753.7"/>
+<line class="line" x1="726.19" y1="619.03" x2="713.99" y2="646.43"/>
+<line class="line" x1="498.11" y1="571.67" x2="527.01" y2="579.69"/>
+<line class="line" x1="505.96" y1="416.68" x2="593.76" y2="416.68"/>
+<line class="line" x1="505.96" y1="421.68" x2="593.76" y2="421.68"/>
+<line class="line" x1="853.64" y1="419.18" x2="771.84" y2="419.18"/>
+<line class="line" x1="487.18" y1="442.18" x2="706.36" y2="573.69"/>
+<line class="line" x1="897.92" y1="442.18" x2="763.57" y2="571.45"/>
+<line class="line" x1="890.71" y1="442.18" x2="758.38" y2="569.5"/>
+<line class="line" x1="451.34" y1="442.18" x2="451.34" y2="528.08"/>
+<line class="line" x1="446.34" y1="442.18" x2="446.34" y2="528.08"/>
+<line class="line" x1="446.34" y1="676.23" x2="446.34" y2="587.94"/>
+<line class="line" x1="451.34" y1="676.23" x2="451.34" y2="587.94"/>
+<line class="line" x1="410.51" y1="442.18" x2="230.07" y2="550.44"/>
+<line class="line" x1="185.02" y1="667.92" x2="185.02" y2="611.31"/>
+<line class="line" x1="190.02" y1="667.92" x2="190.02" y2="611.31"/>
+<line class="line" x1="391.72" y1="403.84" x2="274.98" y2="400.7"/>
+<line class="line" x1="391.72" y1="434.52" x2="274.98" y2="437.66"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:Employee">
+<rect class="shape" x="391.72" y="396.18" width="114.24" height="46" rx="5"/>
+<text x="448.84" y="424.62" font-size="16" font-weight="bold" text-anchor="middle">Employee</text>
+</g>
+<g class="attribute" data-id="attr:entity:Employee/ssn">
+<ellipse class="shape" cx="313.48" cy="252.01" rx="37" ry="22"/>
+<text x="313.48" y="257.45" font-size="16" text-anchor="middle">ssn</text>
+<line class="line" x1="300.8" y1="260.45" x2="326.15" y2="260.45" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:Employee/passport">
+<ellipse class="shape" cx="386.09" cy="184.98" rx="54.85" ry="22"/>
+<text x="386.09" y="190.42" font-size="16" text-anchor="middle">passport</text>
+<line class="line" x1="354.41" y1="193.42" x2="417.77" y2="193.42" stroke-width="1"/>
+<line class="line" x1="354.41" y1="196.42" x2="417.77" y2="196.42" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:Employee/name">
+<ellipse class="shape" cx="296.03" cy="137.74" rx="42.03" ry="22"/>
+<text x="296.03" y="143.18" font-size="16" text-anchor="middle">name</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:Employee/name/first">
+<ellipse class="shape" cx="176.85" cy="109.12" rx="37" ry="22"/>
+<text x="176.85" y="114.56" font-size="16" text-anchor="middle">first</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:Employee/name/middle">
+<ellipse class="shape" cx="200.76" cy="50.43" rx="46.59" ry="22"/>
+<text x="200.76" y="55.87" font-size="16" text-anchor="middle">middle</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:Employee/name/last">
+<ellipse class="shape" cx="286.92" cy="22" rx="37" ry="22"/>
+<text x="286.92" y="27.44" font-size="16" text-anchor="middle">last</text>
+</g>
+<g class="attribute" data-id="attr:entity:Employee/phones">
+<ellipse class="shape" cx="501.78" cy="214.5" rx="53.88" ry="27"/>
+<ellipse class="outline" cx="501.78" cy="214.5" rx="48.88" ry="22"/>
+<text x="501.78" y="219.94" font-size="16" text-anchor="middle">phones</text>
+</g>
+<g class="attribute" data-id="attr:entity:Employee/age">
+<ellipse class="shape dashed" cx="587.51" cy="253.92" rx="37" ry="22"/>
+<text x="587.51" y="259.36" font-size="16" text-anchor="middle">age</text>
+</g>
+<g class="attribute" data-id="attr:entity:Employee/address">
+<ellipse class="shape" cx="609.55" cy="135.12" rx="56.36" ry="27"/>
+<ellipse class="outline" cx="609.55" cy="135.12" rx="51.36" ry="22"/>
+<text x="609.55" y="140.56" font-size="16" text-anchor="middle">address</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:Employee/address/city">
+<ellipse class="shape" cx="604.46" cy="62.21" rx="37" ry="22"/>
+<text x="604.46" y="67.65" font-size="16" text-anchor="middle">city</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:Employee/address/street">
+<ellipse class="shape" cx="698.13" cy="88.03" rx="42.53" ry="22"/>
+<text x="698.13" y="93.47" font-size="16" text-anchor="middle">street</text>
+</g>
+<g class="attribute" data-id="attr:attr:attr:entity:Employee/address/street/name">
+<ellipse class="shape" cx="771.86" cy="41.05" rx="42.03" ry="22"/>
+<text x="771.86" y="46.49" font-size="16" text-anchor="middle">name</text>
+</g>
+<g class="attribute" data-id="attr:attr:attr:entity:Employee/address/street/number">
+<ellipse class="shape" cx="813.86" cy="95.1" rx="50.02" ry="22"/>
+<text x="813.86" y="100.54" font-size="16" text-anchor="middle">number</text>
+</g>
+<g class="entity" data-id="entity:Department">
+<rect class="shape" x="853.64" y="396.18" width="129.15" height="46" rx="5"/>
+<text x="918.22" y="424.62" font-size="16" font-weight="bold" text-anchor="middle">Department</text>
+</g>
+<g class="attribute" data-id="attr:entity:Department/number">
+<ellipse class="shape" cx="994.81" cy="358.25" rx="50.02" ry="22"/>
+<text x="994.81" y="363.69" font-size="16" text-anchor="middle">number</text>
+<line class="line" x1="967.52" y1="366.69" x2="1022.1" y2="366.69" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:Department/dname">
+<ellipse class="shape" cx="1059.19" cy="409.32" rx="46.99" ry="22"/>
+<text x="1059.19" y="414.76" font-size="16" text-anchor="middle">dname</text>
+</g>
+<g class="attribute" data-id="attr:entity:Department/locations">
+<ellipse class="shape" cx="1093.34" cy="479.48" rx="60.99" ry="27"/>
+<ellipse class="outline" cx="1093.34" cy="479.48" rx="55.99" ry="22"/>
+<text x="1093.34" y="484.92" font-size="16" text-anchor="middle">locations</text>
+</g>
+<g class="entity" data-id="entity:Project">
+<rect class="shape" x="398.84" y="676.23" width="100" height="46" rx="5"/>
+<text x="448.84" y="704.67" font-size="16" font-weight="bold" text-anchor="middle">Project</text>
+</g>
+<g class="attribute" data-id="attr:entity:Project/pnumber">
+<ellipse class="shape" cx="581.41" cy="748.14" rx="54.96" ry="22"/>
+<text x="581.41" y="753.58" font-size="16" text-anchor="middle">pnumber</text>
+<line class="line" x1="549.63" y1="756.58" x2="613.19" y2="756.58" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:Project/year">
+<ellipse class="shape" cx="675.37" cy="748.14" rx="37" ry="22"/>
+<text x="675.37" y="753.58" font-size="16" text-anchor="middle">year</text>
+<line class="line" x1="660.33" y1="756.58" x2="690.41" y2="756.58" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:Project/budget">
+<ellipse class="shape" cx="571.53" cy="674.27" rx="47.24" ry="22"/>
+<text x="571.53" y="679.71" font-size="16" text-anchor="middle">budget</text>
+</g>
+<g class="entity" data-id="entity:Dependent">
+<rect class="shape" x="121.68" y="667.92" width="131.68" height="56" rx="5"/>
+<rect class="outline" x="126.68" y="672.92" width="121.68" height="46" rx="3"/>
+<text x="187.52" y="701.36" font-size="16" font-weight="bold" text-anchor="middle">Dependent</text>
+</g>
+<g class="attribute" data-id="attr:entity:Dependent/name">
+<ellipse class="shape" cx="49.76" cy="691.11" rx="42.03" ry="22"/>
+<text x="49.76" y="696.55" font-size="16" text-anchor="middle">name</text>
+<line class="line" x1="29.73" y1="699.55" x2="69.79" y2="699.55" stroke-width="1" stroke-dasharray="4 3"/>
+</g>
+<g class="attribute" data-id="attr:entity:Dependent/birth_date">
+<ellipse class="shape" cx="59.27" cy="753.02" rx="59.27" ry="22"/>
+<text x="59.27" y="758.46" font-size="16" text-anchor="middle">birth_date</text>
+</g>
+<g class="attribute" data-id="attr:entity:Dependent/relationship">
+<ellipse class="shape" cx="197.31" cy="775.68" rx="65.86" ry="22"/>
+<text x="197.31" y="781.12" font-size="16" text-anchor="middle">relationship</text>
+</g>
+<g class="relationship" data-id="rel:Works_For(Employee,Department)">
+<polygon class="shape" points="679.8,388.38 771.84,419.18 679.8,449.98 587.76,419.18"/>
+<text x="679.8" y="424.62" font-size="16" font-weight="bold" text-anchor="middle">Works_For</text>
+</g>
+<g class="relationship" data-id="rel:Manages(Employee,Department)">
+<polygon class="shape" points="737.94,561.84 820.04,592.64 737.94,623.44 655.84,592.64"/>
+<text x="737.94" y="598.08" font-size="16" font-weight="bold" text-anchor="middle">Manages</text>
+</g>
+<g class="attribute" data-id="attr:rel:Manages(Employee,Department)/start_date">
+<ellipse class="shape" cx="704.32" cy="668.14" rx="59.55" ry="22"/>
+<text x="704.32" y="673.58" font-size="16" text-anchor="middle">start_date</text>
+</g>
+<g class="relationship" data-id="rel:Works_On(Employee,Project)">
+<polygon class="shape" points="448.84,527.21 537.37,558.01 448.84,588.81 360.31,558.01"/>
+<text x="448.84" y="563.45" font-size="16" font-weight="bold" text-anchor="middle">Works_On</text>
+</g>
+<g class="attribute" data-id="attr:rel:Works_On(Employee,Project)/hours">
+<ellipse class="shape" cx="564.3" cy="590.03" rx="42.24" ry="22"/>
+<text x="564.3" y="595.47" font-size="16" text-anchor="middle">hours</text>
+</g>
+<g class="relationship" data-id="rel:Dependents_Of(Employee,Dependent)">
+<polygon class="shape" points="187.52,540.03 334.31,575.97 187.52,611.92 40.72,575.97"/>
+<polygon class="outline" points="187.52,545.17 313.29,575.97 187.52,606.77 61.74,575.97"/>
+<text x="187.52" y="581.41" font-size="16" font-weight="bold" text-anchor="middle">Dependents_Of</text>
+</g>
+<g class="relationship" data-id="rel:Supervision(Employee,Employee)">
+<polygon class="shape" points="234.48,388.38 335.72,419.18 234.48,449.98 133.24,419.18"/>
+<text x="234.48" y="424.62" font-size="16" font-weight="bold" text-anchor="middle">Supervision</text>
+</g>
+</g>
+<g class="labels">
+<line class="line" x1="537.44" y1="775.14" x2="704.97" y2="775.14"/>
+<rect class="knockout" x="526.24" y="408.68" width="16.7" height="21"/>
+<text x="534.59" y="424.28" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="817.8" y="408.68" width="14.43" height="21"/>
+<text x="825.01" y="424.28" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="556.67" y="477.71" width="14.43" height="21"/>
+<text x="563.89" y="493.31" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="840.43" y="476.58" width="14.43" height="21"/>
+<text x="847.64" y="492.18" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="429.68" y="461.44" width="38.34" height="21"/>
+<text x="448.84" y="477.04" font-size="15" text-anchor="middle">(1,N)</text>
+<rect class="knockout" x="428.48" y="635.14" width="40.73" height="21"/>
+<text x="448.84" y="650.74" font-size="15" text-anchor="middle">(1,M)</text>
+<rect class="knockout" x="340.14" y="469.57" width="14.43" height="21"/>
+<text x="347.35" y="485.17" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="179.17" y="637.82" width="16.7" height="21"/>
+<text x="187.52" y="653.42" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="343.65" y="392.24" width="14.43" height="21"/>
+<text x="350.86" y="407.84" font-size="15" text-anchor="middle">1</text>
+<text x="322.25" y="385.63" font-size="15" text-anchor="middle" font-style="italic">supervisor</text>
+<rect class="knockout" x="342.51" y="425.12" width="16.7" height="21"/>
+<text x="350.86" y="440.72" font-size="15" text-anchor="middle">N</text>
+<text x="322.25" y="462.96" font-size="15" text-anchor="middle" font-style="italic">supervisee</text>
+</g>
+</svg>

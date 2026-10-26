@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 757.33 400.2" width="757.33" height="400.2">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="757.33" height="400.2" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="103.87" y1="87.89" x2="73.9" y2="86.58"/>
+<line class="line" x1="105.65" y1="113.07" x2="78.57" y2="125.98"/>
+<line class="line" x1="502.4" y1="67.07" x2="519.61" y2="42.49"/>
+<line class="line" x1="536.29" y1="78.98" x2="565.58" y2="72.49"/>
+<line class="line" x1="536.29" y1="100.24" x2="600.97" y2="113.4"/>
+<line class="line" x1="517.95" y1="113.07" x2="600.47" y2="173.02"/>
+<line class="line" x1="203.87" y1="90.07" x2="259.87" y2="90.07"/>
+<line class="line" x1="436.29" y1="90.07" x2="380.29" y2="90.07"/>
+<line class="line" x1="192.21" y1="113.07" x2="293.77" y2="174.01"/>
+<line class="line" x1="447.96" y1="113.07" x2="346.4" y2="174.01"/>
+<line class="line" x1="100" y1="294.25" x2="170.37" y2="292.92"/>
+<line class="line" x1="100" y1="328.54" x2="170.37" y2="329.88"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:دانشجو">
+<rect class="shape" x="103.87" y="67.07" width="100" height="46" rx="5"/>
+<text x="153.87" y="95.51" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">دانشجو</text>
+</g>
+<g class="attribute" data-id="attr:entity:دانشجو/نام">
+<ellipse class="shape" cx="37" cy="84.97" rx="37" ry="22"/>
+<text x="37" y="90.41" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="attribute" data-id="attr:entity:دانشجو/شماره">
+<ellipse class="shape" cx="48.05" cy="140.54" rx="40.71" ry="22"/>
+<text x="48.05" y="145.98" font-size="16" text-anchor="middle" direction="rtl">شماره</text>
+<line class="line" x1="29.22" y1="148.98" x2="66.88" y2="148.98" stroke-width="1"/>
+</g>
+<g class="entity" data-id="entity:درس">
+<rect class="shape" x="436.29" y="67.07" width="100" height="46" rx="5"/>
+<text x="486.29" y="95.51" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">درس</text>
+</g>
+<g class="attribute" data-id="attr:entity:درس/عنوان">
+<ellipse class="shape" cx="533.96" cy="22" rx="39.46" ry="22"/>
+<text x="533.96" y="27.44" font-size="16" text-anchor="middle" direction="rtl">عنوان</text>
+</g>
+<g class="attribute" data-id="attr:entity:درس/شماره">
+<ellipse class="shape" cx="603.25" cy="64.14" rx="40.71" ry="22"/>
+<text x="603.25" y="69.58" font-size="16" text-anchor="middle" direction="rtl">شماره</text>
+<line class="line" x1="584.42" y1="72.58" x2="622.08" y2="72.58" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:درس/تعداد واحد">
+<ellipse class="shape" cx="651.78" cy="123.74" rx="57.55" ry="22"/>
+<text x="651.78" y="129.18" font-size="16" text-anchor="middle" direction="rtl">تعداد واحد</text>
+</g>
+<g class="attribute" data-id="attr:entity:درس/نوع">
+<ellipse class="shape" cx="623.9" cy="190.05" rx="37" ry="22"/>
+<text x="623.9" y="195.49" font-size="16" text-anchor="middle" direction="rtl">نوع</text>
+</g>
+<g class="entity" data-id="copy:درس_تکراری">
+<rect class="shape" x="0" y="284.4" width="100" height="54" rx="5"/>
+<line class="line" x1="0" y1="292.4" x2="100" y2="292.4"/>
+<text x="50" y="320.84" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">درس</text>
+</g>
+<g class="relationship" data-id="rel:انتخاب(دانشجو,درس)">
+<polygon class="shape" points="320.08,59.27 380.29,90.07 320.08,120.87 259.87,90.07"/>
+<text x="320.08" y="95.51" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">انتخاب</text>
+</g>
+<g class="relationship" data-id="rel:حذف(دانشجو,درس)">
+<polygon class="shape" points="320.08,159 374.08,189.8 320.08,220.6 266.08,189.8"/>
+<text x="320.08" y="195.24" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">حذف</text>
+</g>
+<g class="relationship" data-id="rel:پیشنیازی(درس_تکراری,درس_تکراری)">
+<polygon class="shape" points="199.95,280.6 273.89,311.4 199.95,342.2 126,311.4"/>
+<text x="199.95" y="316.84" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">پیشنیازی</text>
+</g>
+</g>
+<g class="labels">
+</g>
+</svg>

@@ -113,3 +113,42 @@ export function normal(a: Point, b: Point): Point {
 export function add(p: Point, q: Point, scale = 1): Point {
   return { x: p.x + q.x * scale, y: p.y + q.y * scale };
 }
+
+/**
+ * How far from the center line the two lines of a unary relationship sit:
+ * at the entity, as a fraction of its side; at the diamond, as a fraction of
+ * its half-height (or half-width), on the two edges that face the entity.
+ */
+const UNARY_SPREAD = { entity: 0.3, diamond: 0.6 };
+
+/**
+ * The two lines of a unary (recursive) relationship, as [start on the
+ * entity's outline, end on the diamond's outline]. The diamond sits beside,
+ * above or below the entity. Both lines leave the facing side of the entity
+ * and end on the two diamond edges that face it, so they run almost parallel,
+ * far enough apart to read as two lines (not as the double line of total
+ * participation) and with room for a cardinality label on each.
+ */
+export function unaryLineEnds(
+  entity: Shape,
+  entityCenter: Point,
+  diamond: Shape,
+  diamondCenter: Point,
+): [Point, Point][] {
+  const dx = diamondCenter.x - entityCenter.x;
+  const dy = diamondCenter.y - entityCenter.y;
+  const sideways = Math.abs(dx) >= Math.abs(dy);
+  const a = diamond.width / 2;
+  const b = diamond.height / 2;
+  const f = UNARY_SPREAD.diamond;
+  return [-1, 1].map((sign): [Point, Point] => {
+    // A point on the edge |x|/a + |y|/b = 1, a fraction f of the way from the facing corner.
+    const end = sideways
+      ? { x: diamondCenter.x - Math.sign(dx) * a * (1 - f), y: diamondCenter.y + sign * b * f }
+      : { x: diamondCenter.x + sign * a * f, y: diamondCenter.y - Math.sign(dy) * b * (1 - f) };
+    const from = sideways
+      ? { x: entityCenter.x, y: entityCenter.y + sign * entity.height * UNARY_SPREAD.entity }
+      : { x: entityCenter.x + sign * entity.width * UNARY_SPREAD.entity, y: entityCenter.y };
+    return [exitPoint(entity, entityCenter, from, end), end];
+  });
+}

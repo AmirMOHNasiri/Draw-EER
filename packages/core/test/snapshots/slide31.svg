@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 1196.54 621.69" width="1196.54" height="621.69">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="1196.54" height="621.69" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="137.14" y1="281.42" x2="107.4" y2="285.34"/>
+<line class="line" x1="389.71" y1="412.2" x2="338.06" y2="371.12"/>
+<line class="line" x1="577.68" y1="429.34" x2="574.75" y2="381.43"/>
+<line class="line" x1="580.31" y1="489.71" x2="581.1" y2="519.7"/>
+<line class="line" x1="555.17" y1="478.64" x2="503.52" y2="519.73"/>
+<line class="line" x1="582.43" y1="72.87" x2="589.69" y2="43.76"/>
+<line class="line" x1="579.02" y1="247.13" x2="583.19" y2="217.42"/>
+<line class="line" x1="933.22" y1="413.6" x2="936.61" y2="443.41"/>
+<line class="line" x1="908.48" y1="403.87" x2="859.43" y2="448.03"/>
+<line class="line" x1="181.01" y1="409.32" x2="181.01" y2="306.45"/>
+<line class="line" x1="181.01" y1="180.8" x2="181.01" y2="244.85"/>
+<line class="line" x1="365.01" y1="275.65" x2="235.01" y2="275.65"/>
+<line class="line" x1="146.12" y1="134.8" x2="136.65" y2="90.28"/>
+<line class="line" x1="215.91" y1="134.8" x2="225.38" y2="90.28"/>
+<line class="line" x1="231.01" y1="429.82" x2="347.98" y2="429.82"/>
+<line class="line" x1="231.01" y1="434.82" x2="347.98" y2="434.82"/>
+<line class="line" x1="415.01" y1="298.65" x2="415.01" y2="401.52"/>
+<line class="line" x1="435.61" y1="298.65" x2="560.1" y2="437.6"/>
+<line class="line" x1="730.61" y1="298.65" x2="601.66" y2="438.89"/>
+<line class="line" x1="723.82" y1="298.65" x2="596.92" y2="436.66"/>
+<line class="line" x1="436.08" y1="252.65" x2="555.82" y2="121.99"/>
+<line class="line" x1="725.68" y1="252.65" x2="596.32" y2="121.5"/>
+<line class="line" x1="465.01" y1="275.65" x2="521.01" y2="275.65"/>
+<line class="line" x1="686.1" y1="275.65" x2="629.01" y2="275.65"/>
+<line class="line" x1="478.06" y1="211.25" x2="550.06" y2="259.07"/>
+<line class="line" x1="810.62" y1="275.65" x2="866.62" y2="275.65"/>
+<line class="line" x1="1048.54" y1="275.65" x2="992.54" y2="275.65"/>
+<line class="line" x1="748.36" y1="252.65" x2="748.36" y2="196.65"/>
+<line class="line" x1="748.36" y1="79.05" x2="748.36" y2="135.05"/>
+<line class="line" x1="1056.74" y1="302.65" x2="955.95" y2="367.75"/>
+<line class="line" x1="786.7" y1="298.65" x2="902.82" y2="368.32"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:دانشجو">
+<rect class="shape" x="131.01" y="409.32" width="100" height="46" rx="5"/>
+<text x="181.01" y="437.76" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">دانشجو</text>
+</g>
+<g class="entity" data-id="entity:استاد">
+<rect class="shape" x="365.01" y="252.65" width="100" height="46" rx="5"/>
+<text x="415.01" y="281.09" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">استاد</text>
+</g>
+<g class="entity" data-id="entity:درس">
+<rect class="shape" x="131.01" y="134.8" width="100" height="46" rx="5"/>
+<text x="181.01" y="163.24" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">درس</text>
+</g>
+<g class="entity" data-id="entity:گروه آموزشی">
+<rect class="shape" x="686.1" y="252.65" width="124.52" height="46" rx="5"/>
+<text x="748.36" y="281.09" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">گروه آموزشی</text>
+</g>
+<g class="entity" data-id="entity:کارمند">
+<rect class="shape" x="698.36" y="33.05" width="100" height="46" rx="5"/>
+<text x="748.36" y="61.49" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند</text>
+</g>
+<g class="entity" data-id="copy:درس_۲">
+<rect class="shape" x="387.41" y="157.25" width="100" height="54" rx="5"/>
+<line class="line" x1="387.41" y1="165.25" x2="487.41" y2="165.25"/>
+<text x="437.41" y="193.69" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">درس</text>
+</g>
+<g class="entity" data-id="copy:دانشجو_۲">
+<rect class="shape" x="1048.54" y="248.65" width="100" height="54" rx="5"/>
+<line class="line" x1="1048.54" y1="256.65" x2="1148.54" y2="256.65"/>
+<text x="1098.54" y="285.09" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">دانشجو</text>
+</g>
+<g class="relationship" data-id="rel:د.ا.د.(دانشجو,درس,استاد)">
+<polygon class="shape" points="181.01,244.85 235.01,275.65 181.01,306.45 127.01,275.65"/>
+<text x="181.01" y="281.09" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">د.ا.د.</text>
+</g>
+<g class="attribute" data-id="attr:rel:د.ا.د.(دانشجو,درس,استاد)/سال-ترم">
+<ellipse class="shape" cx="54.62" cy="292.29" rx="54.62" ry="27"/>
+<ellipse class="outline" cx="54.62" cy="292.29" rx="49.62" ry="22"/>
+<text x="54.62" y="297.73" font-size="16" text-anchor="middle" direction="rtl">سال-ترم</text>
+</g>
+<g class="relationship" data-id="rel:پیشنیازی(درس,درس)">
+<polygon class="shape" points="181.01,47.16 254.96,77.96 181.01,108.76 107.07,77.96"/>
+<text x="181.01" y="83.4" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">پیشنیازی</text>
+</g>
+<g class="relationship" data-id="rel:راهنمایی(دانشجو,استاد)">
+<polygon class="shape" points="415.01,401.52 487.96,432.32 415.01,463.12 342.06,432.32"/>
+<text x="415.01" y="437.76" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">راهنمایی</text>
+</g>
+<g class="attribute" data-id="attr:rel:راهنمایی(دانشجو,استاد)/ترم شروع">
+<ellipse class="shape" cx="313.58" cy="351.65" rx="52.57" ry="22"/>
+<text x="313.58" y="357.09" font-size="16" text-anchor="middle" direction="rtl">ترم شروع</text>
+</g>
+<g class="relationship" data-id="rel:مدیریت(استاد,گروه آموزشی)">
+<polygon class="shape" points="579.52,428.48 645.07,459.28 579.52,490.08 513.96,459.28"/>
+<text x="579.52" y="464.72" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">مدیریت</text>
+</g>
+<g class="attribute" data-id="attr:rel:مدیریت(استاد,گروه آموزشی)/مدت">
+<ellipse class="shape dashed" cx="573.41" cy="359.45" rx="37.07" ry="22"/>
+<text x="573.41" y="364.89" font-size="16" text-anchor="middle" direction="rtl">مدت</text>
+</g>
+<g class="attribute" data-id="attr:rel:مدیریت(استاد,گروه آموزشی)/از">
+<ellipse class="shape" cx="581.67" cy="541.69" rx="37" ry="22"/>
+<text x="581.67" y="547.13" font-size="16" text-anchor="middle" direction="rtl">از</text>
+</g>
+<g class="attribute" data-id="attr:rel:مدیریت(استاد,گروه آموزشی)/تا">
+<ellipse class="shape" cx="481.37" cy="537.35" rx="37" ry="22"/>
+<text x="481.37" y="542.79" font-size="16" text-anchor="middle" direction="rtl">تا</text>
+</g>
+<g class="relationship" data-id="rel:عضویت(استاد,گروه آموزشی)">
+<polygon class="shape" points="575.56,69.65 641.2,100.45 575.56,131.25 509.91,100.45"/>
+<text x="575.56" y="105.89" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">عضویت</text>
+</g>
+<g class="attribute" data-id="attr:rel:عضویت(استاد,گروه آموزشی)/از">
+<ellipse class="shape" cx="595.11" cy="22" rx="37" ry="22"/>
+<text x="595.11" y="27.44" font-size="16" text-anchor="middle" direction="rtl">از</text>
+</g>
+<g class="relationship" data-id="rel:مدعو(استاد,گروه آموزشی,درس_۲)">
+<polygon class="shape" points="575.01,244.85 629.01,275.65 575.01,306.45 521.01,275.65"/>
+<text x="575.01" y="281.09" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">مدعو</text>
+</g>
+<g class="attribute" data-id="attr:rel:مدعو(استاد,گروه آموزشی,درس_۲)/ترم-سال">
+<ellipse class="shape" cx="586.28" cy="195.47" rx="49.62" ry="22"/>
+<text x="586.28" y="200.91" font-size="16" text-anchor="middle" direction="rtl">ترم-سال</text>
+</g>
+<g class="relationship" data-id="rel:تحصیل(گروه آموزشی,دانشجو_۲)">
+<polygon class="shape" points="929.58,244.85 992.54,275.65 929.58,306.45 866.62,275.65"/>
+<text x="929.58" y="281.09" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">تحصیل</text>
+</g>
+<g class="relationship" data-id="rel:اشتغال(گروه آموزشی,کارمند)">
+<polygon class="shape" points="748.36,135.05 811.17,165.85 748.36,196.65 685.55,165.85"/>
+<text x="748.36" y="171.29" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">اشتغال</text>
+</g>
+<g class="relationship" data-id="rel:مهمان(دانشجو_۲,گروه آموزشی)">
+<polygon class="shape" points="929.91,353.77 987.28,384.57 929.91,415.37 872.54,384.57"/>
+<text x="929.91" y="390.01" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">مهمان</text>
+</g>
+<g class="attribute" data-id="attr:rel:مهمان(دانشجو_۲,گروه آموزشی)/مبدا">
+<ellipse class="shape" cx="939.11" cy="465.36" rx="37" ry="22"/>
+<text x="939.11" y="470.8" font-size="16" text-anchor="middle" direction="rtl">مبدا</text>
+</g>
+<g class="attribute" data-id="attr:rel:مهمان(دانشجو_۲,گروه آموزشی)/از ترم">
+<ellipse class="shape" cx="838.87" cy="466.54" rx="38.06" ry="22"/>
+<text x="838.87" y="471.98" font-size="16" text-anchor="middle" direction="rtl">از ترم</text>
+</g>
+</g>
+<g class="labels">
+<rect class="knockout" x="171.47" y="362.82" width="19.1" height="21"/>
+<text x="181.01" y="378.42" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="172.66" y="192.72" width="16.7" height="21"/>
+<text x="181.01" y="208.32" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="312.3" y="265.15" width="14.43" height="21"/>
+<text x="319.51" y="280.75" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="133.61" y="104.73" width="16.7" height="21"/>
+<text x="141.96" y="120.33" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="210.58" y="104.49" width="19.1" height="21"/>
+<text x="220.12" y="120.09" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="261.53" y="421.82" width="16.7" height="21"/>
+<text x="269.88" y="437.42" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="407.79" y="324.15" width="14.43" height="21"/>
+<text x="415.01" y="339.75" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="470.83" y="336.78" width="16.7" height="21"/>
+<text x="479.18" y="352.38" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="675.23" y="336.84" width="14.43" height="21"/>
+<text x="682.44" y="352.44" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="469.64" y="196.41" width="16.7" height="21"/>
+<text x="477.99" y="212.01" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="673.19" y="196.25" width="14.43" height="21"/>
+<text x="680.4" y="211.85" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="476.26" y="265.15" width="16.7" height="21"/>
+<text x="484.61" y="280.75" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="656.57" y="265.15" width="19.1" height="21"/>
+<text x="666.12" y="280.75" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="495.55" y="217.49" width="15.41" height="21"/>
+<text x="503.26" y="233.09" font-size="15" text-anchor="middle">K</text>
+<rect class="knockout" x="823" y="265.15" width="14.43" height="21"/>
+<text x="830.22" y="280.75" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="1020.59" y="265.15" width="16.7" height="21"/>
+<text x="1028.94" y="280.75" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="741.15" y="222.55" width="14.43" height="21"/>
+<text x="748.36" y="238.15" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="740.01" y="88.15" width="16.7" height="21"/>
+<text x="748.36" y="103.75" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="1013.11" y="314.93" width="16.7" height="21"/>
+<text x="1021.46" y="330.53" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="817.79" y="312.53" width="19.1" height="21"/>
+<text x="827.34" y="328.13" font-size="15" text-anchor="middle">M</text>
+</g>
+</svg>

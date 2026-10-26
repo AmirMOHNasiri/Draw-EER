@@ -4,3 +4,4 @@ out
 coverage
 package-lock.json
 docs/*.pdf
+packages/core/test/snapshots

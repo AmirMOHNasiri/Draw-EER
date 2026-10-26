@@ -1,0 +1,38 @@
+// A hospital, with English and Persian names mixed. Has a ternary relationship
+// (Prescribes), a recursive one with roles (Supervises) and a weak-entity chain
+// (Department → Ward → Room → Bed).
+entity Department { "Dept No": key, title, budget }
+weak entity Ward { "Ward code": partial, floor }
+weak entity Room { "Room no": partial, type }
+weak entity Bed { "Bed no": partial }
+
+entity Patient {
+  "Patient ID": key
+  name { first, last }
+  phones: multi
+  "Birth date"
+  age: derived
+}
+
+entity پزشک { "کد نظام پزشکی": key, نام, تخصص: multi }
+entity Drug { code: key, name, price }
+
+identifying rel Has { Department 1, Ward N total }
+identifying rel Contains { Ward 1, Room N total }
+identifying rel Holds { Room 1, Bed N total }
+
+rel Prescribes {
+  پزشک 1
+  Patient N
+  Drug M
+  attrs { dose, date }
+}
+
+rel Supervises {
+  پزشک 1 as سرپرست
+  پزشک N as کارآموز
+}
+
+rel Occupies { Patient 1, Bed 1, attrs { from, to } }
+rel "کار در" { پزشک N total, Department 1 }
+rel Treats { پزشک M, Patient N total }

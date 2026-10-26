@@ -63,24 +63,39 @@ describe('renderSvg', () => {
     expect(count(out, 'class="knockout"')).toBe(2);
     // Each label's center lies on the straight line between A and R or R and B.
     const texts = [
-      ...out.matchAll(/<text x="([\d.-]+)" y="([\d.-]+)" font-size="13"[^>]*>(1|N)</g),
+      ...out.matchAll(/<text x="([\d.-]+)" y="([\d.-]+)" font-size="\d+"[^>]*>(1|N)</g),
     ];
     expect(texts).toHaveLength(2);
   });
 
-  it('attaches the two lines of a unary relationship to two different corners', async () => {
+  it('draws the two lines of a unary relationship apart, ending on the diamond', async () => {
     const out = await svg('entity C\nrel P { C N, C M }');
     const lines = out.slice(out.indexOf('class="lines"'), out.indexOf('class="shapes"'));
-    const ends = [...lines.matchAll(/x2="([\d.-]+)" y2="([\d.-]+)"/g)].map(
-      (m) => `${m[1]},${m[2]}`,
-    );
+    const ends = [...lines.matchAll(/x2="([\d.-]+)" y2="([\d.-]+)"/g)].map((m) => ({
+      x: Number(m[1]),
+      y: Number(m[2]),
+    }));
     expect(ends).toHaveLength(2);
-    expect(ends[0]).not.toBe(ends[1]);
-    const polygon = /class="rel[^"]*"[^>]*>|<polygon class="shape" points="([^"]+)"/.exec(
-      out.slice(out.indexOf('data-id="rel:')),
-    )!;
-    const corners = polygon[1]!.split(' ');
-    for (const end of ends) expect(corners).toContain(end);
+    // Far enough apart to read as two lines, not as one double line.
+    expect(Math.hypot(ends[0]!.x - ends[1]!.x, ends[0]!.y - ends[1]!.y)).toBeGreaterThan(20);
+    // Both end on the diamond's outline: |x - cx| / a + |y - cy| / b = 1.
+    const points = /<polygon class="shape" points="([^"]+)"/
+      .exec(out.slice(out.indexOf('data-id="rel:')))![1]!
+      .split(' ')
+      .map((p) => p.split(',').map(Number) as [number, number]);
+    const xs = points.map(([x]) => x);
+    const ys = points.map(([, y]) => y);
+    const [cx, cy] = [
+      (Math.min(...xs) + Math.max(...xs)) / 2,
+      (Math.min(...ys) + Math.max(...ys)) / 2,
+    ];
+    const [a, b] = [
+      (Math.max(...xs) - Math.min(...xs)) / 2,
+      (Math.max(...ys) - Math.min(...ys)) / 2,
+    ];
+    for (const end of ends) {
+      expect(Math.abs(end.x - cx) / a + Math.abs(end.y - cy) / b).toBeCloseTo(1, 1);
+    }
   });
 
   it('writes cardinalities and roles as labels', async () => {
