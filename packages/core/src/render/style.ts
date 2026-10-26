@@ -25,12 +25,23 @@ export const STYLE = {
   underline: { offset: 3, doubleSpacing: 3, dash: '4 3' },
   dash: '6 4',
   /** Space between a shape and its attributes, and between neighbouring attributes. */
-  attributeGap: { fromOwner: 34, between: 10, nested: 26 },
+  attributeGap: { fromOwner: 30, between: 10, nested: 24 },
   /** Lines to attributes of a composite key: the group line sits this far below the ellipses. */
   keyGroupLineOffset: 5,
-  cardinality: { alongLine: 16, offset: 9 },
-  /** Distance between parallel lines that join the same two shapes (unary relationships). */
+  /**
+   * Cardinality labels on lines: `position` is how far along the line (from
+   * the entity) the label's center sits; `fromEntity` and `fromRelationship`
+   * are the smallest gaps between the label and the two shapes.
+   */
+  label: { position: 0.35, fromEntity: 8, fromRelationship: 6, padding: 2, heightEm: 1 },
+  /** Distance between parallel lines that join the same two shapes (three or more lines). */
   parallelSpacing: 26,
   margin: 24,
-  layout: { nodeSpacing: 36, layerSpacing: 56, componentSpacing: 48 },
+  /**
+   * `gap`: smallest space between a shape or attribute and anything that
+   * belongs to another shape. `minLine`: smallest length of a straight line
+   * between two shapes, so its cardinality label fits. `unaryLine`: the same
+   * for a unary relationship, whose lines run to the diamond's corners.
+   */
+  layout: { gap: 26, minLine: 64, unaryLine: 24, componentSpacing: 60 },
 } as const;

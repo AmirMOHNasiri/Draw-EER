@@ -37,7 +37,7 @@ async function main() {
 
   for (const input of inputs) {
     const source = await readFile(input, 'utf8');
-    const { svg, errors } = await renderDiagram(source, measurer, { embedFont: fonts });
+    const { svg, errors } = renderDiagram(source, measurer, { embedFont: fonts });
     for (const e of errors) {
       console.error(`${input}:${e.range.start.line + 1}:${e.range.start.column + 1}: ${e.message}`);
     }

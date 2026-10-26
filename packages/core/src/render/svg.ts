@@ -9,7 +9,13 @@ import {
 } from '../geometry/collide';
 import type { Layout } from '../layout/layout';
 import type { ElementGeometry, SizedDiagram, TextBlock } from '../layout/size';
-import type { AttributeNode, EntityNode, MainNode, RelationshipNode } from '../model/types';
+import type {
+  AttributeNode,
+  EntityNode,
+  MainNode,
+  ParticipationLink,
+  RelationshipNode,
+} from '../model/types';
 import type { KeyKind } from '../syntax/ast';
 import type { FontData } from '../text/measure';
 import { base64 } from './base64';
@@ -93,6 +99,7 @@ class SvgRenderer {
       `.shape { stroke: ${t.stroke}; stroke-width: ${STYLE.strokeWidth}; fill: ${t.fill}; }`,
       `.outline { stroke: ${t.stroke}; stroke-width: ${STYLE.strokeWidth}; fill: none; }`,
       `.dashed { stroke-dasharray: ${STYLE.dash}; }`,
+      `.knockout { fill: ${t.background ?? t.fill}; stroke: none; }`,
       `</style>`,
       t.background && !empty
         ? `<rect x="${f(x)}" y="${f(y)}" width="${f(width)}" height="${f(height)}" fill="${t.background}"/>`
@@ -207,98 +214,173 @@ class SvgRenderer {
   // -------------------------------------------------------------------------
 
   private participationLinks(): void {
-    // Lines joining the same two shapes (a unary relationship) are spread apart.
-    const pairs = new Map<string, string[]>();
+    // Group the lines that join the same two shapes.
+    const pairs = new Map<string, ParticipationLink[]>();
     for (const link of this.sized.diagram.links) {
       const key = `${link.relationship}|${link.entity}`;
-      pairs.set(key, [...(pairs.get(key) ?? []), link.id]);
+      pairs.set(key, [...(pairs.get(key) ?? []), link]);
     }
 
-    // Draw every line first, so that labels can avoid all of them.
+    // Draw every line first, so that labels placed afterwards can avoid them.
     const pending: (() => void)[] = [];
-    for (const link of this.sized.diagram.links) {
-      const siblings = pairs.get(`${link.relationship}|${link.entity}`)!;
-      const index = siblings.indexOf(link.id);
-      const offset = (index - (siblings.length - 1) / 2) * STYLE.parallelSpacing;
+    for (const links of pairs.values()) {
+      const first = links[0]!;
+      const segments =
+        links.length === 2
+          ? this.unarySegments(first.entity, first.relationship)
+          : links.map((_, i) =>
+              this.straightSegment(
+                first.entity,
+                first.relationship,
+                (i - (links.length - 1) / 2) * STYLE.parallelSpacing,
+              ),
+            );
 
-      const entity = this.position(link.entity);
-      const rel = this.position(link.relationship);
-      const entityShape = this.geometry(link.entity).shape;
-      const relShape = this.geometry(link.relationship).shape;
-      const n = normal(entity, rel);
-
-      const segment = (shift: number): [Point, Point] => {
-        const from = add(entity, n, offset + shift);
-        const to = add(rel, n, offset + shift);
-        return [exitPoint(entityShape, entity, from, to), exitPoint(relShape, rel, to, from)];
-      };
-      if (link.participation === 'total') {
-        const half = STYLE.doubleGap / 2;
-        this.addLine(...segment(-half));
-        this.addLine(...segment(half));
-      } else {
-        this.addLine(...segment(0));
-      }
-
-      const [start, end] = segment(0);
-      // Preferred side: outside of spread lines, otherwise above the line.
-      const side = offset !== 0 ? Math.sign(offset) : labelSide(n);
-      const away =
-        STYLE.cardinality.offset + (link.participation === 'total' ? STYLE.doubleGap / 2 : 0);
-      const length = Math.hypot(end.x - start.x, end.y - start.y) || 1;
-      const pointAt = (distance: number) => ({
-        x: start.x + ((end.x - start.x) / length) * distance,
-        y: start.y + ((end.y - start.y) / length) * distance,
-      });
-
-      pending.push(() => {
-        if (link.cardinality !== null) {
-          // Near the entity end; further along the line or on the other side if crowded.
-          const distances = [16, 26, 38, 52].filter((d) => d < length * 0.6);
-          const anchors = (distances.length > 0 ? distances : [length / 3]).map(pointAt);
-          this.smallLabel(link.cardinality, anchors, n, side, away);
+      const unary = links.length === 2;
+      links.forEach((link, i) => {
+        const [start, end] = segments[i]!;
+        if (link.participation === 'total') {
+          const n = normal(start, end);
+          const half = STYLE.doubleGap / 2;
+          for (const side of [-half, half]) {
+            const [from, to] = this.clipped(link, add(start, n, side), add(end, n, side));
+            // Into a diamond's corner, both strokes meet at the corner itself.
+            this.addLine(from, unary ? end : to);
+          }
+        } else {
+          this.addLine(start, end);
         }
-        if (link.role !== null) {
-          const anchors = [0.5, 0.4, 0.6, 0.3, 0.7].map((t) => pointAt(length * t));
-          this.smallLabel(link.role, anchors, n, side, away, true);
-        }
+        pending.push(() => {
+          if (link.cardinality !== null) this.cardinalityLabel(link.cardinality, start, end, link);
+          if (link.role !== null) this.roleLabel(link.role, start, end);
+        });
       });
     }
     for (const place of pending) place();
   }
 
+  /** A straight line between the two shapes' borders, shifted sideways by `offset`. */
+  private straightSegment(entityId: string, relId: string, offset: number): [Point, Point] {
+    const entity = this.position(entityId);
+    const rel = this.position(relId);
+    const n = normal(entity, rel);
+    const from = add(entity, n, offset);
+    const to = add(rel, n, offset);
+    return [
+      exitPoint(this.geometry(entityId).shape, entity, from, to),
+      exitPoint(this.geometry(relId).shape, rel, to, from),
+    ];
+  }
+
   /**
-   * Places a small label beside a line, at the first candidate spot that
-   * covers no line, shape or other label. Candidates are the `anchors` along
-   * the line, each on the preferred side first, then on the other side.
+   * The two lines of a unary (recursive) relationship. They leave the entity
+   * from two separate points and end at two opposite corners of the diamond
+   * (top and bottom when the diamond is beside the entity, left and right
+   * when it is above or below), so they form a visible loop and cannot be
+   * mistaken for the double line of total participation.
    */
-  private smallLabel(
-    text: string,
-    anchors: Point[],
-    n: Point,
-    preferredSide: number,
-    away: number,
-    italic = false,
-  ): void {
+  private unarySegments(entityId: string, relId: string): [Point, Point][] {
+    const entity = this.position(entityId);
+    const rel = this.position(relId);
+    const entityShape = this.geometry(entityId).shape;
+    const { width, height } = this.geometry(relId).shape;
+    const sideways = Math.abs(rel.x - entity.x) >= Math.abs(rel.y - entity.y);
+    const n = sideways ? { x: 0, y: 1 } : { x: 1, y: 0 };
+    const spread = (sideways ? entityShape.height : entityShape.width) * 0.25;
+    return [-1, 1].map((sign) => {
+      const corner = add(rel, n, (sign * (sideways ? height : width)) / 2);
+      const from = add(entity, n, sign * spread);
+      return [exitPoint(entityShape, entity, from, corner), corner];
+    });
+  }
+
+  /**
+   * Clips one stroke of a double line to the two shapes. Each end first
+   * steps back a little into its shape, so strokes that end at a diamond's
+   * corner still reach the outline.
+   */
+  private clipped(link: ParticipationLink, start: Point, end: Point): [Point, Point] {
+    const entity = this.position(link.entity);
+    const rel = this.position(link.relationship);
+    const from = add(start, unit(start, end), -6);
+    const to = add(end, unit(end, start), -6);
+    return [
+      exitPoint(this.geometry(link.entity).shape, entity, from, end),
+      exitPoint(this.geometry(link.relationship).shape, rel, to, start),
+    ];
+  }
+
+  /**
+   * A cardinality label sits on its own line, about a third of the way from
+   * the entity, with the line broken around it. On a line too short for
+   * that, it goes beside the line, always on the left of the direction from
+   * entity to relationship.
+   */
+  private cardinalityLabel(text: string, start: Point, end: Point, link: ParticipationLink): void {
     const size = STYLE.font.smallSize;
     const width = this.sized.measurer.width(text, { size });
-    const height = size * STYLE.font.lineHeight * 0.8;
-    // How far the label's center must be from its edge facing the line.
-    const reach = (Math.abs(n.x) * width) / 2 + (Math.abs(n.y) * height) / 2;
+    const height = size * STYLE.label.heightEm;
+    const length = Math.hypot(end.x - start.x, end.y - start.y);
+    const d = unit(start, end);
+    const pad = STYLE.label.padding;
+    // Half the label's size measured along the line.
+    const along =
+      (Math.abs(d.x) * (width + 2 * pad)) / 2 + (Math.abs(d.y) * (height + 2 * pad)) / 2;
+    const t = Math.max(length * STYLE.label.position, STYLE.label.fromEntity + along);
 
-    let best: { center: Point; box: Box; hits: number } | null = null;
-    for (const anchor of anchors) {
-      for (const side of [preferredSide, -preferredSide]) {
-        const center = add(anchor, n, side * (away + reach));
-        const box = boxAround(center, width, height, 1.5);
-        const hits = this.collisions(box);
-        if (best === null || hits < best.hits) best = { center, box, hits };
-        if (hits === 0) break;
+    if (t + along <= length - STYLE.label.fromRelationship) {
+      this.knockoutLabel(text, add(start, d, t), width, height);
+      return;
+    }
+    const left = { x: d.y, y: -d.x };
+    const across = (Math.abs(left.x) * width) / 2 + (Math.abs(left.y) * height) / 2;
+    const away = across + 4 + (link.participation === 'total' ? STYLE.doubleGap / 2 : 0);
+    const center = add(add(start, d, Math.min(length / 2, Math.max(t, 0))), left, away);
+    this.plainLabel(text, center, width, height);
+  }
+
+  /** A role name beside its line, past the middle toward the relationship, wherever it fits. */
+  private roleLabel(text: string, start: Point, end: Point): void {
+    const size = STYLE.font.smallSize;
+    const width = this.sized.measurer.width(text, { size });
+    const height = size * STYLE.label.heightEm;
+    const d = unit(start, end);
+    const length = Math.hypot(end.x - start.x, end.y - start.y);
+    const left = { x: d.y, y: -d.x };
+    const across = (Math.abs(left.x) * width) / 2 + (Math.abs(left.y) * height) / 2 + 5;
+
+    let best: { center: Point; hits: number } | null = null;
+    for (const t of [0.6, 0.5, 0.7, 0.4, 0.8]) {
+      for (const side of [1, -1]) {
+        const center = add(add(start, d, length * t), left, side * across);
+        const hits = this.collisions(boxAround(center, width, height, 1.5));
+        if (best === null || hits < best.hits) best = { center, hits };
       }
       if (best?.hits === 0) break;
     }
-    const { center, box } = best!;
-    this.labelBoxes.push(box);
+    this.plainLabel(text, best!.center, width, height, true);
+  }
+
+  /** A label with a background patch that breaks the line under it. */
+  private knockoutLabel(text: string, center: Point, width: number, height: number): void {
+    const pad = STYLE.label.padding;
+    const w = width + 2 * pad;
+    const h = height + 2 * pad;
+    this.labels.push(
+      `<rect class="knockout" x="${f(center.x - w / 2)}" y="${f(center.y - h / 2)}" width="${f(w)}" height="${f(h)}"/>`,
+    );
+    this.plainLabel(text, center, width, height);
+  }
+
+  private plainLabel(
+    text: string,
+    center: Point,
+    width: number,
+    height: number,
+    italic = false,
+  ): void {
+    const size = STYLE.font.smallSize;
+    this.labelBoxes.push(boxAround(center, width, height, 1.5));
     this.includeBox(center, width, height);
     const baseline = center.y + STYLE.font.baselineShift * size;
     this.labels.push(
@@ -364,10 +446,10 @@ class SvgRenderer {
   }
 }
 
-/** Puts labels of mostly horizontal lines above them, and of vertical lines to their right. */
-function labelSide(n: Point): number {
-  if (Math.abs(n.y) > 0.3) return n.y < 0 ? 1 : -1;
-  return n.x > 0 ? 1 : -1;
+/** Unit vector from `a` toward `b`. */
+function unit(a: Point, b: Point): Point {
+  const length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  return { x: (b.x - a.x) / length, y: (b.y - a.y) / length };
 }
 
 function underline(cx: number, baseline: number, width: number, key: KeyKind): string {

@@ -10,7 +10,7 @@ beforeAll(async () => {
 });
 
 async function svg(source: string): Promise<string> {
-  return (await renderDiagram(source, measurer)).svg;
+  return renderDiagram(source, measurer).svg;
 }
 
 /** The SVG markup of the element with this data-id. */
@@ -58,6 +58,31 @@ describe('renderSvg', () => {
     expect(lines(double)).toBe(lines(single) + 1);
   });
 
+  it('puts cardinality labels on their line, breaking it with a knockout', async () => {
+    const out = await svg('entity A\nentity B\nrel R { A 1, B N }');
+    expect(count(out, 'class="knockout"')).toBe(2);
+    // Each label's center lies on the straight line between A and R or R and B.
+    const texts = [
+      ...out.matchAll(/<text x="([\d.-]+)" y="([\d.-]+)" font-size="13"[^>]*>(1|N)</g),
+    ];
+    expect(texts).toHaveLength(2);
+  });
+
+  it('attaches the two lines of a unary relationship to two different corners', async () => {
+    const out = await svg('entity C\nrel P { C N, C M }');
+    const lines = out.slice(out.indexOf('class="lines"'), out.indexOf('class="shapes"'));
+    const ends = [...lines.matchAll(/x2="([\d.-]+)" y2="([\d.-]+)"/g)].map(
+      (m) => `${m[1]},${m[2]}`,
+    );
+    expect(ends).toHaveLength(2);
+    expect(ends[0]).not.toBe(ends[1]);
+    const polygon = /class="rel[^"]*"[^>]*>|<polygon class="shape" points="([^"]+)"/.exec(
+      out.slice(out.indexOf('data-id="rel:')),
+    )!;
+    const corners = polygon[1]!.split(' ');
+    for (const end of ends) expect(corners).toContain(end);
+  });
+
   it('writes cardinalities and roles as labels', async () => {
     const out = await svg('rel R { A (1,N) as boss, B M }');
     expect(out).toContain('>(1,N)</text>');
@@ -80,7 +105,7 @@ describe('renderSvg', () => {
   it('embeds the fonts only when asked', async () => {
     expect(await svg('entity A')).not.toContain('@font-face');
     const fonts = await loadFonts();
-    const embedded = (await renderDiagram('entity A', measurer, { embedFont: fonts })).svg;
+    const embedded = renderDiagram('entity A', measurer, { embedFont: fonts }).svg;
     expect(count(embedded, '@font-face')).toBe(2);
   });
 
@@ -90,7 +115,7 @@ describe('renderSvg', () => {
   });
 
   it('still draws what parsed when there are syntax errors', async () => {
-    const { svg: out, errors } = await renderDiagram('entity A { x: mutli }\nentiy B', measurer);
+    const { svg: out, errors } = renderDiagram('entity A { x: mutli }\nentiy B', measurer);
     expect(errors).toHaveLength(2);
     expect(out).toContain('data-id="attr:entity:A/x"');
   });

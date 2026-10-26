@@ -1,0 +1,64 @@
+// The library diagram from docs/reference (hand-drawn reference for layout quality).
+entity "عضو کتابخانه" {
+  نام
+  "کد ملی": key
+  "مجموع تأخیرها": derived
+}
+
+entity "منبع کتابخانه‌ای" {
+  عنوان
+  شناسه: key
+}
+
+entity کارمند {
+  "کد پرسنلی": key
+  نام
+  "تاریخ استخدام"
+  "مدرک تحصیلی": multi { "مؤسسه آموزشی", مقطع, رشته }
+}
+
+entity انتشارات {
+  "نام تجاری": key
+  آدرس
+}
+
+entity بخش {
+  "شماره بخش": key
+  "نام بخش"
+  موقعیت
+}
+
+weak entity قفسه
+weak entity ردیف { "شماره ردیف": partial }
+
+rel امانت {
+  "عضو کتابخانه" N total
+  "منبع کتابخانه‌ای" M
+  attrs { مهلت, "تاریخ عودت", "تاریخ امانت" }
+}
+
+rel خرید {
+  "منبع کتابخانه‌ای" N total
+  کارمند 1
+  انتشارات 1
+  attrs { مبلغ, تاریخ }
+}
+
+rel مدیر {
+  کارمند N total
+  کارمند 1
+}
+
+rel "قرار دارد" {
+  "منبع کتابخانه‌ای" 1 total
+  ردیف 1
+}
+
+identifying rel شامل { بخش 1, قفسه N total }
+
+// In the reference, «شماره قفسه» hangs off this relationship rather than off قفسه.
+identifying rel شامل {
+  قفسه 1
+  ردیف N total
+  attrs { "شماره قفسه": partial }
+}

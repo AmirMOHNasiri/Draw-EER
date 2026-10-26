@@ -62,10 +62,16 @@ its own.
    shaped with [HarfBuzz](https://harfbuzz.github.io/) (WebAssembly) and the bundled
    [Vazirmatn](https://github.com/rastikerdar/vazirmatn) font, so Persian letters join correctly
    and widths match Chromium to within 0.05 px on every platform.
-4. **Layout** (`src/layout`): [ELK](https://eclipse.dev/elk/) places entities and relationships;
-   attributes are arranged around their owner on the sides that relationship lines leave free.
+4. **Layout** (`src/layout`): entities and relationships are placed in the cells of a grid, scored
+   so that entity–relationship–entity runs in one straight line, ternary relationships form a T,
+   lines do not cross or run through shapes, and shapes keep an open side for their attributes.
+   Attributes then fan out in the free angles around their owner, and rows and columns are
+   compacted to what the shapes facing each other need. (ELK's layered algorithm was tried first;
+   it forces every line into one main direction, so it cannot draw a T or a participant above a
+   relationship.)
 5. **Render** (`src/render`): a custom SVG renderer draws Chen notation. Lines run straight from
-   border to border, and small labels are placed where they cover no line or shape.
+   border to border; cardinality labels sit on their own line, which is broken around them; the
+   two lines of a unary relationship meet different corners of the diamond.
 
 ## License
 

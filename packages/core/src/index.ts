@@ -39,13 +39,13 @@ export interface RenderResult {
 }
 
 /** Parses, lays out and draws `.eer` source in one call. */
-export async function renderDiagram(
+export function renderDiagram(
   source: string,
   measurer: TextMeasurer,
   options: RenderOptions = {},
-): Promise<RenderResult> {
+): RenderResult {
   const { file, errors } = parse(source);
   const sized = sizeDiagram(buildDiagram(file), measurer);
-  const layout = await layoutDiagram(sized);
+  const layout = layoutDiagram(sized);
   return { svg: renderSvg(sized, layout, options), errors, layout };
 }
