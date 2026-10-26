@@ -1,0 +1,32 @@
+# Course slides: reference only, never commit
+docs/*.pdf
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out/
+*.tsbuildinfo
+
+# Packaged extensions
+*.vsix
+
+# Tests and coverage
+coverage/
+.vscode-test/
+.vscode-test-web/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment / secrets
+.env
+.env.*
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

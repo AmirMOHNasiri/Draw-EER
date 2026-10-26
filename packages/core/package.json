@@ -1,0 +1,14 @@
+{
+  "name": "@draw-eer/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Parser, layout and SVG renderer for draw-eer diagrams. No DOM or VS Code dependencies.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}
