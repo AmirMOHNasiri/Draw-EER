@@ -92,7 +92,13 @@ window.acquireVsCodeApi = () => ({
   const pagePath = path.join(temp, 'preview.html');
   await writeFile(pagePath, page);
 
-  const result = await inspect(pathToFileURL(pagePath).href, screenshot);
+  let result;
+  try {
+    result = await inspect(pathToFileURL(pagePath).href, screenshot);
+  } catch (error) {
+    console.log(`FAIL the browser could not run the check: ${error.message}`);
+    process.exit(1);
+  }
   const failures = [];
   const check = (ok, what) => {
     console.log(`${ok ? 'ok  ' : 'FAIL'} ${what}`);
@@ -139,35 +145,66 @@ function findBrowser() {
   return null;
 }
 
-/** Opens `url`, waits until a diagram is shown (or 20 s pass), and reports on the page. */
+/**
+ * Opens `url`, waits until a diagram is shown (or 20 s pass), and reports on
+ * the page. Rejects with Chrome's own output if it quits or refuses a command.
+ */
 async function inspect(url, screenshotPath) {
   const chrome = spawn(
     browser,
     [
       '--headless=new',
       '--disable-gpu',
+      // Ubuntu 23.10 and later (GitHub's ubuntu-latest runners) block the user
+      // namespaces Chrome's sandbox needs, and Chrome then quits at once. The
+      // sandbox guards against hostile web pages; this only loads our own page
+      // from a temporary file, with no network access.
+      '--no-sandbox',
       '--remote-debugging-pipe',
       '--window-size=1400,800',
       'about:blank',
     ],
-    { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'] },
+    { stdio: ['ignore', 'ignore', 'pipe', 'pipe', 'pipe'] },
   );
   const [toChrome, fromChrome] = [chrome.stdio[3], chrome.stdio[4]];
+  // Chrome's messages, shown only if something goes wrong.
+  let log = '';
+  chrome.stderr.on('data', (data) => (log = (log + data).slice(-4000)));
+
   let id = 0;
   let buffer = '';
+  /** Pending commands by id: [resolve, reject]. */
   const waiting = new Map();
+  let failure = null;
+  const fail = (what) => {
+    failure ??= new Error(`${what}${log.trim() ? `\nChrome's output:\n${log.trim()}` : ''}`);
+    for (const [, reject] of waiting.values()) reject(failure);
+    waiting.clear();
+  };
+  chrome.on('error', (error) => fail(`could not start ${browser}: ${error.message}`));
+  chrome.on('exit', (code, signal) =>
+    // Give stderr a moment to arrive, so the message says why it quit.
+    setTimeout(() => fail(`Chrome quit early (exit code ${code}, signal ${signal})`), 100),
+  );
+  // A closed pipe means Chrome is gone; 'exit' explains why.
+  toChrome.on('error', () => {});
+  fromChrome.on('error', () => {});
+
   fromChrome.on('data', (data) => {
     buffer += data;
     for (let end = buffer.indexOf('\0'); end >= 0; end = buffer.indexOf('\0')) {
       const message = JSON.parse(buffer.slice(0, end));
       buffer = buffer.slice(end + 1);
-      waiting.get(message.id)?.(message.result);
+      const [resolve, reject] = waiting.get(message.id) ?? [];
       waiting.delete(message.id);
+      if (message.error) reject?.(new Error(`${message.error.message} (${message.error.code})`));
+      else resolve?.(message.result);
     }
   });
   const send = (method, params = {}, sessionId) =>
-    new Promise((resolve) => {
-      waiting.set(++id, resolve);
+    new Promise((resolve, reject) => {
+      if (failure) return reject(failure);
+      waiting.set(++id, [resolve, reject]);
       toChrome.write(JSON.stringify({ id, method, params, sessionId }) + '\0');
     });
   try {
