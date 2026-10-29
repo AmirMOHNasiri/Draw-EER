@@ -74,12 +74,12 @@ describe('buildDiagram', () => {
     const d = build('weak entity Course\nshow Course again as C2\nrel Prereq { Course, C2 }');
     const copy = d.nodes.find((n) => n.id === 'copy:C2') as EntityNode;
     expect(copy).toMatchObject({ name: 'Course', repeated: true, weak: true, attributes: [] });
-    expect(d.links.map((l) => l.entity)).toEqual(['entity:Course', 'copy:C2']);
+    expect(d.links.map((l) => l.to)).toEqual(['entity:Course', 'copy:C2']);
   });
 
   it('prefers a declared entity over an alias with the same name', () => {
     const d = build('entity A\nshow B again as A\nrel R { A }');
-    expect(d.links[0]!.entity).toBe('entity:A');
+    expect(d.links[0]!.to).toBe('entity:A');
   });
 
   it('marks the attributes of a composite key with a shared group', () => {

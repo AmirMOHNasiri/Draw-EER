@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 619.63 390.75" width="619.63" height="390.75">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="619.63" height="390.75" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="296.24" y1="73.99" x2="321.11" y2="57.22"/>
+<line class="line" x1="261.74" y1="73.99" x2="261.21" y2="44"/>
+<line class="line" x1="172.29" y1="205.99" x2="178.78" y2="235.28"/>
+<line class="line" x1="126.54" y1="205.99" x2="69.09" y2="238.49"/>
+<line class="line" x1="117.19" y1="186.05" x2="87.25" y2="187.88"/>
+<line class="line" x1="407.09" y1="182.12" x2="437.08" y2="181.6"/>
+<line class="line" x1="407.09" y1="204.22" x2="467.84" y2="230.01"/>
+<line class="line" x1="373.19" y1="205.99" x2="431.7" y2="289.55"/>
+<line class="line" x1="331.69" y1="159.99" x2="287.53" y2="119.99"/>
+<path class="line" d="M314.31,134.81 A7,7 0 0 1 304.91,145.18"/>
+<line class="line" x1="192.58" y1="159.99" x2="236.74" y2="119.99"/>
+<path class="line" d="M219.36,145.18 A7,7 0 0 1 209.96,134.81"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:کارمند">
+<rect class="shape" x="212.14" y="73.99" width="100" height="46" rx="5"/>
+<text x="262.14" y="102.43" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند</text>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند/شماره">
+<ellipse class="shape" cx="346.56" cy="40.05" rx="40.71" ry="22"/>
+<text x="346.56" y="45.49" font-size="16" text-anchor="middle" direction="rtl">شماره</text>
+<line class="line" x1="327.73" y1="48.49" x2="365.39" y2="48.49" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند/نام">
+<ellipse class="shape" cx="260.83" cy="22" rx="37" ry="22"/>
+<text x="260.83" y="27.44" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="entity" data-id="entity:روزمزد">
+<rect class="shape" x="117.19" y="159.99" width="100" height="46" rx="5"/>
+<text x="167.19" y="188.43" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">روزمزد</text>
+</g>
+<g class="attribute" data-id="attr:entity:روزمزد/تاریخ شروع قرارداد">
+<ellipse class="shape" cx="183.65" cy="257.25" rx="83.43" ry="22"/>
+<text x="183.65" y="262.69" font-size="16" text-anchor="middle" direction="rtl">تاریخ شروع قرارداد</text>
+</g>
+<g class="attribute" data-id="attr:entity:روزمزد/مدت">
+<ellipse class="shape" cx="42.26" cy="253.67" rx="37.07" ry="22"/>
+<text x="42.26" y="259.11" font-size="16" text-anchor="middle" direction="rtl">مدت</text>
+</g>
+<g class="attribute" data-id="attr:entity:روزمزد/مزد روز">
+<ellipse class="shape" cx="43.78" cy="190.54" rx="43.78" ry="22"/>
+<text x="43.78" y="195.98" font-size="16" text-anchor="middle" direction="rtl">مزد روز</text>
+</g>
+<g class="entity" data-id="entity:رسمی">
+<rect class="shape" x="307.09" y="159.99" width="100" height="46" rx="5"/>
+<text x="357.09" y="188.43" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">رسمی</text>
+</g>
+<g class="attribute" data-id="attr:entity:رسمی/سال استخدام">
+<ellipse class="shape" cx="504.31" cy="180.42" rx="67.32" ry="22"/>
+<text x="504.31" y="185.86" font-size="16" text-anchor="middle" direction="rtl">سال استخدام</text>
+</g>
+<g class="attribute" data-id="attr:entity:رسمی/پایه">
+<ellipse class="shape" cx="497.95" cy="242.79" rx="37" ry="22"/>
+<text x="497.95" y="248.23" font-size="16" text-anchor="middle" direction="rtl">پایه</text>
+</g>
+<g class="attribute" data-id="attr:entity:رسمی/حقوق مبنا">
+<ellipse class="shape" cx="446.54" cy="310.75" rx="55.66" ry="22"/>
+<text x="446.54" y="316.19" font-size="16" text-anchor="middle" direction="rtl">حقوق مبنا</text>
+</g>
+</g>
+<g class="labels">
+</g>
+</svg>

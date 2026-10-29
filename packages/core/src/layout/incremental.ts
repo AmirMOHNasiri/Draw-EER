@@ -115,8 +115,8 @@ class Placer {
     this.rtl = readsRightToLeft(sized);
     for (const node of sized.diagram.nodes) this.partners.set(node.id, []);
     for (const link of sized.diagram.links) {
-      this.partners.get(link.entity)?.push(link.relationship);
-      this.partners.get(link.relationship)?.push(link.entity);
+      this.partners.get(link.to)?.push(link.from);
+      this.partners.get(link.from)?.push(link.to);
     }
   }
 
@@ -297,7 +297,8 @@ class Placer {
       ...this.sized,
       diagram: {
         nodes: diagram.nodes.filter((n) => ids.has(n.id)),
-        links: diagram.links.filter((l) => ids.has(l.entity) && ids.has(l.relationship)),
+        links: diagram.links.filter((l) => ids.has(l.to) && ids.has(l.from)),
+        aggregates: diagram.aggregates.filter((a) => a.members.every((id) => ids.has(id))),
       },
     };
     const own = layoutDiagram(group);
@@ -529,9 +530,9 @@ class Placer {
   private addLines(): void {
     this.lines.length = 0;
     for (const link of this.sized.diagram.links) {
-      const a = this.layout.get(link.entity);
-      const b = this.layout.get(link.relationship);
-      if (a && b && link.entity !== link.relationship) this.lines.push([a, b]);
+      const a = this.layout.get(link.to);
+      const b = this.layout.get(link.from);
+      if (a && b && link.to !== link.from) this.lines.push([a, b]);
     }
   }
 

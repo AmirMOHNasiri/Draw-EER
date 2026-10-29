@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 566.54 424" width="566.54" height="424">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="566.54" height="424" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="343.67" y1="86.18" x2="343.67" y2="46"/>
+<line class="line" x1="348.67" y1="86.18" x2="348.67" y2="46"/>
+<line class="line" x1="400.31" y1="160" x2="357.87" y2="115.33"/>
+<path class="line" d="M384.17,132.84 A7,7 0 0 1 374.02,142.48"/>
+<line class="line" x1="292.02" y1="160" x2="334.46" y2="115.33"/>
+<path class="line" d="M318.31,142.48 A7,7 0 0 1 308.16,132.84"/>
+<line class="line" x1="270.17" y1="246" x2="270.17" y2="206"/>
+<line class="line" x1="416.83" y1="322.4" x2="285.92" y2="269.38"/>
+<path class="line" d="M354,289.4 A7,7 0 0 1 348.75,302.38"/>
+<line class="line" x1="270.17" y1="320" x2="270.17" y2="280"/>
+<path class="line" d="M277.17,300 A7,7 0 0 1 263.17,300"/>
+<line class="line" x1="129.44" y1="320" x2="254.41" y2="269.38"/>
+<path class="line" d="M194.55,301.18 A7,7 0 0 1 189.3,288.2"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:کارمند">
+<rect class="shape" x="296.17" y="0" width="100" height="46" rx="5"/>
+<text x="346.17" y="28.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند</text>
+</g>
+<g class="entity" data-id="entity:نابرنامه ساز">
+<rect class="shape" x="363.89" y="160" width="116.55" height="46" rx="5"/>
+<text x="422.16" y="188.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">نابرنامه ساز</text>
+</g>
+<g class="entity" data-id="entity:برنامه ساز">
+<rect class="shape" x="216.45" y="160" width="107.44" height="46" rx="5"/>
+<text x="270.17" y="188.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">برنامه ساز</text>
+</g>
+<g class="entity" data-id="entity:سیستمی">
+<rect class="shape" x="416.83" y="320" width="101.71" height="46" rx="5"/>
+<text x="467.68" y="348.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">سیستمی</text>
+</g>
+<g class="entity" data-id="entity:متخصص Backend">
+<rect class="shape" x="185.3" y="320" width="169.73" height="46" rx="5"/>
+<text x="270.17" y="348.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">متخصص Backend</text>
+</g>
+<g class="entity" data-id="entity:متخصص Front">
+<rect class="shape" x="0" y="320" width="145.3" height="46" rx="5"/>
+<text x="72.65" y="348.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">متخصص Front</text>
+</g>
+<g class="circle" data-id="spec:کارمند(نابرنامه ساز,برنامه ساز)">
+<ellipse class="shape" cx="346.17" cy="103" rx="17" ry="17"/>
+<text x="346.17" y="109.12" font-size="18" font-weight="bold" text-anchor="middle">D</text>
+</g>
+<g class="circle" data-id="spec:برنامه ساز(سیستمی,متخصص Backend,متخصص Front)">
+<ellipse class="shape" cx="270.17" cy="263" rx="17" ry="17"/>
+<text x="270.17" y="269.12" font-size="18" font-weight="bold" text-anchor="middle">O</text>
+</g>
+</g>
+<g class="labels">
+</g>
+</svg>

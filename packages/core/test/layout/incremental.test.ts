@@ -80,9 +80,9 @@ function linesThroughNew(s: SizedDiagram, layout: Layout): string[] {
   const fresh = [...layout.keys()].filter((id) => !pinned.layout.has(id));
   const result: string[] = [];
   for (const link of s.diagram.links) {
-    const [a, b] = [layout.get(link.entity)!, layout.get(link.relationship)!];
+    const [a, b] = [layout.get(link.to)!, layout.get(link.from)!];
     for (const id of fresh) {
-      if (id === link.entity || id === link.relationship) continue;
+      if (id === link.to || id === link.from) continue;
       if (segmentHitsShape(a, b, s.geometry.get(id)!.shape, layout.get(id)!)) {
         result.push(`${link.id} through ${id}`);
       }

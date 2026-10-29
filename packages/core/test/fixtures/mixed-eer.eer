@@ -1,0 +1,29 @@
+// Every EER construct together with ordinary relationships, written for the
+// layout rather than taken from a slide, so it does not just fit the slides.
+entity Person { ssn: key, name { first, last }, phones: multi }
+entity Employee { salary }
+entity Student { gpa: derived }
+entity Professor { rank }
+specialize Person overlapping total { Employee, Student }
+specialize Employee disjoint { Professor, Staff }
+
+entity Department { dname: key, budget }
+rel WorksIn {
+  Employee N total
+  Department 1
+  attrs { since }
+}
+
+entity Bank { bid: key }
+entity Company { cid: key }
+category Sponsor { Bank, Company }
+rel Funds { Sponsor 1, Project N }
+
+entity Project { pid: key, title }
+aggregate Supervision { rel Supervises { Professor 1, Student N, Project } }
+rel Evaluates { Supervision, Committee, attrs { grade } }
+
+entity Building { bno: key }
+entity Room { number: key }
+partof Building { Room, Lab }
+rel LocatedIn { Department N, Building 1 }

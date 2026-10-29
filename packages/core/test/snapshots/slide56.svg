@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 288 530" width="288" height="530">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="288" height="530" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="108.81" y1="90.21" x2="70.13" y2="46"/>
+<path class="line" d="M94.73,63.49 A7,7 0 0 1 84.2,72.71"/>
+<line class="line" x1="131.19" y1="90.21" x2="169.88" y2="46"/>
+<path class="line" d="M155.8,72.71 A7,7 0 0 1 145.27,63.49"/>
+<line class="line" x1="117.5" y1="160" x2="117.5" y2="119.82"/>
+<line class="line" x1="122.5" y1="160" x2="122.5" y2="119.82"/>
+<line class="line" x1="108.81" y1="356.21" x2="70.13" y2="312"/>
+<path class="line" d="M94.73,329.49 A7,7 0 0 1 84.2,338.71"/>
+<line class="line" x1="131.19" y1="356.21" x2="169.88" y2="312"/>
+<path class="line" d="M155.8,338.71 A7,7 0 0 1 145.27,329.49"/>
+<line class="line" x1="120" y1="426" x2="120" y2="386"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:G">
+<rect class="shape" x="70" y="160" width="100" height="46" rx="5"/>
+<text x="120" y="188.44" font-size="16" font-weight="bold" text-anchor="middle">G</text>
+</g>
+<g class="entity" data-id="entity:E">
+<rect class="shape" x="0" y="0" width="100" height="46" rx="5"/>
+<text x="50" y="28.44" font-size="16" font-weight="bold" text-anchor="middle">E</text>
+</g>
+<g class="entity" data-id="entity:F">
+<rect class="shape" x="140" y="0" width="100" height="46" rx="5"/>
+<text x="190" y="28.44" font-size="16" font-weight="bold" text-anchor="middle">F</text>
+</g>
+<g class="entity" data-id="entity:K">
+<rect class="shape" x="70" y="426" width="100" height="46" rx="5"/>
+<text x="120" y="454.44" font-size="16" font-weight="bold" text-anchor="middle">K</text>
+</g>
+<g class="entity" data-id="entity:H">
+<rect class="shape" x="0" y="266" width="100" height="46" rx="5"/>
+<text x="50" y="294.44" font-size="16" font-weight="bold" text-anchor="middle">H</text>
+</g>
+<g class="entity" data-id="entity:J">
+<rect class="shape" x="140" y="266" width="100" height="46" rx="5"/>
+<text x="190" y="294.44" font-size="16" font-weight="bold" text-anchor="middle">J</text>
+</g>
+<g class="circle" data-id="union:G(E,F)">
+<ellipse class="shape" cx="120" cy="103" rx="17" ry="17"/>
+<text x="120" y="109.12" font-size="18" font-weight="bold" text-anchor="middle">U</text>
+</g>
+<g class="circle" data-id="union:K(H,J)">
+<ellipse class="shape" cx="120" cy="369" rx="17" ry="17"/>
+<text x="120" y="375.12" font-size="18" font-weight="bold" text-anchor="middle">U</text>
+</g>
+</g>
+<g class="labels">
+</g>
+</svg>

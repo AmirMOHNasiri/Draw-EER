@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 428 529.85" width="428" height="529.85">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="428" height="529.85" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="241.87" y1="266" x2="266.89" y2="249.44"/>
+<line class="line" x1="206.92" y1="266" x2="206.66" y2="236"/>
+<line class="line" x1="125.01" y1="398" x2="122.39" y2="427.88"/>
+<line class="line" x1="88.74" y1="398" x2="63.03" y2="413.45"/>
+<line class="line" x1="280.41" y1="398" x2="271.89" y2="426.76"/>
+<line class="line" x1="292.56" y1="86" x2="227.44" y2="46"/>
+<path class="line" d="M263.66,60.04 A7,7 0 0 1 256.34,71.96"/>
+<line class="line" x1="190" y1="86" x2="190" y2="46"/>
+<path class="line" d="M197,66 A7,7 0 0 1 183,66"/>
+<line class="line" x1="87.44" y1="86" x2="152.56" y2="46"/>
+<path class="line" d="M123.66,71.96 A7,7 0 0 1 116.34,60.04"/>
+<line class="line" x1="265.8" y1="352" x2="228.54" y2="312"/>
+<path class="line" d="M252.29,327.23 A7,7 0 0 1 242.05,336.77"/>
+<line class="line" x1="148.44" y1="352" x2="185.7" y2="312"/>
+<path class="line" d="M172.19,336.77 A7,7 0 0 1 161.95,327.23"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:موجود زنده">
+<rect class="shape" x="132.05" y="0" width="115.89" height="46" rx="5"/>
+<text x="190" y="28.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">موجود زنده</text>
+</g>
+<g class="entity" data-id="entity:انسان">
+<rect class="shape" x="280" y="86" width="100" height="46" rx="5"/>
+<text x="330" y="114.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">انسان</text>
+</g>
+<g class="entity" data-id="entity:حیوان">
+<rect class="shape" x="140" y="86" width="100" height="46" rx="5"/>
+<text x="190" y="114.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">حیوان</text>
+</g>
+<g class="entity" data-id="entity:نبات">
+<rect class="shape" x="0" y="86" width="100" height="46" rx="5"/>
+<text x="50" y="114.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">نبات</text>
+</g>
+<g class="entity" data-id="entity:کارمند">
+<rect class="shape" x="157.12" y="266" width="100" height="46" rx="5"/>
+<text x="207.12" y="294.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند</text>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند/شماره">
+<ellipse class="shape" cx="292.63" cy="232.4" rx="40.71" ry="22"/>
+<text x="292.63" y="237.84" font-size="16" text-anchor="middle" direction="rtl">شماره</text>
+<line class="line" x1="273.81" y1="240.84" x2="311.46" y2="240.84" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند/نام">
+<ellipse class="shape" cx="206.47" cy="214" rx="37" ry="22"/>
+<text x="206.47" y="219.44" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="entity" data-id="entity:کارمند مونث">
+<rect class="shape" x="65.7" y="352" width="122.64" height="46" rx="5"/>
+<text x="127.02" y="380.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند مونث</text>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند مونث/A">
+<ellipse class="shape" cx="120.47" cy="449.85" rx="37" ry="22"/>
+<text x="120.47" y="455.29" font-size="16" text-anchor="middle">A</text>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند مونث/B">
+<ellipse class="shape" cx="37" cy="429.09" rx="37" ry="22"/>
+<text x="37" y="434.53" font-size="16" text-anchor="middle">B</text>
+</g>
+<g class="entity" data-id="entity:کارمند مذکر">
+<rect class="shape" x="228.34" y="352" width="117.77" height="46" rx="5"/>
+<text x="287.22" y="380.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند مذکر</text>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند مذکر/C">
+<ellipse class="shape" cx="265.47" cy="448.43" rx="37" ry="22"/>
+<text x="265.47" y="453.87" font-size="16" text-anchor="middle">C</text>
+</g>
+</g>
+<g class="labels">
+</g>
+</svg>

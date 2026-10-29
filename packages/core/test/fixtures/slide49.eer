@@ -1,0 +1,3 @@
+// Slide 49: disjoint total (D, double line) and overlapping partial (O).
+specialize کارمند disjoint total { "کارمند مذکر", "کارمند مونث" }
+specialize "برنامه ساز" overlapping { "APP نویس", "سیستم نویس" }

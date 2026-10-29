@@ -1,0 +1,16 @@
+// Slide 52: multiple inheritance (a subtype of two supertypes).
+entity G inherits E, F
+
+entity کارمند {
+  نام
+  "کد ملی": key2
+  "شماره کارگزینی": key
+  "سال استخدام"
+}
+entity دانشجو {
+  نام
+  "کد ملی": key2
+  "شماره دانشجویی": key
+  "سال ورود"
+}
+entity داکا inherits دانشجو, کارمند { "ساعات مجاز کار" }

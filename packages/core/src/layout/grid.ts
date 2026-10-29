@@ -1,4 +1,5 @@
 import type { AttributeNode, Diagram } from '../model/types';
+import { treeCells, type Hierarchy } from './tree';
 
 /**
  * Places entities and relationships in the cells of a grid.
@@ -23,6 +24,20 @@ import type { AttributeNode, Diagram } from '../model/types';
  * - the drawing pays for its area and for not being landscape (diagrams
  *   end up in slides and reports), both while it grows and when finished.
  *
+ * Hierarchies (specialization, category, part-of) are not placed shape by
+ * shape: each one is a rigid block of cells laid out as a tree (see
+ * tree.ts), placed all at once where its lines to the rest cost least, and
+ * never turned. Nothing else may go inside it. An aggregate is a rigid block
+ * too, laid out on its own beforehand (see layout.ts); nothing may go
+ * inside its box, and lines between other shapes should not cross it. A
+ * relationship that connects to an aggregate goes straight below the
+ * relationship inside (`COST.aggregate`), and other lines into it should
+ * reach its shapes from outside the box (`COST.intoBox`). An aggregate comes
+ * in variants (its participants arranged in different ways around the
+ * relationship); the one that fits best is used. A relationship between entities
+ * of two different hierarchies should have both in its own row, so its
+ * lines are one straight line (`COST.acrossTrees`).
+ *
  * The greedy pass runs from a few different starting shapes. Each result is
  * then improved by rotating whole branches (parts of the diagram that hang
  * off a single line) around the shape they hang from, which folds long
@@ -33,6 +48,12 @@ import type { AttributeNode, Diagram } from '../model/types';
 export interface Cell {
   col: number;
   row: number;
+}
+
+/** An aggregate laid out on its own: its cells in each variant, relative to the relationship inside. */
+export interface AggregateCells {
+  inner: string;
+  variants: Map<string, Cell>[];
 }
 
 const DIRECTIONS: Cell[] = [
@@ -88,6 +109,27 @@ const COST = {
   /** Degrees of open angle each attribute (nested ones included) needs, up to `maxRoom`. */
   roomPerAttribute: 25,
   maxRoom: 270,
+  /**
+   * For each broken aggregate rule: a relationship connecting to an
+   * aggregate not straight below the relationship inside it, or not below
+   * all of the aggregate's participants; a participant below the
+   * relationship inside. High enough to act as a rule.
+   */
+  aggregate: 1000,
+  /** A binary relationship between two hierarchies whose entities are not both in its row. */
+  acrossTrees: 80,
+  /**
+   * A line from outside an aggregate to a shape inside it that does not come
+   * from the shape's outer side (away from the relationship inside, or from
+   * below for the relationship itself), where its attributes left room.
+   */
+  intoBox: 60,
+  /**
+   * An EER line that leaves its tree (to a shape inside an aggregate) and
+   * runs sideways instead of down from the general end; twice this if it
+   * runs up.
+   */
+  notDownward: 40,
 };
 
 /**
@@ -95,8 +137,13 @@ const COST = {
  * (for very large diagrams) tries one starting shape instead of four and
  * fewer rounds of rotation.
  */
-export function placeOnGrid(diagram: Diagram, quick = false): Map<string, Cell>[] {
-  const graph = new Graph(diagram);
+export function placeOnGrid(
+  diagram: Diagram,
+  hierarchies: Hierarchy[],
+  aggregates: AggregateCells[],
+  quick = false,
+): Map<string, Cell>[] {
+  const graph = new Graph(diagram, hierarchies, aggregates);
   return graph.components().map((component) => {
     let best: { cells: Map<string, Cell>; cost: number } | null = null;
     for (const root of graph.roots(component).slice(0, quick ? 1 : 4)) {
@@ -122,8 +169,17 @@ class Graph {
   readonly attributes = new Map<string, number>();
   /** Unary relationships: both lines go to one entity. */
   readonly unary = new Set<string>();
+  /** The block of every shape in a hierarchy or aggregate, in each of its variants. */
+  readonly blockOf = new Map<string, Block[]>();
+  /** For every shape inside an aggregate, the relationship inside. */
+  readonly innerOf = new Map<string, string>();
+  readonly aggregates: { inner: string; participants: string[]; outer: string[] }[];
+  /** Binary relationships between entities of two different hierarchies: [relationship, entity, entity]. */
+  readonly acrossTrees: [string, string, string][] = [];
+  /** EER lines outside any tree: general end → specific ends. */
+  readonly downward = new Map<string, Set<string>>();
 
-  constructor(diagram: Diagram) {
+  constructor(diagram: Diagram, hierarchies: Hierarchy[], aggregates: AggregateCells[]) {
     const count = (list: AttributeNode[]): number =>
       list.reduce((sum, a) => sum + 1 + count(a.children), 0);
     diagram.nodes.forEach((node, i) => {
@@ -133,12 +189,144 @@ class Graph {
       this.attributes.set(node.id, count(node.attributes));
     });
     for (const link of diagram.links) {
-      const a = this.neighbours.get(link.entity)!;
-      const b = this.neighbours.get(link.relationship)!;
-      if (b.includes(link.entity) && b.length === 1) this.unary.add(link.relationship);
-      if (!a.includes(link.relationship)) a.push(link.relationship);
-      if (!b.includes(link.entity)) b.push(link.entity);
+      const a = this.neighbours.get(link.to)!;
+      const b = this.neighbours.get(link.from)!;
+      if (b.includes(link.to) && b.length === 1) this.unary.add(link.from);
+      if (!a.includes(link.from)) a.push(link.from);
+      if (!b.includes(link.to)) b.push(link.to);
     }
+    for (const hierarchy of hierarchies) {
+      const block = new Block(treeCells(hierarchy), false);
+      for (const id of hierarchy.members) this.blockOf.set(id, [block]);
+    }
+    for (const { inner, variants } of aggregates) {
+      // The relationship first, so that it is placed before the others (see `outward`).
+      const blocks = variants.map(
+        (cells) =>
+          new Block(
+            new Map([[inner, cells.get(inner)!], ...[...cells].filter(([id]) => id !== inner)]),
+            true,
+          ),
+      );
+      for (const id of variants[0]!.keys()) {
+        this.blockOf.set(id, blocks);
+        this.innerOf.set(id, inner);
+      }
+    }
+    const tree = new Map<string, number>();
+    hierarchies.forEach((h, i) => h.members.forEach((id) => tree.set(id, i)));
+    for (const link of diagram.links) {
+      if (link.kind === 'participation') continue;
+      const block = tree.get(link.from);
+      if (block !== undefined && block === tree.get(link.to)) continue;
+      if (!this.downward.has(link.from)) this.downward.set(link.from, new Set());
+      this.downward.get(link.from)!.add(link.to);
+    }
+    for (const node of diagram.nodes) {
+      if (node.kind !== 'relationship') continue;
+      const ends = [...new Set(diagram.links.filter((l) => l.from === node.id).map((l) => l.to))];
+      const [a, b] = ends;
+      if (ends.length !== 2 || !tree.has(a!) || !tree.has(b!) || tree.get(a!) === tree.get(b!))
+        continue;
+      this.acrossTrees.push([node.id, a!, b!]);
+    }
+    this.aggregates = diagram.aggregates.map((a) => ({
+      inner: a.relationship,
+      participants: a.members.filter((m) => m !== a.relationship),
+      outer: diagram.links.filter((l) => l.aggregate === a.id).map((l) => l.from),
+    }));
+  }
+
+  /**
+   * Cost of the line between `a` and `b` if it enters an aggregate (`a` or
+   * `b` inside it, the other outside) from the wrong side (see `COST.intoBox`).
+   */
+  intoBoxCost(a: string, aCell: Cell, b: string, bCell: Cell, cells: Map<string, Cell>): number {
+    let cost = 0;
+    for (const [inside, here, there, outside] of [
+      [a, aCell, bCell, b],
+      [b, bCell, aCell, a],
+    ] as const) {
+      const inner = this.innerOf.get(inside);
+      if (inner === undefined || this.innerOf.get(outside) === inner) continue;
+      const out = this.outward(inside, here, cells);
+      if (out && out.col * (there.col - here.col) + out.row * (there.row - here.row) <= 0)
+        cost += COST.intoBox;
+    }
+    return cost;
+  }
+
+  /** The outer side of a shape inside an aggregate: away from the relationship, or down for it. */
+  private outward(id: string, cell: Cell, cells: Map<string, Cell>): Cell | null {
+    const inner = this.innerOf.get(id)!;
+    if (id === inner) return { col: 0, row: 1 };
+    const c = cells.get(inner);
+    if (!c) return null;
+    return { col: Math.sign(cell.col - c.col), row: Math.sign(cell.row - c.row) };
+  }
+
+  /** Cost of the line between `a` and `b` if it is an EER line outside a tree that does not run down. */
+  downwardCost(a: string, aCell: Cell, b: string, bCell: Cell): number {
+    const [upper, lower] = this.downward.get(a)?.has(b)
+      ? [aCell, bCell]
+      : this.downward.get(b)?.has(a)
+        ? [bCell, aCell]
+        : [null, null];
+    if (!upper || !lower || lower.row > upper.row) return 0;
+    return lower.row === upper.row ? COST.notDownward : 2 * COST.notDownward;
+  }
+
+  /**
+   * How many relationships between two hierarchies `id` in `cell` leaves
+   * bent, with the shapes already in `cells` (see `COST.acrossTrees`).
+   */
+  acrossTreesFaults(id: string, cell: Cell, cells: Map<string, Cell>): number {
+    let faults = 0;
+    for (const trio of this.acrossTrees) {
+      if (!trio.includes(id)) continue;
+      const rows = trio.map((t) => (t === id ? cell : cells.get(t))?.row);
+      if (rows.every((r) => r !== undefined) && new Set(rows).size > 1) faults++;
+    }
+    return faults;
+  }
+
+  /**
+   * How many aggregate rules `id` in `cell` breaks with the shapes already
+   * in `cells` (see `COST.aggregate`).
+   */
+  aggregateFaults(id: string, cell: Cell, cells: Map<string, Cell>): number {
+    let faults = 0;
+    for (const { inner, participants, outer } of this.aggregates) {
+      const below = (lower: Cell, upper: Cell) => lower.row > upper.row;
+      const under = (lower: Cell, upper: Cell) => lower.col === upper.col && below(lower, upper);
+      if (outer.includes(id)) {
+        const i = cells.get(inner);
+        if (i && !under(cell, i)) faults++;
+        for (const p of participants) {
+          const c = cells.get(p);
+          if (c && !below(cell, c)) faults++;
+        }
+      }
+      if (id === inner) {
+        for (const o of outer) {
+          const c = cells.get(o);
+          if (c && !under(c, cell)) faults++;
+        }
+        for (const p of participants) {
+          const c = cells.get(p);
+          if (c && below(c, cell)) faults++;
+        }
+      }
+      if (participants.includes(id)) {
+        const i = cells.get(inner);
+        if (i && below(cell, i)) faults++;
+        for (const o of outer) {
+          const c = cells.get(o);
+          if (c && !below(c, cell)) faults++;
+        }
+      }
+    }
+    return faults;
   }
 
   degree(id: string): number {
@@ -182,11 +370,54 @@ class Graph {
   }
 }
 
+/**
+ * A rigid block of cells: a hierarchy (relative to its first root) or an
+ * aggregate (relative to the relationship inside), and the cells it keeps
+ * free inside. A hierarchy keeps free, on each row, everything between its
+ * leftmost and rightmost shape in that row and the rows just above and below
+ * (so no shape can end up between its levels, where the rigid block leaves
+ * no room); an aggregate keeps its whole box free.
+ */
+class Block {
+  readonly reserved: { row: number; lo: number; hi: number }[] = [];
+  /** An aggregate's box, in cells; null for a hierarchy. */
+  readonly box: { minCol: number; maxCol: number; minRow: number; maxRow: number } | null;
+
+  constructor(
+    readonly cells: Map<string, Cell>,
+    aggregate: boolean,
+  ) {
+    const rows = [...cells.values()].map((c) => c.row);
+    const cols = [...cells.values()].map((c) => c.col);
+    this.box = aggregate
+      ? {
+          minCol: Math.min(...cols),
+          maxCol: Math.max(...cols),
+          minRow: Math.min(...rows),
+          maxRow: Math.max(...rows),
+        }
+      : null;
+    for (let row = Math.min(...rows); row <= Math.max(...rows); row++) {
+      if (this.box) {
+        this.reserved.push({ row, lo: this.box.minCol, hi: this.box.maxCol });
+        continue;
+      }
+      const near = [...cells.values()].filter((c) => Math.abs(c.row - row) <= 1);
+      const nearCols = near.map((c) => c.col);
+      this.reserved.push({ row, lo: Math.min(...nearCols), hi: Math.max(...nearCols) });
+    }
+  }
+}
+
 class GreedyPlacer {
   private readonly cells = new Map<string, Cell>();
   private readonly occupied = new Map<string, string>();
   /** Lines between placed shapes. */
   private readonly edges: [string, string][] = [];
+  /** Inside placed blocks, by the first cell of their first root. */
+  private readonly reserved: { row: number; lo: number; hi: number }[] = [];
+  /** Placed aggregate boxes, with the shapes inside them. */
+  private readonly boxes: { box: CellBox; members: Set<string> }[] = [];
 
   constructor(
     private readonly graph: Graph,
@@ -194,12 +425,110 @@ class GreedyPlacer {
   ) {}
 
   run(root: string): Map<string, Cell> {
-    this.place(root, { col: 0, row: 0 });
+    const blocks = this.graph.blockOf.get(root);
+    if (blocks) {
+      const at = blocks[0]!.cells.get(root)!;
+      this.placeBlock(blocks[0]!, { col: -at.col, row: -at.row });
+    } else {
+      this.place(root, { col: 0, row: 0 });
+    }
     while (this.cells.size < this.component.length) {
       const next = this.pickNext();
-      this.place(next, this.bestCell(next));
+      const variants = this.graph.blockOf.get(next);
+      if (variants) {
+        const { block, shift } = this.bestShift(variants);
+        this.placeBlock(block, shift);
+      } else {
+        this.place(next, this.bestCell(next));
+      }
     }
     return this.cells;
+  }
+
+  /**
+   * Where to put a block: each of its shapes that has a placed neighbour is
+   * tried in every cell `bestCell` would try for it (further out if none is
+   * free), and each try costs what placing the block's shapes one by one
+   * would. Every variant of the block is tried.
+   */
+  private bestShift(variants: Block[]): { block: Block; shift: Cell } {
+    let best: { block: Block; shift: Cell } | null = null;
+    let bestCost = Infinity;
+    for (let reach = 3; best === null; reach += 3) {
+      for (const block of variants) {
+        const tried = new Set<string>();
+        for (const [id, from] of block.cells) {
+          for (const neighbour of this.placedNeighbours(id)) {
+            const n = this.cells.get(neighbour)!;
+            for (const d of DIRECTIONS) {
+              for (let length = 1; length <= reach; length++) {
+                const shift = {
+                  col: n.col + d.col * length - from.col,
+                  row: n.row + d.row * length - from.row,
+                };
+                if (tried.has(key(shift))) continue;
+                tried.add(key(shift));
+                const cost = this.blockCost(block, shift);
+                if (cost < bestCost - 1e-9) {
+                  best = { block, shift };
+                  bestCost = cost;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return best!;
+  }
+
+  /** Cost of a block moved by `shift`; Infinity if it would overlap anything. */
+  private blockCost(block: Block, shift: Cell): number {
+    const moved = [...block.cells].map(([id, c]): [string, Cell] => [
+      id,
+      { col: c.col + shift.col, row: c.row + shift.row },
+    ]);
+    if (moved.some(([, c]) => this.taken(c))) return Infinity;
+    for (const r of block.reserved) {
+      for (const c of this.cells.values()) {
+        if (c.row === r.row + shift.row && c.col >= r.lo + shift.col && c.col <= r.hi + shift.col)
+          return Infinity;
+      }
+    }
+    let cost = 0;
+    if (block.box) {
+      // Lines already drawn between other shapes should not cross the new box.
+      const box = shiftBox(block.box, shift);
+      for (const [a, b] of this.edges) {
+        if (segmentHitsCellBox(this.cells.get(a)!, this.cells.get(b)!, box))
+          cost += COST.throughShape;
+      }
+    }
+    const placed: string[] = [];
+    for (const [id, c] of moved) {
+      cost += this.cost(id, c);
+      this.place(id, c);
+      placed.push(id);
+    }
+    for (const id of placed.reverse()) this.unplace(id);
+    return cost;
+  }
+
+  private placeBlock(block: Block, shift: Cell): void {
+    for (const [id, c] of block.cells)
+      this.place(id, { col: c.col + shift.col, row: c.row + shift.row });
+    for (const r of block.reserved) {
+      this.reserved.push({ row: r.row + shift.row, lo: r.lo + shift.col, hi: r.hi + shift.col });
+    }
+    if (block.box) {
+      this.boxes.push({ box: shiftBox(block.box, shift), members: new Set(block.cells.keys()) });
+    }
+  }
+
+  /** True if a shape is in the cell or a block keeps it free. */
+  private taken(cell: Cell): boolean {
+    if (this.occupied.has(key(cell))) return true;
+    return this.reserved.some((r) => r.row === cell.row && cell.col >= r.lo && cell.col <= r.hi);
   }
 
   /** The unplaced shape with the most placed neighbours (then most lines, then model order). */
@@ -234,7 +563,7 @@ class GreedyPlacer {
             col: from.col + direction.col * length,
             row: from.row + direction.row * length,
           };
-          if (this.occupied.has(key(cell))) continue;
+          if (this.taken(cell)) continue;
           const cost = this.cost(id, cell);
           if (cost < bestCost - 1e-9) {
             best = cell;
@@ -255,7 +584,14 @@ class GreedyPlacer {
     for (const neighbour of neighbours) {
       const other = this.cells.get(neighbour)!;
       cost += lineCost(cell, other);
+      cost += this.graph.downwardCost(id, cell, neighbour, other);
+      cost += this.graph.intoBoxCost(id, cell, neighbour, other, this.cells);
       if (this.runsThroughShape(cell, other, [id, neighbour])) cost += COST.throughShape;
+      // Only lines to a shape inside an aggregate may cross into its box.
+      for (const { box, members } of this.boxes) {
+        if (!members.has(id) && !members.has(neighbour) && segmentHitsCellBox(cell, other, box))
+          cost += COST.throughShape;
+      }
       for (const [a, b] of this.edges) {
         if (a === neighbour || b === neighbour) continue;
         if (segmentsCross(cell, other, this.cells.get(a)!, this.cells.get(b)!))
@@ -279,6 +615,8 @@ class GreedyPlacer {
       }
     }
     cost += roomCost(newArms, this.graph.attributes.get(id)!);
+    cost += COST.aggregate * this.graph.aggregateFaults(id, cell, this.cells);
+    cost += COST.acrossTrees * this.graph.acrossTreesFaults(id, cell, this.cells);
 
     // The new shape must not sit on an existing line.
     for (const [a, b] of this.edges) {
@@ -317,6 +655,14 @@ class GreedyPlacer {
     for (const neighbour of this.placedNeighbours(id)) this.edges.push([id, neighbour]);
   }
 
+  /** Undoes the last `place` of `id` (its lines were the last ones added). */
+  private unplace(id: string): void {
+    const cell = this.cells.get(id)!;
+    this.cells.delete(id);
+    this.occupied.delete(key(cell));
+    while (this.edges.length > 0 && this.edges.at(-1)![0] === id) this.edges.pop();
+  }
+
   private placedNeighbours(id: string): string[] {
     return this.graph.neighbours.get(id)!.filter((n) => this.cells.has(n));
   }
@@ -352,6 +698,8 @@ function totalCost(graph: Graph, cells: Map<string, Cell>): number {
     const p = cells.get(a)!;
     const q = cells.get(b)!;
     cost += lineCost(p, q);
+    cost += graph.downwardCost(a, p, b, q);
+    cost += graph.intoBoxCost(a, p, b, q, cells);
     for (const [id, c] of cells) {
       if (id !== a && id !== b && onSegment(c, p, q)) cost += COST.throughShape;
     }
@@ -372,6 +720,11 @@ function totalCost(graph: Graph, cells: Map<string, Cell>): number {
       for (let j = i + 1; j < arms.length; j++) cost += bend * spreadCost(arms[i]!, arms[j]!);
     }
     cost += roomCost(arms, graph.attributes.get(id)!);
+  }
+  // Each fault is seen from both shapes involved (or all three).
+  for (const [id, cell] of cells) {
+    cost += (COST.aggregate / 2) * graph.aggregateFaults(id, cell, cells);
+    cost += (COST.acrossTrees / 3) * graph.acrossTreesFaults(id, cell, cells);
   }
   return cost + shapeCost([...cells.values()]);
 }
@@ -409,7 +762,11 @@ function improveByRotation(
 ): Map<string, Cell> {
   let cells = start;
   let cost = totalCost(graph, cells);
-  const bridges = [{ pivot: component[0]!, branch: component }, ...findBridges(graph, component)];
+  // Hierarchies are always drawn top-down, so nothing that holds one turns.
+  const bridges = [
+    { pivot: component[0]!, branch: component },
+    ...findBridges(graph, component),
+  ].filter(({ branch }) => !branch.some((id) => graph.blockOf.has(id)));
   for (let round = 0; round < rounds; round++) {
     let improved = false;
     for (const { pivot, branch } of bridges) {
@@ -537,6 +894,45 @@ function segmentsCross(a: Cell, b: Cell, c: Cell, d: Cell): boolean {
   const d3 = cross(a, b, c);
   const d4 = cross(a, b, d);
   return d1 * d2 < 0 && d3 * d4 < 0;
+}
+
+interface CellBox {
+  minCol: number;
+  maxCol: number;
+  minRow: number;
+  maxRow: number;
+}
+
+function shiftBox(box: CellBox, shift: Cell): CellBox {
+  return {
+    minCol: box.minCol + shift.col,
+    maxCol: box.maxCol + shift.col,
+    minRow: box.minRow + shift.row,
+    maxRow: box.maxRow + shift.row,
+  };
+}
+
+/** True if the segment from `a` to `b` passes through the box (grown by under half a cell). */
+function segmentHitsCellBox(a: Cell, b: Cell, box: CellBox): boolean {
+  const m = 0.4;
+  let t0 = 0;
+  let t1 = 1;
+  const d = { col: b.col - a.col, row: b.row - a.row };
+  for (const [p, q, lo, hi] of [
+    [a.col, d.col, box.minCol - m, box.maxCol + m],
+    [a.row, d.row, box.minRow - m, box.maxRow + m],
+  ] as const) {
+    if (Math.abs(q) < 1e-12) {
+      if (p < lo || p > hi) return false;
+      continue;
+    }
+    let [s, e] = [(lo - p) / q, (hi - p) / q];
+    if (s > e) [s, e] = [e, s];
+    t0 = Math.max(t0, s);
+    t1 = Math.min(t1, e);
+    if (t0 > t1) return false;
+  }
+  return true;
 }
 
 function normalizeCells(cells: Map<string, Cell>): Map<string, Cell> {

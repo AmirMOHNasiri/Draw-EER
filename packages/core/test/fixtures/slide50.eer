@@ -1,0 +1,5 @@
+// Slide 50: the four kinds of specialization.
+specialize E1 disjoint total { A1, B1 }
+specialize E2 disjoint partial { A2, B2 }
+specialize E3 overlapping total { A3, B3 }
+specialize E4 overlapping partial { A4, B4 }

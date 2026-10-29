@@ -91,8 +91,8 @@ export function snap(
 ): Point {
   const partners = new Set<string>();
   for (const link of diagram.links) {
-    if (link.entity === id) partners.add(link.relationship);
-    if (link.relationship === id) partners.add(link.entity);
+    if (link.to === id) partners.add(link.from);
+    if (link.from === id) partners.add(link.to);
   }
   const owner = owners(diagram).get(id);
   if (owner !== undefined) partners.add(owner);

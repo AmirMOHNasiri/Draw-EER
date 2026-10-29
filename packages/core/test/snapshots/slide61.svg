@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -24 516 433.85" width="516" height="433.85">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-24" width="516" height="433.85" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="234" y1="97.69" x2="234.83" y2="68"/>
+<line class="line" x1="288" y1="248.05" x2="310.86" y2="243.4"/>
+<line class="line" x1="180" y1="248.05" x2="157.14" y2="252.69"/>
+<g class="aggregate" data-id="aggregate:A">
+<rect class="outline dashed" x="0" y="0" width="468" height="183.29" rx="16"/>
+</g>
+<line class="line" x1="124" y1="128.49" x2="180" y2="128.49"/>
+<line class="line" x1="344" y1="128.49" x2="288" y2="128.49"/>
+<line class="line dashed" x1="234" y1="159.29" x2="234" y2="183.29"/>
+<line class="line" x1="234" y1="183.29" x2="234" y2="217.25"/>
+<line class="line" x1="234" y1="334.85" x2="234" y2="278.85"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:E">
+<rect class="shape" x="24" y="105.49" width="100" height="46" rx="5"/>
+<text x="74" y="133.93" font-size="16" font-weight="bold" text-anchor="middle">E</text>
+</g>
+<g class="entity" data-id="entity:F">
+<rect class="shape" x="344" y="105.49" width="100" height="46" rx="5"/>
+<text x="394" y="133.93" font-size="16" font-weight="bold" text-anchor="middle">F</text>
+</g>
+<g class="entity" data-id="entity:G">
+<rect class="shape" x="184" y="334.85" width="100" height="46" rx="5"/>
+<text x="234" y="363.29" font-size="16" font-weight="bold" text-anchor="middle">G</text>
+</g>
+<g class="relationship" data-id="rel:R1(E,F)">
+<polygon class="shape" points="234,97.69 288,128.49 234,159.29 180,128.49"/>
+<text x="234" y="133.93" font-size="16" font-weight="bold" text-anchor="middle">R1</text>
+</g>
+<g class="attribute" data-id="attr:rel:R1(E,F)/a">
+<ellipse class="shape" cx="235.44" cy="46" rx="37" ry="22"/>
+<text x="235.44" y="51.44" font-size="16" text-anchor="middle">a</text>
+</g>
+<g class="relationship" data-id="rel:R2(A,G)">
+<polygon class="shape" points="234,217.25 288,248.05 234,278.85 180,248.05"/>
+<text x="234" y="253.49" font-size="16" font-weight="bold" text-anchor="middle">R2</text>
+</g>
+<g class="attribute" data-id="attr:rel:R2(A,G)/b">
+<ellipse class="shape" cx="345.87" cy="236.29" rx="37" ry="22"/>
+<text x="345.87" y="241.73" font-size="16" text-anchor="middle">b</text>
+</g>
+<g class="attribute" data-id="attr:rel:R2(A,G)/c">
+<ellipse class="shape" cx="122.13" cy="259.81" rx="37" ry="22"/>
+<text x="122.13" y="265.25" font-size="16" text-anchor="middle">c</text>
+</g>
+</g>
+<g class="labels">
+</g>
+</svg>

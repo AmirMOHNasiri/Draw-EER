@@ -21,6 +21,24 @@ export const STYLE = {
   doubleGap: 5,
   entity: { paddingX: 22, minWidth: 100, height: 46, cornerRadius: 5, repeatedLineOffset: 8 },
   relationship: { paddingX: 8, paddingY: 5, minWidth: 108, minHeight: 58, wrapWidth: 100 },
+  /**
+   * The D, O and U circles; `junction` is the size kept free around the
+   * point where the lines of a total specialization without D or O split.
+   */
+  circle: { diameter: 34, fontSize: 18, junction: 8 },
+  /** The "Has" hexagon of part-of: `tip` is how far each pointed end reaches past the sides. */
+  partOf: { paddingX: 5, paddingY: 4, tip: 10 },
+  /** The subset symbol on lines toward a subtype: a half circle of this radius. */
+  subset: { radius: 7 },
+  /**
+   * Hierarchies (see layout/tree.ts): `siblingGap` between neighbouring
+   * subtrees (attributes included), `levelGap` between the outlines of a
+   * shape and the shapes one level below it, `partGap` between a part-of
+   * hexagon and each shape it joins.
+   */
+  tree: { siblingGap: 40, levelGap: 40, partGap: 22 },
+  /** The dashed box around an aggregate: space between it and what it holds. */
+  aggregate: { padding: 24, cornerRadius: 16 },
   /** `paddingY`: space above and below the text inside an ellipse. */
   attribute: { paddingX: 20, paddingY: 11, minWidth: 74, height: 44, wrapWidth: 130 },
   underline: { offset: 3, doubleSpacing: 3, dash: '4 3' },

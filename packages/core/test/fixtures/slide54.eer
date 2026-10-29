@@ -1,0 +1,5 @@
+// Slide 54: generalization of two entities into کارمند.
+entity کارمند { شماره: key, نام }
+entity روزمزد { "تاریخ شروع قرارداد", مدت, "مزد روز" }
+entity رسمی { "سال استخدام", پایه, "حقوق مبنا" }
+specialize کارمند { رسمی, روزمزد }

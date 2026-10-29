@@ -223,8 +223,29 @@ slope, so they do not flatten into other shapes. Attributes are then placed agai
 angles and compaction repeats (three rounds). Finally, any shape whose attributes ended up under
 a slanted line gets them placed once more with everything else fixed.
 
+**Hierarchies** (`tree.ts`). Specializations, categories and part-of are not placed shape by
+shape. Each connected hierarchy is laid out as a tidy top-down tree (Reingold–Tilford style):
+the supertype on top, the D/O circle straight below it, the subtypes in one evenly spaced row,
+centered under the circle; subtrees keep clear of each other level by level. The superclasses
+of a category (or the supertypes of a shared subtype) form a row above it, and each part-of
+hexagon sits halfway along its line. Children follow the text, right to left when most of
+their names are Persian. The tree then moves as one rigid block: the grid places it whole
+(never turned) and keeps its inside free, and compaction moves its shapes together. A shape
+in a tree keeps its attributes beside or below it, off the tree's lines. A relationship
+between two trees prefers both entities in its own row, so its line is straight.
+
+**Aggregates.** An aggregate is laid out first, on its own: the relationship inside, its
+participants around it (nothing below it, where the line to the outer relationship leaves),
+and all their attributes. Participants that also connect to the outside keep their outer side
+free of attributes, and every arrangement of the participants around the diamond is tried as
+a variant, so the grid can turn each one to face its outside lines. The dashed box encloses
+exactly that block with even padding; compaction treats the box as an obstacle, so nothing
+else can come near it, and the outer relationship goes straight below the diamond. A shape
+inside an aggregate leaves its hierarchy's tree; the tree's line runs into the box to reach
+it.
+
 **Speed.** Layout runs again whenever the text changes, so it must be fast. Real diagrams (up to
-about 40 shapes and attributes) take 3–320 ms, a 300-element synthetic diagram about 1.8 s (see
+about 40 shapes and attributes) take 3–320 ms, a 300-element synthetic diagram about 2 s (see
 `npm run bench`). Diagrams with more than 150 shapes and attributes get a cheaper search (one
 starting shape, fewer rounds). This depends only on the diagram, never on the clock, so the same
 text always gives the same picture.

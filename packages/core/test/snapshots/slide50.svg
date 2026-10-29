@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 588 530" width="588" height="530">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="588" height="530" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="117.5" y1="86.18" x2="117.5" y2="46"/>
+<line class="line" x1="122.5" y1="86.18" x2="122.5" y2="46"/>
+<line class="line" x1="70.13" y1="160" x2="108.81" y2="115.79"/>
+<path class="line" d="M94.73,142.51 A7,7 0 0 1 84.2,133.29"/>
+<line class="line" x1="169.88" y1="160" x2="131.19" y2="115.79"/>
+<path class="line" d="M155.8,133.29 A7,7 0 0 1 145.27,142.51"/>
+<line class="line" x1="420" y1="86" x2="420" y2="46"/>
+<line class="line" x1="370.13" y1="160" x2="408.81" y2="115.79"/>
+<path class="line" d="M394.73,142.51 A7,7 0 0 1 384.2,133.29"/>
+<line class="line" x1="469.88" y1="160" x2="431.19" y2="115.79"/>
+<path class="line" d="M455.8,133.29 A7,7 0 0 1 445.27,142.51"/>
+<line class="line" x1="117.5" y1="352.18" x2="117.5" y2="312"/>
+<line class="line" x1="122.5" y1="352.18" x2="122.5" y2="312"/>
+<line class="line" x1="70.13" y1="426" x2="108.81" y2="381.79"/>
+<path class="line" d="M94.73,408.51 A7,7 0 0 1 84.2,399.29"/>
+<line class="line" x1="169.88" y1="426" x2="131.19" y2="381.79"/>
+<path class="line" d="M155.8,399.29 A7,7 0 0 1 145.27,408.51"/>
+<line class="line" x1="420" y1="352" x2="420" y2="312"/>
+<line class="line" x1="370.13" y1="426" x2="408.81" y2="381.79"/>
+<path class="line" d="M394.73,408.51 A7,7 0 0 1 384.2,399.29"/>
+<line class="line" x1="469.88" y1="426" x2="431.19" y2="381.79"/>
+<path class="line" d="M455.8,399.29 A7,7 0 0 1 445.27,408.51"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:E1">
+<rect class="shape" x="70" y="0" width="100" height="46" rx="5"/>
+<text x="120" y="28.44" font-size="16" font-weight="bold" text-anchor="middle">E1</text>
+</g>
+<g class="entity" data-id="entity:A1">
+<rect class="shape" x="0" y="160" width="100" height="46" rx="5"/>
+<text x="50" y="188.44" font-size="16" font-weight="bold" text-anchor="middle">A1</text>
+</g>
+<g class="entity" data-id="entity:B1">
+<rect class="shape" x="140" y="160" width="100" height="46" rx="5"/>
+<text x="190" y="188.44" font-size="16" font-weight="bold" text-anchor="middle">B1</text>
+</g>
+<g class="entity" data-id="entity:E2">
+<rect class="shape" x="370" y="0" width="100" height="46" rx="5"/>
+<text x="420" y="28.44" font-size="16" font-weight="bold" text-anchor="middle">E2</text>
+</g>
+<g class="entity" data-id="entity:A2">
+<rect class="shape" x="300" y="160" width="100" height="46" rx="5"/>
+<text x="350" y="188.44" font-size="16" font-weight="bold" text-anchor="middle">A2</text>
+</g>
+<g class="entity" data-id="entity:B2">
+<rect class="shape" x="440" y="160" width="100" height="46" rx="5"/>
+<text x="490" y="188.44" font-size="16" font-weight="bold" text-anchor="middle">B2</text>
+</g>
+<g class="entity" data-id="entity:E3">
+<rect class="shape" x="70" y="266" width="100" height="46" rx="5"/>
+<text x="120" y="294.44" font-size="16" font-weight="bold" text-anchor="middle">E3</text>
+</g>
+<g class="entity" data-id="entity:A3">
+<rect class="shape" x="0" y="426" width="100" height="46" rx="5"/>
+<text x="50" y="454.44" font-size="16" font-weight="bold" text-anchor="middle">A3</text>
+</g>
+<g class="entity" data-id="entity:B3">
+<rect class="shape" x="140" y="426" width="100" height="46" rx="5"/>
+<text x="190" y="454.44" font-size="16" font-weight="bold" text-anchor="middle">B3</text>
+</g>
+<g class="entity" data-id="entity:E4">
+<rect class="shape" x="370" y="266" width="100" height="46" rx="5"/>
+<text x="420" y="294.44" font-size="16" font-weight="bold" text-anchor="middle">E4</text>
+</g>
+<g class="entity" data-id="entity:A4">
+<rect class="shape" x="300" y="426" width="100" height="46" rx="5"/>
+<text x="350" y="454.44" font-size="16" font-weight="bold" text-anchor="middle">A4</text>
+</g>
+<g class="entity" data-id="entity:B4">
+<rect class="shape" x="440" y="426" width="100" height="46" rx="5"/>
+<text x="490" y="454.44" font-size="16" font-weight="bold" text-anchor="middle">B4</text>
+</g>
+<g class="circle" data-id="spec:E1(A1,B1)">
+<ellipse class="shape" cx="120" cy="103" rx="17" ry="17"/>
+<text x="120" y="109.12" font-size="18" font-weight="bold" text-anchor="middle">D</text>
+</g>
+<g class="circle" data-id="spec:E2(A2,B2)">
+<ellipse class="shape" cx="420" cy="103" rx="17" ry="17"/>
+<text x="420" y="109.12" font-size="18" font-weight="bold" text-anchor="middle">D</text>
+</g>
+<g class="circle" data-id="spec:E3(A3,B3)">
+<ellipse class="shape" cx="120" cy="369" rx="17" ry="17"/>
+<text x="120" y="375.12" font-size="18" font-weight="bold" text-anchor="middle">O</text>
+</g>
+<g class="circle" data-id="spec:E4(A4,B4)">
+<ellipse class="shape" cx="420" cy="369" rx="17" ry="17"/>
+<text x="420" y="375.12" font-size="18" font-weight="bold" text-anchor="middle">O</text>
+</g>
+</g>
+<g class="labels">
+</g>
+</svg>

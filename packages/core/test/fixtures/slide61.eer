@@ -1,0 +1,3 @@
+// Slide 61: aggregation, a relationship with a relationship.
+aggregate A { rel R1 { E, F, attrs { a } } }
+rel R2 { A, G, attrs { b, c } }

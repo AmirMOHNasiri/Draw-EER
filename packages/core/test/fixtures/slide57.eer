@@ -1,0 +1,17 @@
+// Slide 57 (from Elmasri): two categories joined by a relationship.
+entity شخص { PID: key }
+entity شرکت { CID: key }
+entity بانک { BID: key }
+entity مالک { OID: key }
+category مالک { بانک, شرکت, شخص }
+
+entity سواری { VID: key, ظرفیت }
+entity باری { VID: key }
+entity "وسیله نقلیه" { VID: key }
+category "وسیله نقلیه" total { باری, سواری }
+
+rel مالکیت {
+  مالک M
+  "وسیله نقلیه" N
+  attrs { از, تا }
+}

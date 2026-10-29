@@ -1,0 +1,7 @@
+// Slide 62: evaluating a professor's supervision of a student's project.
+aggregate راهنمایی { rel "راهنمایی پروژه" { استاد, دانشجو, پروژه } }
+rel ارزیابی {
+  راهنمایی
+  ارزیاب
+  attrs { "کیفیت راهنمایی" }
+}

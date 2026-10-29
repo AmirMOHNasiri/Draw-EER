@@ -58,6 +58,22 @@ function nodeGeometry(node: MainNode, measurer: TextMeasurer): ElementGeometry {
     };
   }
 
+  if (node.kind === 'circle') {
+    const { diameter, fontSize, junction } = STYLE.circle;
+    const label = textBlock(node.name, { size: fontSize, bold: true }, measurer);
+    const size = node.symbol === null ? junction : diameter;
+    return { label, shape: { kind: 'ellipse', width: size, height: size } };
+  }
+
+  if (node.kind === 'partOf') {
+    // The hexagon turns to lie along its line, so its footprint for layout is
+    // a circle as wide as it is long: its tips touch that circle, so lines
+    // that end there end at the tips. The renderer draws the real hexagon.
+    const label = textBlock(node.name, { size: STYLE.font.smallSize, bold: true }, measurer);
+    const length = hexagonSize(label).length;
+    return { label, shape: { kind: 'ellipse', width: length, height: length } };
+  }
+
   // A diamond with half-diagonals a and b contains the text box (w, h) when
   // (w/2)/a + (h/2)/b <= 1; a = w and b = h is the balanced choice.
   const { paddingX, paddingY, minWidth, minHeight, wrapWidth } = STYLE.relationship;
@@ -70,6 +86,12 @@ function nodeGeometry(node: MainNode, measurer: TextMeasurer): ElementGeometry {
     [a, b] = [a + (gap * edge) / b, b + (gap * edge) / a];
   }
   return { label, shape: { kind: 'diamond', width: 2 * a, height: 2 * b } };
+}
+
+/** Length (tip to tip) and height of a part-of hexagon around its label. */
+export function hexagonSize(label: TextBlock): { length: number; height: number } {
+  const { paddingX, paddingY, tip } = STYLE.partOf;
+  return { length: label.width + 2 * (paddingX + tip), height: label.height + 2 * paddingY };
 }
 
 function attributeGeometry(attribute: AttributeNode, measurer: TextMeasurer): ElementGeometry {

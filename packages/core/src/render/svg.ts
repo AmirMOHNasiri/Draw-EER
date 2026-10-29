@@ -8,12 +8,20 @@ import {
   type Box,
 } from '../geometry/collide';
 import type { Layout } from '../layout/layout';
-import type { ElementGeometry, SizedDiagram, TextBlock } from '../layout/size';
+import {
+  hexagonSize,
+  type ElementGeometry,
+  type SizedDiagram,
+  type TextBlock,
+} from '../layout/size';
 import type {
+  Aggregate,
   AttributeNode,
+  CircleNode,
   EntityNode,
+  Link,
   MainNode,
-  ParticipationLink,
+  PartOfNode,
   RelationshipNode,
 } from '../model/types';
 import type { KeyKind } from '../syntax/ast';
@@ -68,6 +76,8 @@ class SvgRenderer {
   private readonly segments: [Point, Point][] = [];
   private readonly obstacles: { center: Point; shape: Shape }[] = [];
   private readonly labelBoxes: Box[] = [];
+  /** The dashed box of each aggregate, by id. */
+  private readonly aggregateBoxes = new Map<string, Box>();
 
   constructor(
     private readonly sized: SizedDiagram,
@@ -81,7 +91,8 @@ class SvgRenderer {
       this.mainNode(node);
       this.attributes(node.attributes, node.id);
     }
-    this.participationLinks();
+    for (const aggregate of diagram.aggregates) this.aggregate(aggregate);
+    this.links();
 
     const { margin } = STYLE;
     const x = this.bounds.minX - margin;
@@ -121,15 +132,26 @@ class SvgRenderer {
     const c = this.position(node.id);
     this.include(c, shape);
     this.obstacles.push({ center: c, shape });
-    const body =
-      node.kind === 'entity' ? this.entity(node, shape, c) : this.relationship(node, shape, c);
-    const labelCenter =
-      node.kind === 'entity' && node.repeated
-        ? { x: c.x, y: c.y + STYLE.entity.repeatedLineOffset / 2 }
-        : c;
-    this.shapes.push(
-      `<g class="${node.kind}" data-id="${escape(node.id)}">${body}${this.text(label, labelCenter)}</g>`,
-    );
+    let body: string;
+    switch (node.kind) {
+      case 'entity': {
+        const labelCenter = node.repeated
+          ? { x: c.x, y: c.y + STYLE.entity.repeatedLineOffset / 2 }
+          : c;
+        body = this.entity(node, shape, c) + this.text(label, labelCenter);
+        break;
+      }
+      case 'relationship':
+        body = this.relationship(node, shape, c) + this.text(label, c);
+        break;
+      case 'circle':
+        body = this.circle(node, shape, c, label);
+        break;
+      case 'partOf':
+        body = this.hexagon(node, c, label);
+        break;
+    }
+    this.shapes.push(`<g class="${node.kind}" data-id="${escape(node.id)}">${body}</g>`);
   }
 
   private entity(node: EntityNode, shape: Shape, c: Point): string {
@@ -159,6 +181,93 @@ class SvgRenderer {
     return svg;
   }
 
+  /** A D, O or U circle; a junction point draws nothing but can still be grabbed. */
+  private circle(node: CircleNode, shape: Shape, c: Point, label: TextBlock): string {
+    const r = shape.width / 2;
+    if (node.symbol === null) {
+      return `<circle cx="${f(c.x)}" cy="${f(c.y)}" r="${f(r)}" fill="transparent"/>`;
+    }
+    return ellipse(c, r, r, 'shape') + this.text(label, c);
+  }
+
+  /**
+   * The part-of hexagon, turned to lie along the line from the whole to the
+   * part, with its label along it (never upside down).
+   */
+  private hexagon(node: PartOfNode, c: Point, label: TextBlock): string {
+    const { length, height } = hexagonSize(label);
+    const whole = this.sized.diagram.links.find((l) => l.to === node.id);
+    const part = this.sized.diagram.links.find((l) => l.from === node.id);
+    let angle = 0;
+    if (whole && part) {
+      const a = this.position(whole.from);
+      const b = this.position(part.to);
+      angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+    }
+    // Text reads left to right (or right to left) the right way up.
+    if (angle > 90) angle -= 180;
+    if (angle <= -90) angle += 180;
+    const half = length / 2;
+    const side = half - STYLE.partOf.tip;
+    const corners = [
+      [-half, 0],
+      [-side, -height / 2],
+      [side, -height / 2],
+      [half, 0],
+      [side, height / 2],
+      [-side, height / 2],
+    ];
+    const points = corners.map(([x, y]) => `${f(c.x + x!)},${f(c.y + y!)}`).join(' ');
+    return (
+      `<g transform="rotate(${f(angle)} ${f(c.x)} ${f(c.y)})">` +
+      `<polygon class="shape" points="${points}"/>${this.text(label, c)}</g>`
+    );
+  }
+
+  /**
+   * The dashed box around an aggregate: around the relationship inside,
+   * its participants and all their attributes.
+   */
+  private aggregate(aggregate: Aggregate): void {
+    const box = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+    // Measured as the layout measures it: below an attribute, room for a key group's line.
+    const add = (id: string, below = 0) => {
+      const c = this.position(id);
+      const { width, height } = this.geometry(id).shape;
+      box.minX = Math.min(box.minX, c.x - width / 2);
+      box.maxX = Math.max(box.maxX, c.x + width / 2);
+      box.minY = Math.min(box.minY, c.y - height / 2);
+      box.maxY = Math.max(box.maxY, c.y + height / 2 + below);
+    };
+    const visit = (attributes: AttributeNode[]) => {
+      for (const a of attributes) {
+        add(a.id, STYLE.keyGroupLineOffset);
+        visit(a.children);
+      }
+    };
+    const nodes = new Map(this.sized.diagram.nodes.map((n) => [n.id, n]));
+    for (const id of aggregate.members) {
+      add(id);
+      visit(nodes.get(id)?.attributes ?? []);
+    }
+    // The same box the layout kept clear (see `aggregateBlocks` in layout.ts).
+    const { padding, cornerRadius } = STYLE.aggregate;
+    const padded = {
+      minX: box.minX - padding,
+      minY: box.minY - padding,
+      maxX: box.maxX + padding,
+      maxY: box.maxY + padding,
+    };
+    this.aggregateBoxes.set(aggregate.id, padded);
+    const center = { x: (padded.minX + padded.maxX) / 2, y: (padded.minY + padded.maxY) / 2 };
+    const width = padded.maxX - padded.minX;
+    const height = padded.maxY - padded.minY;
+    this.includeBox(center, width, height);
+    this.lines.push(
+      `<g class="aggregate" data-id="${escape(aggregate.id)}">${rect(center, width, height, cornerRadius, 'outline dashed')}</g>`,
+    );
+  }
+
   private attributes(attributes: AttributeNode[], parentId: string): void {
     const parent = this.position(parentId);
     const parentShape = this.geometry(parentId).shape;
@@ -167,7 +276,8 @@ class SvgRenderer {
       const { shape, label } = this.geometry(attribute.id);
       this.include(c, shape);
       this.obstacles.push({ center: c, shape });
-      this.addLine(exitPoint(parentShape, parent, parent, c), exitPoint(shape, c, c, parent));
+      const start = attributeLineStart(parentShape, parent, c);
+      this.addLine(start, exitPoint(shape, c, c, start));
 
       const rx = shape.width / 2;
       const ry = shape.height / 2;
@@ -214,11 +324,11 @@ class SvgRenderer {
   // Relationship lines
   // -------------------------------------------------------------------------
 
-  private participationLinks(): void {
+  private links(): void {
     // Group the lines that join the same two shapes.
-    const pairs = new Map<string, ParticipationLink[]>();
+    const pairs = new Map<string, Link[]>();
     for (const link of this.sized.diagram.links) {
-      const key = `${link.relationship}|${link.entity}`;
+      const key = `${link.from}|${link.to}`;
       pairs.set(key, [...(pairs.get(key) ?? []), link]);
     }
 
@@ -228,11 +338,11 @@ class SvgRenderer {
       const first = links[0]!;
       const segments =
         links.length === 2
-          ? this.unarySegments(first.entity, first.relationship)
+          ? this.unarySegments(first.to, first.from)
           : links.map((_, i) =>
               this.straightSegment(
-                first.entity,
-                first.relationship,
+                first.to,
+                first.from,
                 (i - (links.length - 1) / 2) * STYLE.parallelSpacing,
               ),
             );
@@ -245,9 +355,12 @@ class SvgRenderer {
           for (const side of [-half, half]) {
             this.addLine(...this.clipped(link, add(start, n, side), add(end, n, side)));
           }
+        } else if (link.aggregate !== null) {
+          this.aggregateLine(start, end, this.aggregateBoxes.get(link.aggregate));
         } else {
           this.addLine(start, end);
         }
+        if (link.subset) this.subsetArc(...this.outsideBoxes(start, end));
         // On a unary loop, a role name goes outside the loop, away from the other line.
         const other = links.length === 2 ? segments[1 - i]! : null;
         pending.push(() => {
@@ -259,7 +372,10 @@ class SvgRenderer {
     for (const place of pending) place();
   }
 
-  /** A straight line between the two shapes' borders, shifted sideways by `offset`. */
+  /**
+   * A straight line between the two shapes' borders, shifted sideways by
+   * `offset`. Lines run all the way to a junction point, so they meet there.
+   */
   private straightSegment(entityId: string, relId: string, offset: number): [Point, Point] {
     const entity = this.position(entityId);
     const rel = this.position(relId);
@@ -267,9 +383,64 @@ class SvgRenderer {
     const from = add(entity, n, offset);
     const to = add(rel, n, offset);
     return [
-      exitPoint(this.geometry(entityId).shape, entity, from, to),
-      exitPoint(this.geometry(relId).shape, rel, to, from),
+      this.isJunction(entityId) ? from : exitPoint(this.geometry(entityId).shape, entity, from, to),
+      this.isJunction(relId) ? to : exitPoint(this.geometry(relId).shape, rel, to, from),
     ];
+  }
+
+  private isJunction(id: string): boolean {
+    const node = this.sized.diagram.nodes.find((n) => n.id === id);
+    return node?.kind === 'circle' && node.symbol === null;
+  }
+
+  /**
+   * The subset symbol: a half circle across the middle of the line, open
+   * toward `end` (the more general side) and curving toward `start`.
+   */
+  private subsetArc(start: Point, end: Point): void {
+    const r = STYLE.subset.radius;
+    const middle = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+    const n = normal(start, end);
+    const d = unit(end, start);
+    const p = add(middle, n, r);
+    const q = add(middle, n, -r);
+    // Sweep so that the arc passes through middle + d·r (screen y points down).
+    const sweep = n.x * d.y - n.y * d.x > 0 ? 1 : 0;
+    this.segments.push([p, q]);
+    this.lines.push(
+      `<path class="line" d="M${f(p.x)},${f(p.y)} A${r},${r} 0 0 ${sweep} ${f(q.x)},${f(q.y)}"/>`,
+    );
+  }
+
+  /**
+   * The part of a line outside every aggregate box (a line that comes from
+   * outside into a box, or the whole line), so that a subset symbol in its
+   * middle does not land on a box's border.
+   */
+  private outsideBoxes(start: Point, end: Point): [Point, Point] {
+    let [s, e] = [start, end];
+    for (const box of this.aggregateBoxes.values()) {
+      if (inBox(box, s) && !inBox(box, e))
+        s = add(s, { x: e.x - s.x, y: e.y - s.y }, boxExit(box, s, e));
+      if (inBox(box, e) && !inBox(box, s))
+        e = add(e, { x: s.x - e.x, y: s.y - e.y }, boxExit(box, e, s));
+    }
+    return [s, e];
+  }
+
+  /**
+   * A line into an aggregate, from the relationship inside (`start`): dashed
+   * inside the aggregate's box, solid outside (slides 61 and 62).
+   */
+  private aggregateLine(start: Point, end: Point, box: Box | undefined): void {
+    const d = { x: end.x - start.x, y: end.y - start.y };
+    const t = box ? boxExit(box, start, end) : 1;
+    const exit = add(start, d, t);
+    this.segments.push([start, end]);
+    this.lines.push(
+      `<line class="line dashed" x1="${f(start.x)}" y1="${f(start.y)}" x2="${f(exit.x)}" y2="${f(exit.y)}"/>`,
+    );
+    if (t < 1) this.lines.push(line(exit, end));
   }
 
   /** The two lines of a unary (recursive) relationship (see `unaryLineEnds`). */
@@ -287,14 +458,14 @@ class SvgRenderer {
    * steps back a little into its shape, so strokes that end at a diamond's
    * corner still reach the outline.
    */
-  private clipped(link: ParticipationLink, start: Point, end: Point): [Point, Point] {
-    const entity = this.position(link.entity);
-    const rel = this.position(link.relationship);
+  private clipped(link: Link, start: Point, end: Point): [Point, Point] {
+    const entity = this.position(link.to);
+    const rel = this.position(link.from);
     const from = add(start, unit(start, end), -6);
     const to = add(end, unit(end, start), -6);
     return [
-      exitPoint(this.geometry(link.entity).shape, entity, from, end),
-      exitPoint(this.geometry(link.relationship).shape, rel, to, start),
+      this.isJunction(link.to) ? start : exitPoint(this.geometry(link.to).shape, entity, from, end),
+      this.isJunction(link.from) ? end : exitPoint(this.geometry(link.from).shape, rel, to, start),
     ];
   }
 
@@ -304,7 +475,7 @@ class SvgRenderer {
    * that, it goes beside the line, always on the left of the direction from
    * entity to relationship.
    */
-  private cardinalityLabel(text: string, start: Point, end: Point, link: ParticipationLink): void {
+  private cardinalityLabel(text: string, start: Point, end: Point, link: Link): void {
     const size = STYLE.font.smallSize;
     const width = this.sized.measurer.width(text, { size });
     const height = size * STYLE.label.heightEm;
@@ -449,6 +620,50 @@ class SvgRenderer {
     this.bounds.minY = Math.min(this.bounds.minY, c.y - height / 2);
     this.bounds.maxY = Math.max(this.bounds.maxY, c.y + height / 2);
   }
+}
+
+function inBox(box: Box, p: Point): boolean {
+  return p.x > box.minX && p.x < box.maxX && p.y > box.minY && p.y < box.maxY;
+}
+
+/**
+ * How far along the segment from `from` (inside the box) to `to` it leaves
+ * the box, from 0 to 1 (1 if it never does).
+ */
+function boxExit(box: Box, from: Point, to: Point): number {
+  const d = { x: to.x - from.x, y: to.y - from.y };
+  let t = 1;
+  if (d.x > 0) t = Math.min(t, (box.maxX - from.x) / d.x);
+  if (d.x < 0) t = Math.min(t, (box.minX - from.x) / d.x);
+  if (d.y > 0) t = Math.min(t, (box.maxY - from.y) / d.y);
+  if (d.y < 0) t = Math.min(t, (box.minY - from.y) / d.y);
+  return Math.max(0, t);
+}
+
+/** Within this angle of a diamond's vertex, an attribute's line starts at the vertex. */
+const VERTEX_SNAP = (20 * Math.PI) / 180;
+
+/**
+ * Where the line to an attribute at `to` leaves its owner. On a diamond, an
+ * attribute roughly in the direction of a vertex is joined to the vertex
+ * itself, as on the slides; anywhere else the line points at the center.
+ */
+function attributeLineStart(shape: Shape, center: Point, to: Point): Point {
+  if (shape.kind === 'diamond') {
+    const angle = Math.atan2(to.y - center.y, to.x - center.x);
+    const a = shape.width / 2;
+    const b = shape.height / 2;
+    for (const [direction, vertex] of [
+      [0, { x: center.x + a, y: center.y }],
+      [Math.PI / 2, { x: center.x, y: center.y + b }],
+      [Math.PI, { x: center.x - a, y: center.y }],
+      [-Math.PI / 2, { x: center.x, y: center.y - b }],
+    ] as const) {
+      const off = Math.abs(Math.atan2(Math.sin(angle - direction), Math.cos(angle - direction)));
+      if (off <= VERTEX_SNAP) return vertex;
+    }
+  }
+  return exitPoint(shape, center, center, to);
 }
 
 /** Unit vector from `a` toward `b`. */

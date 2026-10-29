@@ -1,0 +1,7 @@
+// Slide 46: specialization without disjoint/overlapping (no circle), partial.
+specialize "موجود زنده" { انسان, حیوان, نبات }
+
+entity کارمند { شماره: key, نام }
+entity "کارمند مونث" { A, B }
+entity "کارمند مذکر" { C }
+specialize کارمند { "کارمند مذکر", "کارمند مونث" }

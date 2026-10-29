@@ -1,0 +1,5 @@
+// Slide 59: part-of ("Has" hexagon on each line).
+entity "وسیله نقلیه" { VID: key }
+entity موتور { MID: key }
+entity شاسی { SID: key }
+partof "وسیله نقلیه" { شاسی, موتور }

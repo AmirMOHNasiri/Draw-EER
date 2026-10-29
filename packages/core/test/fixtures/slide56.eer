@@ -1,0 +1,3 @@
+// Slide 56: categories (U), total (double line) and partial.
+category G total { E, F }
+category K partial { H, J }

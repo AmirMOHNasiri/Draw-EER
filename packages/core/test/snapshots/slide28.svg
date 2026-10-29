@@ -9,8 +9,8 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 </style>
 <rect x="-24" y="-29" width="523.49" height="265.59" fill="#ffffff"/>
 <g class="lines">
-<line class="line" x1="234.72" y1="133.66" x2="232.89" y2="163.6"/>
-<line class="line" x1="238.37" y1="73.93" x2="240.21" y2="43.99"/>
+<line class="line" x1="236.55" y1="134.6" x2="233.7" y2="163.63"/>
+<line class="line" x1="236.55" y1="73" x2="239.4" y2="43.96"/>
 <line class="line" x1="100" y1="101.3" x2="181.22" y2="101.3"/>
 <line class="line" x1="100" y1="106.3" x2="181.22" y2="106.3"/>
 <line class="line" x1="375.49" y1="103.8" x2="296.76" y2="103.8"/>

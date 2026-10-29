@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 328.41 594" width="328.41" height="594">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="328.41" height="594" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="151.72" y1="85.03" x2="200.76" y2="40.86"/>
+<line class="line" x1="121.91" y1="85.03" x2="116.44" y2="55.53"/>
+<line class="line" x1="125.37" y1="217.03" x2="124.32" y2="247.01"/>
+<line class="line" x1="90.07" y1="217.03" x2="64.77" y2="233.15"/>
+<line class="line" x1="126.17" y1="171.03" x2="126.17" y2="131.03"/>
+<path class="line" d="M133.17,151.03 A7,7 0 0 1 119.17,151.03"/>
+<line class="line" x1="138.92" y1="446" x2="138.92" y2="402"/>
+<line class="line" x1="143.92" y1="446" x2="143.92" y2="402"/>
+<line class="line" x1="194.03" y1="490" x2="141.42" y2="446"/>
+<path class="line" d="M172.22,462.63 A7,7 0 0 1 163.23,473.37"/>
+<line class="line" x1="88.82" y1="490" x2="141.42" y2="446"/>
+<path class="line" d="M119.61,473.37 A7,7 0 0 1 110.63,462.63"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:کارمند">
+<rect class="shape" x="76.17" y="85.03" width="100" height="46" rx="5"/>
+<text x="126.17" y="113.47" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند</text>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند/شماره">
+<ellipse class="shape" cx="221.71" cy="22" rx="40.71" ry="22"/>
+<text x="221.71" y="27.44" font-size="16" text-anchor="middle" direction="rtl">شماره</text>
+<line class="line" x1="202.88" y1="30.44" x2="240.54" y2="30.44" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند/نام">
+<ellipse class="shape" cx="112.39" cy="33.66" rx="37" ry="22"/>
+<text x="112.39" y="39.1" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="entity" data-id="entity:برنامه ساز">
+<rect class="shape" x="72.45" y="171.03" width="107.44" height="46" rx="5"/>
+<text x="126.17" y="199.47" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">برنامه ساز</text>
+</g>
+<g class="attribute" data-id="attr:entity:برنامه ساز/نوع">
+<ellipse class="shape" cx="123.55" cy="269" rx="37" ry="22"/>
+<text x="123.55" y="274.44" font-size="16" text-anchor="middle" direction="rtl">نوع</text>
+</g>
+<g class="attribute" data-id="attr:entity:برنامه ساز/سطح">
+<ellipse class="shape" cx="38.93" cy="249.6" rx="38.93" ry="22"/>
+<text x="38.93" y="255.04" font-size="16" text-anchor="middle" direction="rtl">سطح</text>
+</g>
+<g class="entity" data-id="entity:کارمند ۲">
+<rect class="shape" x="91.42" y="356" width="100" height="46" rx="5"/>
+<text x="141.42" y="384.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند ۲</text>
+</g>
+<g class="entity" data-id="entity:کارمند مذکر">
+<rect class="shape" x="162.64" y="490" width="117.77" height="46" rx="5"/>
+<text x="221.52" y="518.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند مذکر</text>
+</g>
+<g class="entity" data-id="entity:کارمند مونث">
+<rect class="shape" x="0" y="490" width="122.64" height="46" rx="5"/>
+<text x="61.32" y="518.44" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند مونث</text>
+</g>
+<g class="circle" data-id="spec:کارمند ۲(کارمند مذکر,کارمند مونث)">
+<circle cx="141.42" cy="446" r="4" fill="transparent"/>
+</g>
+</g>
+<g class="labels">
+</g>
+</svg>

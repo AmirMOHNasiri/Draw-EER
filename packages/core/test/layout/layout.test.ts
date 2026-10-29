@@ -183,11 +183,9 @@ describe('overall shape', () => {
     const layout = layoutDiagram(s);
     const target = STYLE.layout.minLine;
     const gaps: number[] = [];
-    for (const link of new Map(
-      s.diagram.links.map((l) => [l.entity + l.relationship, l]),
-    ).values()) {
-      const [a, b] = [layout.get(link.entity)!, layout.get(link.relationship)!];
-      const [p, q] = [s.geometry.get(link.entity)!.shape, s.geometry.get(link.relationship)!.shape];
+    for (const link of new Map(s.diagram.links.map((l) => [l.to + l.from, l])).values()) {
+      const [a, b] = [layout.get(link.to)!, layout.get(link.from)!];
+      const [p, q] = [s.geometry.get(link.to)!.shape, s.geometry.get(link.from)!.shape];
       if (Math.abs(a.y - b.y) < 0.01) gaps.push(Math.abs(a.x - b.x) - (p.width + q.width) / 2);
       else if (Math.abs(a.x - b.x) < 0.01)
         gaps.push(Math.abs(a.y - b.y) - (p.height + q.height) / 2);
@@ -223,14 +221,14 @@ describe.each(fixtures)('lines in %s', (fixture) => {
     const layout = layoutDiagram(s);
     const counts = new Map<string, number>();
     for (const link of s.diagram.links) {
-      const key = `${link.relationship}|${link.entity}`;
+      const key = `${link.from}|${link.to}`;
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
     const hits: string[] = [];
     for (const link of s.diagram.links) {
-      if (counts.get(`${link.relationship}|${link.entity}`)! > 1) continue; // unary loops are not center-to-center lines
-      const from = layout.get(link.entity)!;
-      const to = layout.get(link.relationship)!;
+      if (counts.get(`${link.from}|${link.to}`)! > 1) continue; // unary loops are not center-to-center lines
+      const from = layout.get(link.to)!;
+      const to = layout.get(link.from)!;
       for (const [id, p] of layout) {
         if (!id.startsWith('attr:')) continue;
         const { width, height } = s.geometry.get(id)!.shape;
@@ -246,11 +244,11 @@ describe.each(fixtures)('lines in %s', (fixture) => {
     const layout = layoutDiagram(s);
     const hits: string[] = [];
     for (const link of s.diagram.links) {
-      if (link.entity === link.relationship) continue;
-      const from = layout.get(link.entity)!;
-      const to = layout.get(link.relationship)!;
+      if (link.to === link.from) continue;
+      const from = layout.get(link.to)!;
+      const to = layout.get(link.from)!;
       for (const node of s.diagram.nodes) {
-        if (node.id === link.entity || node.id === link.relationship) continue;
+        if (node.id === link.to || node.id === link.from) continue;
         const { width, height } = s.geometry.get(node.id)!.shape;
         // Shrunk a little: a line may graze a corner.
         if (segmentHitsBox(from, to, boxAround(layout.get(node.id)!, width * 0.8, height * 0.8)))
@@ -265,7 +263,7 @@ describe.each(fixtures)('lines in %s', (fixture) => {
     const layout = layoutDiagram(s);
     const counts = new Map<string, number>();
     for (const link of s.diagram.links) {
-      const key = `${link.relationship}|${link.entity}`;
+      const key = `${link.from}|${link.to}`;
       counts.set(key, (counts.get(key) ?? 0) + 1);
     }
     // Attribute lines, from parent center to attribute center.
@@ -280,9 +278,9 @@ describe.each(fixtures)('lines in %s', (fixture) => {
 
     const crossings: string[] = [];
     for (const link of s.diagram.links) {
-      if (counts.get(`${link.relationship}|${link.entity}`)! > 1) continue;
-      const p = layout.get(link.entity)!;
-      const q = layout.get(link.relationship)!;
+      if (counts.get(`${link.from}|${link.to}`)! > 1) continue;
+      const p = layout.get(link.to)!;
+      const q = layout.get(link.from)!;
       for (const [id, a, b] of connectors)
         if (cross(p, q, a, b)) crossings.push(`${link.id} / ${id}`);
     }

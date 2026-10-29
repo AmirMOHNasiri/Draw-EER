@@ -1,0 +1,7 @@
+// Slide 48: partial specialization with one subtype; total specialization
+// without a circle (the double line splits at a point).
+entity کارمند { شماره: key, نام }
+entity "برنامه ساز" { نوع, سطح }
+specialize کارمند partial { "برنامه ساز" }
+
+specialize "کارمند ۲" total { "کارمند مذکر", "کارمند مونث" }

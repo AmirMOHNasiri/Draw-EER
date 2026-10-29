@@ -1,0 +1,3 @@
+// Slide 51: a subtype with subtypes of its own (two levels).
+specialize کارمند disjoint total { "نابرنامه ساز", "برنامه ساز" }
+specialize "برنامه ساز" overlapping { سیستمی, "متخصص Backend", "متخصص Front" }
