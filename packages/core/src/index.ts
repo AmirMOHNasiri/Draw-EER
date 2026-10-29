@@ -14,7 +14,7 @@ import type { TextMeasurer } from './text/measure';
 
 export { parse } from './syntax/parser';
 export type { ParseResult } from './syntax/parser';
-export type { ParseError } from './syntax/errors';
+export type { Fix, ParseError, TextEdit } from './syntax/errors';
 export type * from './syntax/ast';
 
 export { buildDiagram } from './model/build';

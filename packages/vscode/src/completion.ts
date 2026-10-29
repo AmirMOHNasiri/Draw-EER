@@ -21,11 +21,17 @@ export interface Suggestion {
 }
 
 /** Where the cursor is, as far as completion cares. */
-export type Context =
-  | { block: 'top'; item: string }
-  | { block: 'entity'; item: string }
-  | { block: 'relationship'; item: string }
-  | { block: 'names'; item: string };
+export interface Context {
+  /** The innermost block that decides what can be written: `none` inside a comment or string. */
+  block: 'top' | 'entity' | 'relationship' | 'names' | 'aggregate' | 'none';
+  /** The current item up to the cursor: since the last newline, brace or (inside a block) comma. */
+  item: string;
+}
+
+/** A name being typed, matched like the language's word pattern. */
+const TYPING_RE = /(?:[\p{L}_][\p{L}\p{M}\p{N}_\u200c\u200d]*|\p{N}+)$/u;
+/** A finished word of the item: a quoted name (perhaps unclosed) or a run of non-spaces. */
+const WORD_RE = /"(?:[^"\\]|\\.)*"?|[^\s"]+/g;
 
 const STATEMENTS: Suggestion[] = [
   {
@@ -104,6 +110,11 @@ const PARTICIPANT_WORDS: Suggestion[] = [
   { label: '(1,N)', kind: 'value', detail: '(min,max) cardinality' },
 ];
 
+const PARTICIPATION_WORDS: Suggestion[] = [
+  { label: 'total', kind: 'keyword', detail: 'Total (double line)' },
+  { label: 'partial', kind: 'keyword', detail: 'Partial (single line)' },
+];
+
 const SPECIALIZE_WORDS: Suggestion[] = [
   { label: 'disjoint', kind: 'keyword', detail: 'Disjoint subclasses (D in a circle)' },
   { label: 'overlapping', kind: 'keyword', detail: 'Overlapping subclasses (O in a circle)' },
@@ -114,20 +125,25 @@ const SPECIALIZE_WORDS: Suggestion[] = [
 /** Suggestions at `offset` (UTF-16 code units) in `source`. */
 export function suggestionsAt(source: string, offset: number): Suggestion[] {
   const context = contextAt(source, offset);
-  const words = context.item.trim().split(/\s+/).filter(Boolean);
+  // The word being typed (`en` in `en|`) is only what VS Code filters the list
+  // by; what fits is decided by the finished words before it.
+  const typing = TYPING_RE.exec(context.item)?.[0] ?? '';
+  const words = context.item.slice(0, context.item.length - typing.length).match(WORD_RE) ?? [];
+  const unused = (options: Suggestion[]) => without(options, words);
 
   switch (context.block) {
-    case 'top': {
-      if (words[0] === 'specialize' && words.length >= 2) return SPECIALIZE_WORDS;
-      if ((words[0] === 'show' && words.length >= 2) || words[0] === 'show') {
-        return words.length >= 2 ? [{ label: 'again as', kind: 'keyword' }] : entityNames(source);
-      }
-      if (words.length >= 1 && words.at(-1) !== 'weak' && words.at(-1) !== 'identifying') return [];
-      return STATEMENTS;
-    }
-    case 'entity':
+    case 'none':
+      return [];
+    case 'top':
+      return topLevel(source, words);
+    case 'aggregate':
+      return words.length === 0 ? STATEMENTS.filter((s) => s.label.endsWith('rel')) : [];
+    case 'entity': {
       // After `name:` come flags; before it, the attribute's name is free text.
-      return context.item.includes(':') ? ATTRIBUTE_FLAGS : [];
+      const colon = context.item.indexOf(':');
+      if (colon === -1) return [];
+      return without(ATTRIBUTE_FLAGS, context.item.slice(colon + 1).match(WORD_RE) ?? []);
+    }
     case 'relationship':
       if (words.length === 0)
         return [
@@ -140,10 +156,82 @@ export function suggestionsAt(source: string, offset: number): Suggestion[] {
           },
         ];
       if (words.at(-1) === 'as') return [];
-      return PARTICIPANT_WORDS;
+      return unused(PARTICIPANT_WORDS).filter(
+        // One cardinality per participant.
+        (s) => s.kind !== 'value' || !words.slice(1).some(isCardinality),
+      );
     case 'names':
       return entityNames(source);
   }
+}
+
+/** Suggestions outside any block, from the words already written on the line. */
+function topLevel(source: string, words: string[]): Suggestion[] {
+  if (words.length === 0) return STATEMENTS;
+  const [first, ...rest] = words;
+  switch (first) {
+    case 'weak':
+      return rest.length === 0 ? STATEMENTS.filter((s) => s.label === 'entity') : entityStatement();
+    case 'identifying':
+      return rest.length === 0 ? STATEMENTS.filter((s) => s.label === 'rel') : [];
+    case 'entity':
+      return entityStatement();
+    case 'specialize':
+      return rest.length === 0 ? entityNames(source) : without(SPECIALIZE_WORDS, rest);
+    case 'category':
+      return rest.length === 0 ? [] : without(PARTICIPATION_WORDS, rest);
+    case 'partof':
+      if (rest.length === 0) return entityNames(source);
+      return rest.length === 1
+        ? [{ label: 'as', kind: 'keyword', detail: 'Label of the hexagon' }]
+        : [];
+    case 'show':
+      if (rest.length === 0) return entityNames(source);
+      if (rest.length === 1) {
+        return [
+          {
+            label: 'again as',
+            kind: 'snippet',
+            insertText: 'again as ${1:Alias}',
+            detail: 'Name the copy',
+          },
+          { label: 'again', kind: 'keyword' },
+        ];
+      }
+      return rest.length === 2 && rest[1] === 'again' ? [{ label: 'as', kind: 'keyword' }] : [];
+    default:
+      return [];
+  }
+
+  /** `entity Name |` → `inherits`; `entity Name inherits |` → entity names. */
+  function entityStatement(): Suggestion[] {
+    const afterKeyword = words.slice(words.indexOf('entity') + 1);
+    if (afterKeyword.includes('inherits')) return entityNames(source);
+    return afterKeyword.length === 1
+      ? [{ label: 'inherits', kind: 'keyword', detail: 'Supertypes of this entity' }]
+      : [];
+  }
+}
+
+/**
+ * `options` minus words already written, and minus the other choice of a
+ * pair that excludes each other (total/partial, disjoint/overlapping).
+ */
+function without(options: Suggestion[], written: string[]): Suggestion[] {
+  const pairs = [
+    ['total', 'partial'],
+    ['disjoint', 'overlapping'],
+    ['key', 'key2', 'partial'],
+  ];
+  const taken = new Set(written);
+  for (const pair of pairs) {
+    if (pair.some((w) => taken.has(w))) pair.forEach((w) => taken.add(w));
+  }
+  return options.filter((s) => !taken.has(s.label));
+}
+
+function isCardinality(word: string): boolean {
+  return /^(?:\p{N}+|\p{L}|\*|\(.*)$/u.test(word);
 }
 
 /** Names of all entities declared or used in the file, for completion. */
@@ -182,7 +270,7 @@ function entityNames(source: string): Suggestion[] {
 
 /**
  * The block the cursor is in and the text of the current item (since the
- * last newline, comma or brace), skipping strings and comments.
+ * last newline, brace or comma), skipping strings and comments.
  */
 export function contextAt(source: string, offset: number): Context {
   /** For each open brace: the words before it, like "rel Enroll" or "attrs". */
@@ -194,17 +282,20 @@ export function contextAt(source: string, offset: number): Context {
     const next = source[i + 1];
     if (ch === '/' && next === '/') {
       while (i < offset && source[i] !== '\n') i++;
+      if (i === offset) return { block: 'none', item: '' };
       continue;
     }
     if (ch === '/' && next === '*') {
       const end = source.indexOf('*/', i + 2);
-      i = end === -1 ? offset : end + 2;
+      if (end === -1 || end + 2 > offset) return { block: 'none', item: '' };
+      i = end + 2;
       continue;
     }
     if (ch === '"') {
       let j = i + 1;
       while (j < offset && source[j] !== '"' && source[j] !== '\n') j += source[j] === '\\' ? 2 : 1;
-      item += source.slice(i, Math.min(j + 1, offset));
+      if (j >= offset) return { block: 'none', item: '' };
+      item += source.slice(i, j + 1);
       i = j + 1;
       continue;
     }
@@ -214,7 +305,8 @@ export function contextAt(source: string, offset: number): Context {
     } else if (ch === '}') {
       headers.pop();
       item = '';
-    } else if (ch === '\n' || ch === ',') {
+    } else if (ch === '\n' || (ch === ',' && headers.length > 0)) {
+      // A comma outside braces belongs to `inherits A, B`, which stays one item.
       item = '';
     } else {
       item += ch;
@@ -238,7 +330,7 @@ export function contextAt(source: string, offset: number): Context {
       case 'partof':
         return { block: 'names', item };
       case 'aggregate':
-        return { block: 'top', item };
+        return { block: 'aggregate', item };
       default:
         // A composite attribute's braces: keep looking outward.
         continue;

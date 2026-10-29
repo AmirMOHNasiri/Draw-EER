@@ -1,5 +1,5 @@
 import type { Position, Range } from './ast';
-import type { ParseError } from './errors';
+import type { ParseError, TextEdit } from './errors';
 
 export type TokenKind =
   'ident' | 'string' | 'number' | '{' | '}' | '(' | ')' | ',' | ':' | '*' | 'newline' | 'eof';
@@ -105,9 +105,17 @@ export function lex(source: string): LexResult {
         }
       }
       if (!closed) {
+        // The fix closes it at the end of its first line, the likeliest intent.
+        const lineEnd = source.slice(start.offset).search(/[\r\n]|$/) + start.offset;
+        const at = {
+          line: start.line,
+          column: start.column + lineEnd - start.offset,
+          offset: lineEnd,
+        };
         errors.push({
           message: "Unterminated comment: add '*/' to close it.",
           range: { start, end: { ...start, column: start.column + 2, offset: start.offset + 2 } },
+          fix: { title: "Close the comment with '*/'", edits: [insert(at, ' */')] },
         });
       }
       // A comment that spans lines still separates the lines around it.
@@ -146,6 +154,7 @@ export function lex(source: string): LexResult {
         errors.push({
           message: "Unterminated string: add a closing '\"' on the same line.",
           range: { start, end: position(offset) },
+          fix: { title: "Add the closing '\"'", edits: [insert(position(offset), '"')] },
         });
       }
       continue;
@@ -162,7 +171,7 @@ export function lex(source: string): LexResult {
       push('ident', word, start);
     } else {
       push('ident', word, start, { invalid: true });
-      errors.push({ message: invalidWordMessage(word), range: { start, end: position(offset) } });
+      errors.push(invalidWordError(word, { start, end: position(offset) }));
     }
   }
 
@@ -182,9 +191,34 @@ function codePointLength(source: string, offset: number): number {
   return (source.codePointAt(offset) ?? 0) > 0xffff ? 2 : 1;
 }
 
-function invalidWordMessage(word: string): string {
-  if (/^\p{Nd}/u.test(word)) {
-    return `'${word}' is not a valid name: names cannot start with a digit. Put it in double quotes, like "${word}".`;
+function invalidWordError(word: string, range: Range): ParseError {
+  // The Persian keyboard types «،» where a comma is meant.
+  if (word.includes('،')) {
+    return {
+      message: `'${word}' contains a Persian comma '،'. Separate items with ',' instead.`,
+      range,
+      fix: {
+        title: "Replace '،' with ','",
+        edits: [{ range, newText: word.replaceAll('،', ',') }],
+      },
+    };
   }
-  return `'${word}' is not a valid name. Put names that contain spaces or symbols in double quotes, like "${word}".`;
+  const quoted = `"${word.replaceAll('\\', '\\\\')}"`;
+  const fix = { title: `Put '${word}' in double quotes`, edits: [{ range, newText: quoted }] };
+  if (/^\p{Nd}/u.test(word)) {
+    return {
+      message: `'${word}' is not a valid name: names cannot start with a digit. Put it in double quotes, like ${quoted}.`,
+      range,
+      fix,
+    };
+  }
+  return {
+    message: `'${word}' is not a valid name. Put names that contain spaces or symbols in double quotes, like ${quoted}.`,
+    range,
+    fix,
+  };
+}
+
+function insert(at: Position, newText: string): TextEdit {
+  return { range: { start: at, end: at }, newText };
 }

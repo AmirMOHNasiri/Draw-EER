@@ -28,6 +28,12 @@ jobs:
       # host and in the preview's worker, as bundled.
       - run: npm run build
       - run: npm run smoke -w packages/vscode
+      # Completion, Quick Fixes and highlighting inside a real VS Code. Linux
+      # runners have no display, so it runs under a virtual one there.
+      - run: xvfb-run -a npm run test:integration -w packages/vscode
+        if: runner.os == 'Linux'
+      - run: npm run test:integration -w packages/vscode
+        if: runner.os != 'Linux'
       # The real preview page in headless Chrome (preinstalled on the Linux runners).
       - run: node packages/vscode/scripts/webview-check.mjs --require
         if: runner.os == 'Linux'

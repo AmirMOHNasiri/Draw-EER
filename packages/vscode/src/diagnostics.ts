@@ -3,7 +3,7 @@
  * panel). Only syntax is checked; whatever parses is drawn.
  */
 import * as vscode from 'vscode';
-import { parse } from '@draw-eer/core';
+import { parse, type Range } from '@draw-eer/core';
 
 /** How long to wait after a change before parsing again, in ms. Parsing is fast. */
 const DELAY = 150;
@@ -18,14 +18,8 @@ export function registerDiagnostics(context: vscode.ExtensionContext): void {
     collection.set(
       document.uri,
       errors.map((error) => {
-        const range = new vscode.Range(
-          error.range.start.line,
-          error.range.start.column,
-          error.range.end.line,
-          error.range.end.column,
-        );
         const diagnostic = new vscode.Diagnostic(
-          range,
+          toRange(error.range),
           error.message,
           vscode.DiagnosticSeverity.Error,
         );
@@ -57,4 +51,9 @@ export function registerDiagnostics(context: vscode.ExtensionContext): void {
       collection.delete(document.uri);
     }),
   );
+}
+
+/** A core range (0-based lines and UTF-16 columns, like VS Code) as a VS Code range. */
+export function toRange(range: Range): vscode.Range {
+  return new vscode.Range(range.start.line, range.start.column, range.end.line, range.end.column);
 }

@@ -56,6 +56,41 @@ describe('completion', () => {
     );
   });
 
+  it('offers the same list while a word is being typed', () => {
+    // The reported bug: `en` on an empty line between declarations offered nothing.
+    expect(labels('entity A { a }\nen|\nentity B { b }')).toContain('entity');
+    expect(labels('spec|')).toContain('specialize');
+    expect(labels('weak en|')).toEqual(['entity']);
+    expect(labels('entity A {\n  id: ke|\n}')).toContain('key');
+    expect(labels('entity Student\nrel Takes {\n  Stu|\n}')).toContain('Student');
+    expect(labels('entity Student\nrel Takes {\n  Student N to|\n}')).toContain('total');
+    expect(labels('entity Person\nspecialize Per|')).toContain('Person');
+  });
+
+  it('leaves out words already written on the item', () => {
+    expect(labels('rel R { A N total |')).toEqual(['as']);
+    expect(labels('entity A { id: key |')).toEqual(['multi', 'derived']);
+    expect(labels('specialize E disjoint |')).toEqual(['total', 'partial']);
+  });
+
+  it('offers what may follow names outside blocks', () => {
+    expect(labels('entity Person\nentity Student |')).toEqual(['inherits']);
+    expect(labels('entity Person\nentity Student inherits |')).toContain('Person');
+    expect(labels('entity Person\nentity Student inherits Person, |')).toContain('Person');
+    expect(labels('category Owner |')).toEqual(['total', 'partial']);
+    expect(labels('entity Car\npartof Car |')).toEqual(['as']);
+    expect(labels('entity Course\nshow |')).toEqual(['Course']);
+    expect(labels('show Course |')).toEqual(['again as', 'again']);
+    expect(labels('show Course again |')).toEqual(['as']);
+    expect(labels('aggregate S {\n  |')).toEqual(['rel', 'identifying rel']);
+  });
+
+  it('offers nothing inside comments and strings', () => {
+    expect(labels('// en|')).toEqual([]);
+    expect(labels('/* en|')).toEqual([]);
+    expect(labels('entity "Course Un|')).toEqual([]);
+  });
+
   it('ignores braces inside strings and comments', () => {
     expect(contextAt('entity A { "x{" // }\n  y: ', 31).block).toBe('entity');
     expect(contextAt('/* rel R { */\n', 14).block).toBe('top');

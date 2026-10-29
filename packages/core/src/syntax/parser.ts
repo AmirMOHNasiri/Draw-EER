@@ -20,7 +20,7 @@ import type {
   SpecializeDecl,
   Statement,
 } from './ast';
-import { suggest, type ParseError } from './errors';
+import { suggest, type Fix, type ParseError } from './errors';
 import { lex, type Token } from './lexer';
 
 export interface ParseResult {
@@ -38,7 +38,7 @@ export interface ParseResult {
  */
 export function parse(source: string): ParseResult {
   const { tokens, errors } = lex(source);
-  const file = new Parser(tokens, errors).parseFile();
+  const file = new Parser(source, tokens, errors).parseFile();
   errors.sort((a, b) => a.range.start.offset - b.range.start.offset);
   return { file, errors };
 }
@@ -94,6 +94,7 @@ class Parser {
   private lastEnd: Position;
 
   constructor(
+    private readonly source: string,
     private readonly tokens: Token[],
     private readonly errors: ParseError[],
   ) {
@@ -133,9 +134,18 @@ class Parser {
         const next = word === 'weak' ? 'entity' : 'rel';
         this.advance();
         if (!this.isWord(next)) {
+          const found = this.current;
+          const hint = this.hintFor(found, [next]);
           this.error(
-            `Expected '${next}' after '${word}', but found ${describe(this.current)}.`,
-            this.current.range,
+            hint
+              ? `Expected '${next}' after '${word}'. Did you mean '${hint}'?`
+              : `Expected '${next}' after '${word}', but found ${describe(found)}.`,
+            found.range,
+            hint
+              ? replaceWith(found, hint)
+              : found.kind === 'ident' || found.kind === 'string'
+                ? insertBefore(found, `${next} `, `Add '${next}'`)
+                : undefined,
           );
           this.recoverToNextStatement();
           return null;
@@ -164,6 +174,7 @@ class Parser {
           ? `Unknown declaration '${token.text}'. Did you mean '${hint}'?`
           : `Expected a declaration such as 'entity', 'rel' or 'specialize', but found '${token.text}'.`,
         token.range,
+        hint ? replaceWith(token, hint) : undefined,
       );
     } else if (token.kind !== 'ident') {
       // Invalid words were already reported by the lexer.
@@ -179,11 +190,42 @@ class Parser {
   /** Each statement must end its line (or the file). */
   private expectEndOfStatement(statement: Statement): void {
     if (this.is('newline') || this.is('eof') || this.atDeclarationStart()) return;
-    let message = `Expected a new line after ${describeStatement(statement)}, but found ${describe(this.current)}.`;
+    const token = this.current;
+
+    // A misspelled keyword that may come here: `entity A inherit B`, `show A again az B`.
+    const expected =
+      statement.kind === 'entity' && statement.inherits.length === 0 && !statement.attributes.length
+        ? ['inherits']
+        : statement.kind === 'show' && statement.alias === null
+          ? ['as']
+          : [];
+    const hint = this.hintFor(token, expected);
+    if (hint) {
+      this.error(
+        `Unexpected '${token.text}' after ${describeStatement(statement)}. Did you mean '${hint}'?`,
+        token.range,
+        replaceWith(token, hint),
+      );
+      this.recoverToNextStatement();
+      return;
+    }
+
+    let message = `Expected a new line after ${describeStatement(statement)}, but found ${describe(token)}.`;
     if (statement.kind === 'entity' && statement.attributes.length === 0) {
       message += ` Attributes go inside braces: entity ${statement.name.text} { ... }.`;
     }
-    this.error(message, this.current.range);
+    // Two declarations on one line: moving the second to its own line fixes it.
+    const startsDeclaration = this.startsDeclaration(token, this.peek());
+    this.error(
+      message,
+      token.range,
+      startsDeclaration
+        ? {
+            title: `Move '${token.text}' to a new line`,
+            edits: [replaceGap(this.lastEnd, token, '\n')],
+          }
+        : undefined,
+    );
     this.recoverToNextStatement();
   }
 
@@ -240,13 +282,23 @@ class Parser {
         this.error(
           `Missing ':' before '${this.current.text}'. Write it as ${name.text}: ${this.current.text}.`,
           this.current.range,
+          { title: "Add ':'", edits: [insertAt(name.range.end, ':')] },
         );
       }
       const colon = missingColon ? null : this.advance();
       let flagCount = 0;
       while (this.is('ident')) {
+        const before = this.lastEnd;
         const token = this.advance();
         flagCount++;
+        /** Deletes this flag, and the ':' too if it is the only flag. */
+        const remove = (title: string): Fix => {
+          const alone = colon !== null && flagCount === 1 && !this.is('ident');
+          return {
+            title,
+            edits: [deleteRange(alone ? name.range.end : before, token.range.end)],
+          };
+        };
         const word = token.invalid ? '' : token.text;
         const keyKind = KEY_FLAGS.get(word);
         if (keyKind) {
@@ -256,19 +308,27 @@ class Parser {
                 ? `Duplicate flag '${word}'.`
                 : 'An attribute can have only one of key, key2 or partial.',
               token.range,
+              key === keyKind ? remove(`Remove the second '${word}'`) : undefined,
             );
           } else {
             key = keyKind;
           }
         } else if (word === 'multi' || word === 'derived') {
           const already = word === 'multi' ? multivalued : derived;
-          if (already) this.error(`Duplicate flag '${word}'.`, token.range);
+          if (already) {
+            this.error(
+              `Duplicate flag '${word}'.`,
+              token.range,
+              remove(`Remove the second '${word}'`),
+            );
+          }
           if (word === 'multi') multivalued = true;
           else derived = true;
         } else if (word === 'composite') {
           this.error(
             `'composite' is not needed: braces make an attribute composite, like ${name.text} { first, last }.`,
             token.range,
+            remove("Remove 'composite'"),
           );
         } else if (!token.invalid) {
           const hint = suggest(word, ATTRIBUTE_FLAGS);
@@ -277,11 +337,15 @@ class Parser {
               ? `Unknown attribute flag '${word}'. Did you mean '${hint}'?`
               : `Unknown attribute flag '${word}'. Expected ${ATTRIBUTE_FLAG_LIST}.`,
             token.range,
+            hint ? replaceWith(token, hint) : undefined,
           );
         }
       }
       if (colon && flagCount === 0 && !this.is('{')) {
-        this.error(`Expected an attribute flag after ':' (${ATTRIBUTE_FLAG_LIST}).`, colon.range);
+        this.error(`Expected an attribute flag after ':' (${ATTRIBUTE_FLAG_LIST}).`, colon.range, {
+          title: "Remove ':'",
+          edits: [deleteRange(name.range.end, colon.range.end)],
+        });
       }
     }
 
@@ -317,20 +381,31 @@ class Parser {
         this.advance();
         break;
       }
+      const found = this.current;
       this.error(
-        `Expected ',' or ')' in the key group, but found ${describe(this.current)}.`,
-        this.current.range,
+        `Expected ',' or ')' in the key group, but found ${describe(found)}.`,
+        found.range,
+        found.kind === 'ident' || found.kind === 'string' ? this.commaBefore(found) : undefined,
       );
       return this.abandonParenthesized();
     }
 
     const example = `(${names.map((n) => n.text).join(', ')}): key`;
     if (!this.is(':')) {
+      // `(a, b) partial` needs only the colon; `(a, b)` alone needs a key kind too.
+      const keyWord = this.isFlagWord([...KEY_FLAGS.keys()]);
       this.error(
         `Expected ':' and a key kind after the key group, like ${example}.`,
         this.current.range,
+        {
+          title: keyWord ? "Add ':'" : "Add ': key'",
+          edits: [insertAt(this.lastEnd, keyWord ? ':' : ': key')],
+        },
       );
-      return null;
+      if (!keyWord) return null;
+      // `(a, b) partial`: only the colon is missing, so keep the group.
+      const key = KEY_FLAGS.get(this.advance().text)!;
+      return { kind: 'keyGroup', names, key, range: this.rangeFrom(start) };
     }
     this.advance();
 
@@ -343,6 +418,7 @@ class Parser {
           ? `Unknown key kind '${token.text}'. Did you mean '${hint}'?`
           : `Expected a key kind (key, key2 or partial) after the key group, like ${example}.`,
         token.range,
+        hint ? replaceWith(token, hint) : undefined,
       );
       if (token.kind === 'ident') this.advance();
       return null;
@@ -374,8 +450,19 @@ class Parser {
       this.recoverToNextStatement();
     } else {
       this.parseBlock(`relationship "${name.text}"`, 'participants', () => {
-        if (this.isWord('attrs') && this.peek().kind === '{') {
-          this.advance();
+        if (this.is('ident') && this.peek().kind === '{') {
+          // Only `attrs` opens a block here; take a misspelling for it too.
+          const word = this.advance();
+          if (word.text !== 'attrs') {
+            const hint = suggest(word.text, ['attrs']);
+            this.error(
+              hint
+                ? `Unknown block '${word.text}' in relationship "${name.text}". Did you mean 'attrs'?`
+                : `Only 'attrs' can open a block inside a relationship, like attrs { ${word.text} }.`,
+              word.range,
+              replaceWith(word, 'attrs'),
+            );
+          }
           attributes.push(...this.parseAttributeBlock(`attrs of relationship "${name.text}"`));
           return true;
         }
@@ -432,14 +519,22 @@ class Parser {
         else role = roleName;
       } else if (token.kind === 'ident' && !token.invalid) {
         // Any other word: most likely a typo or a missing separator.
-        this.advance();
         const hint = suggest(token.text, [...PARTICIPATION_FLAGS, 'as']);
         this.error(
           hint
             ? `Unknown word '${token.text}' after participant "${name.text}". Did you mean '${hint}'?`
             : `Unexpected '${token.text}' after participant "${name.text}". Put ',' or a new line between participants. A cardinality is a number, a single letter or *, like 1, N or (0,N).`,
           token.range,
+          hint ? replaceWith(token, hint) : this.commaBefore(token),
         );
+        this.advance();
+        // Carry on as if the suggested word was written, so `as` still takes its role name.
+        if (hint === 'as') {
+          role ??= this.expectName("a role name after 'as'");
+          if (!role) break;
+        } else if (hint) {
+          participation ??= hint as Participation;
+        }
       } else {
         break;
       }
@@ -498,12 +593,12 @@ class Parser {
       const token = this.advance();
       const word = token.invalid ? '' : token.text;
       if (word === 'disjoint' || word === 'overlapping') {
-        if (disjointness === word) this.error(`Duplicate '${word}'.`, token.range);
+        if (disjointness === word) this.duplicateWord(token);
         else if (disjointness)
           this.error("Use either 'disjoint' or 'overlapping', not both.", token.range);
         else disjointness = word;
       } else if (word === 'total' || word === 'partial') {
-        if (participation === word) this.error(`Duplicate '${word}'.`, token.range);
+        if (participation === word) this.duplicateWord(token);
         else if (participation)
           this.error("Use either 'total' or 'partial', not both.", token.range);
         else participation = word;
@@ -554,8 +649,17 @@ class Parser {
       return null;
     }
     let label: Name | null = null;
-    if (this.isWord('as')) {
-      this.advance();
+    // `as` or a misspelling of it, followed by the label.
+    const misspelledAs = this.hintFor(this.current, ['as']) !== undefined && this.peekIsName();
+    if (this.isWord('as') || misspelledAs) {
+      const token = this.advance();
+      if (token.text !== 'as') {
+        this.error(
+          `Unexpected '${token.text}' after partof ${whole.text}. Did you mean 'as'?`,
+          token.range,
+          replaceWith(token, 'as'),
+        );
+      }
       label = this.expectName("a label after 'as'");
     }
     const parts = this.parseNameBlock(
@@ -581,6 +685,7 @@ class Parser {
       return { kind: 'aggregate', name, relationship: null, range: this.rangeFrom(start) };
     }
 
+    const openIndex = this.index;
     const open = this.advance();
     let relationship: RelationshipDecl | null = null;
     let reported = false;
@@ -610,11 +715,21 @@ class Parser {
         this.error(
           `Missing '}' to close aggregate "${name.text}" (opened on line ${open.range.start.line + 1}).`,
           open.range,
+          this.closingBraceFix(openIndex),
         );
         reported = true;
         break;
       }
-      this.error(`Expected 'rel' inside aggregate "${name.text}", like ${example}.`, token.range);
+      const word = this.keywordText(token);
+      const alias = word === undefined ? undefined : STATEMENT_ALIASES.get(word.toLowerCase());
+      const hint = alias === 'rel' ? alias : this.hintFor(token, ['rel', 'identifying']);
+      this.error(
+        hint
+          ? `Expected 'rel' inside aggregate "${name.text}". Did you mean '${hint}'?`
+          : `Expected 'rel' inside aggregate "${name.text}", like ${example}.`,
+        token.range,
+        hint ? replaceWith(token, hint) : undefined,
+      );
       reported = true;
       this.recoverToItemEnd();
     }
@@ -637,11 +752,22 @@ class Parser {
       return null;
     }
     if (!this.isWord('again')) {
+      const token = this.current;
+      const hint = this.hintFor(token, ['again']);
+      // `show A as B` and `show A` lack the word; anything else is a typo or unclear.
+      const missing = this.isWord('as') || this.is('newline') || this.is('eof');
       this.error(
-        `Expected 'again' after show ${entity.text}, like show ${entity.text} again as ${entity.text}2.`,
-        this.current.range,
+        hint
+          ? `Expected 'again' after show ${entity.text}. Did you mean 'again'?`
+          : `Expected 'again' after show ${entity.text}, like show ${entity.text} again as ${entity.text}2.`,
+        token.range,
+        hint
+          ? replaceWith(token, 'again')
+          : missing
+            ? { title: "Add 'again'", edits: [insertAt(entity.range.end, ' again')] }
+            : undefined,
       );
-      return { kind: 'show', entity, alias: null, range: this.rangeFrom(start) };
+      if (!hint) return { kind: 'show', entity, alias: null, range: this.rangeFrom(start) };
     }
     this.advance();
     let alias: Name | null = null;
@@ -675,6 +801,7 @@ class Parser {
           this.error(
             `Missing '}' to close ${owner} (opened on line ${open.range.start.line + 1}).`,
             open.range,
+            this.closingBraceFix(openIndex),
           );
           return;
         }
@@ -685,6 +812,7 @@ class Parser {
         this.error(
           `Missing '}' to close ${owner} (opened on line ${open.range.start.line + 1}).`,
           open.range,
+          this.closingBraceFix(openIndex),
         );
         return;
       }
@@ -693,9 +821,13 @@ class Parser {
       this.blockDepth--;
       if (!this.isSeparator() && !this.is('}') && !this.is('eof') && !this.atDeclarationStart()) {
         if (ok) {
+          const found = this.current;
           this.error(
-            `Expected ',' or a new line between ${itemNoun}, but found ${describe(this.current)}.`,
-            this.current.range,
+            `Expected ',' or a new line between ${itemNoun}, but found ${describe(found)}.`,
+            found.range,
+            found.kind === 'ident' || found.kind === 'string' || found.kind === '('
+              ? this.commaBefore(found)
+              : undefined,
           );
         }
         this.recoverToItemEnd();
@@ -739,7 +871,7 @@ class Parser {
       const token = this.advance();
       const word = token.invalid ? '' : token.text;
       if (word === 'total' || word === 'partial') {
-        if (participation === word) this.error(`Duplicate '${word}'.`, token.range);
+        if (participation === word) this.duplicateWord(token);
         else if (participation)
           this.error("Use either 'total' or 'partial', not both.", token.range);
         else participation = word;
@@ -757,7 +889,57 @@ class Parser {
         ? `Unknown word '${token.text}'. Did you mean '${hint}'?`
         : `Unexpected '${token.text}'. Expected ${expected}, or '{'.`,
       token.range,
+      hint ? replaceWith(token, hint) : undefined,
     );
+  }
+
+  /** `Duplicate 'total'.`, with a fix that deletes the second one; `token` was just consumed. */
+  private duplicateWord(token: Token): void {
+    const previous = this.tokens[this.index - 2]!;
+    this.error(`Duplicate '${token.text}'.`, token.range, {
+      title: `Remove the second '${token.text}'`,
+      edits: [deleteRange(previous.range.end, token.range.end)],
+    });
+  }
+
+  /**
+   * The keyword in `candidates` that `token` is probably a misspelling or an
+   * unfinished form of, if any. Only for bare words, never quoted names.
+   */
+  private hintFor(token: Token, candidates: string[]): string | undefined {
+    const word = this.keywordText(token);
+    return word === undefined ? undefined : suggest(word, candidates);
+  }
+
+  private peekIsName(): boolean {
+    const next = this.peek();
+    return next.kind === 'ident' || next.kind === 'string';
+  }
+
+  /** Inserts ',' between the previous token and `token`. */
+  private commaBefore(token: Token): Fix {
+    const spaced = token.range.start.offset > this.lastEnd.offset;
+    return { title: "Add ','", edits: [insertAt(this.lastEnd, spaced ? ',' : ', ')] };
+  }
+
+  /**
+   * Closes the block opened by the `{` at `openIndex`. If items follow the
+   * `{` on its own line, the block most likely ends on that line too, so the
+   * `}` goes at the end of that line; otherwise it goes on a new line after
+   * the last item, indented like the line that opened the block.
+   */
+  private closingBraceFix(openIndex: number): Fix {
+    let last = openIndex;
+    while (this.tokens[last + 1] && !['newline', 'eof'].includes(this.tokens[last + 1]!.kind))
+      last++;
+    const title = "Add the missing '}'";
+    if (last > openIndex) {
+      return { title, edits: [insertAt(this.tokens[last]!.range.end, ' }')] };
+    }
+    const open = this.tokens[openIndex]!.range.start;
+    const lineStart = open.offset - open.column;
+    const indent = /^[ \t]*/.exec(this.source.slice(lineStart))![0];
+    return { title, edits: [insertAt(this.lastEnd, `\n${indent}}`)] };
   }
 
   private expectName(what: string): Name | null {
@@ -786,8 +968,12 @@ class Parser {
     const token = this.current;
     const previous = this.tokens[this.index - 1];
     if (previous && previous.kind !== 'newline') return false;
+    return this.startsDeclaration(token, this.peek());
+  }
+
+  /** True when `token` and `next` read like the start of a declaration, such as `entity Foo`. */
+  private startsDeclaration(token: Token, next: Token): boolean {
     const word = this.keywordText(token);
-    const next = this.peek();
     switch (word) {
       case 'weak':
         return this.isWord('entity', next);
@@ -922,11 +1108,36 @@ class Parser {
     return { start, end: this.lastEnd };
   }
 
-  private error(message: string, range: Range): void {
+  private error(message: string, range: Range, fix?: Fix): void {
     // One error per position is enough; later ones are usually follow-on noise.
     if (this.errors.some((e) => e.range.start.offset === range.start.offset)) return;
-    this.errors.push({ message, range });
+    this.errors.push(fix ? { message, range, fix } : { message, range });
   }
+}
+
+// ---------------------------------------------------------------------------
+// Quick fixes
+// ---------------------------------------------------------------------------
+
+function replaceWith(token: Token, word: string): Fix {
+  return { title: `Change to '${word}'`, edits: [{ range: token.range, newText: word }] };
+}
+
+function insertAt(at: Position, newText: string): Fix['edits'][number] {
+  return { range: { start: at, end: at }, newText };
+}
+
+function insertBefore(token: Token, newText: string, title: string): Fix {
+  return { title, edits: [insertAt(token.range.start, newText)] };
+}
+
+function deleteRange(start: Position, end: Position): Fix['edits'][number] {
+  return { range: { start, end }, newText: '' };
+}
+
+/** Replaces the space between `end` and `token` with `newText`. */
+function replaceGap(end: Position, token: Token, newText: string): Fix['edits'][number] {
+  return { range: { start: end, end: token.range.start }, newText };
 }
 
 /** A cardinality label: a number, `*` or a single letter (`N`, `M`, `ن`). */

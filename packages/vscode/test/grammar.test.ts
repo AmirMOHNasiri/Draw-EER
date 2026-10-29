@@ -28,20 +28,32 @@ beforeAll(async () => {
   grammar = (await registry.loadGrammar('source.eer'))!;
 });
 
-/** Each token's text with its innermost scope (without the `.eer` suffix), across all lines. */
-function tokens(source: string): [string, string][] {
+/** Each token's text with its scopes (without `source.eer` and the `.eer` suffixes), across all lines. */
+function scopedTokens(source: string): [string, string[]][] {
   let state = textmate.INITIAL;
-  const result: [string, string][] = [];
+  const result: [string, string[]][] = [];
   for (const line of source.split('\n')) {
     const { tokens: lineTokens, ruleStack } = grammar.tokenizeLine(line, state);
     for (const token of lineTokens) {
       const text = line.slice(token.startIndex, token.endIndex);
       if (text.trim() === '') continue;
-      result.push([text, token.scopes.at(-1)!.replace(/\.eer$/, '')]);
+      result.push([text, token.scopes.slice(1).map((s) => s.replace(/\.eer$/, ''))]);
     }
     state = ruleStack;
   }
   return result;
+}
+
+/** Each token's text with its innermost scope, the one that decides its color. */
+function tokens(source: string): [string, string][] {
+  return scopedTokens(source).map(([text, scopes]) => [text, scopes.at(-1)!]);
+}
+
+/** In order, the text of every token whose innermost scope is `scope`. */
+function textsWith(source: string, scope: string): string[] {
+  return tokens(source)
+    .filter(([, s]) => s === scope)
+    .map(([text]) => text);
 }
 
 const scopeOf = (source: string, text: string) => tokens(source).find(([t]) => t === text)?.[1];
@@ -89,7 +101,7 @@ describe('grammar', () => {
   it('handles Persian names with a zero-width non-joiner, and quoted names', () => {
     const source =
       'entity "عضو کتابخانه" {\n  تاریخ\u200cعضویت: key\n}\nrel پیش\u200cنیازی { درس N, درس M }';
-    expect(scopeOf(source, '"عضو کتابخانه"')).toBe('string.quoted.double');
+    expect(scopeOf(source, '"عضو کتابخانه"')).toBe('entity.name.type');
     expect(scopeOf(source, 'تاریخ\u200cعضویت')).toBe('variable.other.property');
     expect(scopeOf(source, 'پیش\u200cنیازی')).toBe('entity.name.function.relationship');
     expect(scopeOf(source, 'درس')).toBe('entity.name.type');
@@ -112,10 +124,113 @@ describe('grammar', () => {
     expect(tokens(source).find(([t]) => t.includes('block'))?.[1]).toBe('comment.block');
   });
 
+  describe('names get the same color wherever they are', () => {
+    // Each test lists every token with the scope, in order, so a name that
+    // is missing (colored differently) or one too many fails it.
+    it('every participant of a relationship, first or after a comma, on any line, quoted or not', () => {
+      const source = [
+        'rel مبدا { پرواز N total, فرودگاه 1 }',
+        'identifying rel اجرا { پرواز 1, "پرواز روزانه" N total }',
+        'rel R {',
+        '  Student (0,N) as learner, Course (1,1)',
+        '  "Big Room" 1',
+        '  Teacher',
+        '  , Desk',
+        '  attrs { grade }',
+        '}',
+        'rel Pair { Person 1 as head,Person N as member }',
+      ].join('\n');
+      expect(textsWith(source, 'entity.name.type')).toEqual([
+        'پرواز',
+        'فرودگاه',
+        'پرواز',
+        '"پرواز روزانه"',
+        'Student',
+        'Course',
+        '"Big Room"',
+        'Teacher',
+        'Desk',
+        'Person',
+        'Person',
+      ]);
+      expect(textsWith(source, 'variable.parameter.role')).toEqual(['learner', 'head', 'member']);
+      expect(textsWith(source, 'variable.other.property')).toEqual(['grade']);
+    });
+
+    it('a cardinality letter after a name is not taken for a participant', () => {
+      const source = 'rel R {\n  A N, B M\n  C 1 total\n}';
+      expect(textsWith(source, 'entity.name.type')).toEqual(['A', 'B', 'C']);
+      expect(textsWith(source, 'constant.numeric.cardinality')).toEqual(['N', 'M', '1']);
+    });
+
+    it('every attribute name, quoted or not, simple, composite or in a key group', () => {
+      const source = [
+        'entity A { a: key, "b c", d }',
+        'entity B {',
+        '  "e f": multi',
+        '  g { h, "i j" }',
+        '  (k, "l m"): partial',
+        '}',
+      ].join('\n');
+      expect(textsWith(source, 'variable.other.property')).toEqual([
+        'a',
+        '"b c"',
+        'd',
+        '"e f"',
+        'g',
+        'h',
+        '"i j"',
+        'k',
+        '"l m"',
+      ]);
+    });
+
+    it('every member of a specialization, category or part-of, on any line', () => {
+      const source = [
+        'specialize E disjoint total { A, "B C",',
+        '  D',
+        '}',
+        'category U partial { A, "B C" }',
+        'partof Car as "Has" { Wheel, "Steering Wheel" }',
+      ].join('\n');
+      expect(textsWith(source, 'entity.name.type')).toEqual([
+        'E',
+        'A',
+        '"B C"',
+        'D',
+        'U',
+        'A',
+        '"B C"',
+        'Car',
+        'Wheel',
+        '"Steering Wheel"',
+      ]);
+    });
+
+    it('declared names, quoted or not', () => {
+      const source =
+        'entity "Big A" { x }\nentity B { y }\nrel "R S" { "Big A", B }\nrel T { B, B }';
+      expect(textsWith(source, 'entity.name.type')).toEqual([
+        '"Big A"',
+        'B',
+        '"Big A"',
+        'B',
+        'B',
+        'B',
+      ]);
+      expect(textsWith(source, 'entity.name.function.relationship')).toEqual(['"R S"', 'T']);
+    });
+
+    it('keeps quoted names inside a string scope, so the editor treats them as strings', () => {
+      const quoted = scopedTokens('rel R { "Big A" 1 }').find(([t]) => t === '"Big A"');
+      expect(quoted?.[1]).toEqual(['string.quoted.double', 'entity.name.type']);
+    });
+  });
+
   it('tokenizes every fixture without leaving the root scope stuck', () => {
     // After a whole file, the state must be back at the top level (every
     // block it entered has ended), or the next statement would be colored wrong.
-    for (const name of ['library', 'slide31', 'hospital', 'employee']) {
+    for (const name of ['library', 'slide31', 'hospital', 'employee', 'airline', 'shop']) {
       const source = readFileSync(
         new URL(`../../core/test/fixtures/${name}.eer`, import.meta.url),
         'utf8',

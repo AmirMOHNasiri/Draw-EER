@@ -124,14 +124,18 @@
     "watch": "node scripts/build.mjs --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p webview/tsconfig.json --noEmit",
     "smoke": "node scripts/build.mjs && node scripts/smoke.mjs",
-    "check:webview": "node scripts/build.mjs && node scripts/webview-check.mjs"
+    "check:webview": "node scripts/build.mjs && node scripts/webview-check.mjs",
+    "test:integration": "node scripts/build.mjs && node scripts/integration.mjs"
   },
   "dependencies": {
     "@draw-eer/core": "0.1.0"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.10",
     "@types/vscode": "1.90.0",
+    "@vscode/test-electron": "^3.1.0",
     "esbuild": "0.28.2",
+    "mocha": "^12.0.3",
     "vscode-oniguruma": "2.0.1",
     "vscode-textmate": "9.3.2"
   }

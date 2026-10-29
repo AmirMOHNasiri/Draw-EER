@@ -28,9 +28,13 @@ See [docs/language.md](docs/language.md) for the full language reference.
 ## The VS Code extension
 
 - `.eer` files get syntax highlighting, bracket matching, comment toggling and completion
-  (statements, attribute flags after `:`, entity names, cardinalities and participation).
-- Syntax errors show as red squiggles and in the Problems panel, with "did you mean" hints.
-  Nothing else is checked: whatever parses is drawn.
+  (statements, attribute flags after `:`, entity names, cardinalities and participation). A name
+  has the same color wherever it appears, quoted or not.
+- Syntax errors show as red squiggles and in the Problems panel, with "did you mean" hints for
+  misspelled or unfinished keywords (`en` → `entity`). Most errors have a Quick Fix (the light bulb,
+  or `Ctrl+.`) that repairs them in one click: a misspelled keyword or flag, a missing `:`, `,` or
+  `}`, a name that needs quotes, a Persian comma `،` where `,` is meant. Nothing else is checked:
+  whatever parses is drawn.
 - **Open Preview to the Side** (the preview button in the editor title, or `Ctrl+K V`) shows the
   diagram, redrawn as you type (after `drawEer.preview.updateDelay` ms, 300 by default). It follows
   the color theme. Scroll to zoom around the pointer, drag to pan, double-click or `F` to fit,
@@ -39,8 +43,8 @@ See [docs/language.md](docs/language.md) for the full language reference.
 To try it from a clone: open the repository in VS Code and press `F5` ("Run Extension"), which
 builds `packages/vscode` and opens a window with the fixtures folder.
 
-**Where the work happens.** The extension host only parses (for the squiggles), which takes a few
-milliseconds. Layout and drawing run in a Web Worker inside the preview, so a large diagram never
+**Where the work happens.** The extension host only parses (for the squiggles, Quick Fixes and
+completion), which takes a few milliseconds. Layout and drawing run in a Web Worker inside the preview, so a large diagram never
 blocks the editor or other extensions, and while it is busy only the newest text waits. HarfBuzz
 needs care when bundled: `harfbuzzjs` loads its WebAssembly at import time with a top-level
 `await`, which esbuild cannot emit for the extension host (CommonJS) or the worker. The build
@@ -50,6 +54,12 @@ loads, as bundled, in both places. `npm run check:webview -w packages/vscode` go
 the real preview page, with its Content Security Policy, in headless Chrome or Chromium, and checks
 that it draws, loads the font, zooms, pans and fits. (It found that the worker inherits the page's
 policy, which must allow `'wasm-unsafe-eval'` for HarfBuzz to compile.)
+
+`npm run test:integration -w packages/vscode` runs `packages/vscode/test/integration` inside a real
+VS Code (downloaded into `packages/vscode/.vscode-test/` on the first run; on Linux without a
+display, run it under `xvfb-run -a`). It opens `.eer` files and asks for completions, Quick Fixes
+and the colors of names the way the editor does. The parser's fixes, completion logic and grammar
+scopes have faster unit tests that run with `npm test`.
 
 ## Repository layout
 
