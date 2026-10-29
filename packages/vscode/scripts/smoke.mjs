@@ -3,7 +3,8 @@
  *
  * 1. The extension host: a probe bundled exactly like dist/extension.js
  *    (CommonJS for Node, with the harfbuzz plugin) loads HarfBuzz from
- *    dist/harfbuzz.wasm and measures Persian text.
+ *    dist/harfbuzz.wasm and measures Persian text, then exports an SVG with
+ *    subset fonts and a PNG with resvg, from the .wasm files in dist/.
  * 2. The preview's worker: dist/worker.js runs in a sandbox without Node's
  *    globals, like a browser Web Worker, gets the same `init` and `render`
  *    messages the preview page sends, and must answer with an SVG.
@@ -44,6 +45,14 @@ check(
   `extension host: HarfBuzz measures «دانشجو» (${host.width.toFixed(2)} px)`,
 );
 check(host.persian && host.svg > 500, 'extension host: renders a Persian diagram to SVG');
+check(
+  host.fontFaces === 2 && host.exported < 30_000,
+  `extension host: exports an SVG with subset fonts (${(host.exported / 1000).toFixed(1)} KB)`,
+);
+check(
+  host.png > 1000,
+  `extension host: exports a PNG with resvg (${(host.png / 1000).toFixed(1)} KB)`,
+);
 
 // 2. Preview worker -----------------------------------------------------------
 const replies = [];
@@ -78,22 +87,23 @@ sandbox.self.onmessage({
     bold: bytes('fonts/Vazirmatn-Bold.ttf'),
   },
 });
-sandbox.self.onmessage({
-  data: {
-    type: 'render',
-    id: 1,
-    text: 'entity دانشجو { نام }\nrel R { دانشجو 1, Course N }',
-    theme: { stroke: '#ccc', text: '#ccc', fill: '#1e1e1e', background: null },
-  },
-});
-const deadline = Date.now() + 10_000;
-while (
-  !replies.some((r) => r.type === 'rendered' || r.type === 'failed') &&
-  Date.now() < deadline
-) {
-  await new Promise((resolve) => setTimeout(resolve, 20));
+const render = {
+  type: 'render',
+  text: 'entity دانشجو { نام }\nrel R { دانشجو 1, Course N }',
+  theme: { stroke: '#ccc', text: '#ccc', fill: '#1e1e1e', background: null },
+  positions: { nodes: {}, attributes: {} },
+};
+/** Sends a render request and waits for its answer. */
+async function draw(request) {
+  sandbox.self.onmessage({ data: request });
+  const deadline = Date.now() + 10_000;
+  const answered = () => replies.find((r) => r.id === request.id && r.type !== 'ready');
+  while (!answered() && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  return answered();
 }
-const rendered = replies.find((r) => r.type === 'rendered');
+const rendered = await draw({ ...render, id: 1 });
 check(
   replies.some((r) => r.type === 'ready'),
   'worker: HarfBuzz loads from the .wasm bytes',
@@ -102,6 +112,17 @@ check(rendered?.svg.includes('دانشجو') === true, 'worker: renders a Persia
 check(rendered?.svg.includes('stroke: #ccc') === true, 'worker: uses the theme colors');
 check(rendered?.errors === 0, 'worker: reports no syntax errors for valid input');
 if (rendered) console.log(`     worker drew it in ${rendered.ms.toFixed(0)} ms`);
+
+// A drag: the first one pins the whole layout (two entities and the relationship).
+const dragged = await draw({
+  ...render,
+  id: 2,
+  move: { id: 'entity:دانشجو', dx: 40, dy: 0, snap: 0 },
+});
+check(
+  Object.keys(dragged?.positions?.nodes ?? {}).length === 3 && dragged.svg !== rendered?.svg,
+  'worker: applies a drag and pins the whole layout',
+);
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} smoke check(s) failed`);

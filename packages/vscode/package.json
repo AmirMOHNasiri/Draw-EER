@@ -65,6 +65,31 @@
         "title": "Open Preview to the Side",
         "category": "Draw EER",
         "icon": "$(open-preview)"
+      },
+      {
+        "command": "drawEer.exportSvg",
+        "title": "Export as SVG…",
+        "category": "Draw EER"
+      },
+      {
+        "command": "drawEer.exportPng",
+        "title": "Export as PNG…",
+        "category": "Draw EER"
+      },
+      {
+        "command": "drawEer.resetLayout",
+        "title": "Reset Layout",
+        "category": "Draw EER"
+      },
+      {
+        "command": "drawEer.undoLayoutChange",
+        "title": "Undo Layout Change",
+        "category": "Draw EER"
+      },
+      {
+        "command": "drawEer.redoLayoutChange",
+        "title": "Redo Layout Change",
+        "category": "Draw EER"
       }
     ],
     "menus": {
@@ -80,6 +105,16 @@
           "command": "drawEer.openPreview",
           "when": "resourceExtname == .eer",
           "group": "navigation"
+        },
+        {
+          "command": "drawEer.exportSvg",
+          "when": "resourceExtname == .eer",
+          "group": "7_drawEer@1"
+        },
+        {
+          "command": "drawEer.exportPng",
+          "when": "resourceExtname == .eer",
+          "group": "7_drawEer@2"
         }
       ],
       "commandPalette": [
@@ -90,6 +125,26 @@
         {
           "command": "drawEer.openPreviewToSide",
           "when": "editorLangId == eer"
+        },
+        {
+          "command": "drawEer.exportSvg",
+          "when": "editorLangId == eer || activeWebviewPanelId == 'drawEer.preview'"
+        },
+        {
+          "command": "drawEer.exportPng",
+          "when": "editorLangId == eer || activeWebviewPanelId == 'drawEer.preview'"
+        },
+        {
+          "command": "drawEer.resetLayout",
+          "when": "editorLangId == eer || activeWebviewPanelId == 'drawEer.preview'"
+        },
+        {
+          "command": "drawEer.undoLayoutChange",
+          "when": "activeWebviewPanelId == 'drawEer.preview'"
+        },
+        {
+          "command": "drawEer.redoLayoutChange",
+          "when": "activeWebviewPanelId == 'drawEer.preview'"
         }
       ]
     },
@@ -105,6 +160,23 @@
         "key": "ctrl+shift+v",
         "mac": "cmd+shift+v",
         "when": "editorLangId == eer"
+      },
+      {
+        "command": "drawEer.undoLayoutChange",
+        "key": "ctrl+z",
+        "mac": "cmd+z",
+        "when": "activeWebviewPanelId == 'drawEer.preview'"
+      },
+      {
+        "command": "drawEer.redoLayoutChange",
+        "key": "ctrl+shift+z",
+        "mac": "cmd+shift+z",
+        "when": "activeWebviewPanelId == 'drawEer.preview'"
+      },
+      {
+        "command": "drawEer.redoLayoutChange",
+        "key": "ctrl+y",
+        "when": "activeWebviewPanelId == 'drawEer.preview'"
       }
     ],
     "configuration": {
@@ -115,9 +187,22 @@
           "default": 300,
           "minimum": 0,
           "description": "How long to wait after typing stops before redrawing the preview, in milliseconds."
+        },
+        "drawEer.export.pngScale": {
+          "type": "number",
+          "default": 3,
+          "minimum": 1,
+          "maximum": 8,
+          "description": "Size of exported PNG images, as a multiple of the diagram's size on screen. 3 gives sharp images for print and slides."
         }
       }
-    }
+    },
+    "jsonValidation": [
+      {
+        "fileMatch": "*.eer.layout.json",
+        "url": "./schemas/eer-layout.schema.json"
+      }
+    ]
   },
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -128,7 +213,8 @@
     "test:integration": "node scripts/build.mjs && node scripts/integration.mjs"
   },
   "dependencies": {
-    "@draw-eer/core": "0.1.0"
+    "@draw-eer/core": "0.1.0",
+    "@resvg/resvg-wasm": "2.6.2"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

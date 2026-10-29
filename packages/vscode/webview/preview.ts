@@ -1,15 +1,20 @@
 /**
  * The preview page: shows the SVG drawn by the worker, follows the VS Code
- * theme, and zooms and pans.
+ * theme, zooms and pans, and lets the user drag shapes and attributes.
  *
- * - Mouse wheel zooms around the pointer; dragging pans.
+ * - Mouse wheel zooms around the pointer; dragging the background pans.
+ * - Dragging a shape or an attribute moves it (its attributes come along);
+ *   it snaps into line with the shapes it is joined to unless Alt is held,
+ *   and Escape cancels. The extension saves the result in the layout file.
  * - Toolbar and keys: + and - zoom, 0 shows actual size, F fits the window
- *   (double-click does too).
- * - Until the user zooms or pans, the diagram keeps fitting the window as
- *   it grows; after that, the view stays where the user put it.
+ *   (double-click does too). Export and reset are toolbar buttons; undo and
+ *   redo are VS Code keybindings (Ctrl+Z, Ctrl+Shift+Z) handled by the
+ *   extension.
+ * - Until the user zooms, pans or drags, the diagram keeps fitting the
+ *   window as it grows; after that, the view stays where the user put it.
  */
-import type { Theme } from '@draw-eer/core';
-import type { FromWebview, FromWorker, PreviewState, ToWebview, ToWorker } from './protocol';
+import type { Positions, Theme } from '@draw-eer/core';
+import type { FromWebview, FromWorker, Move, PreviewState, ToWebview, ToWorker } from './protocol';
 
 interface Config {
   uri: string;
@@ -33,11 +38,34 @@ const status = document.getElementById('status')!;
 const MIN_SCALE = 0.1;
 const MAX_SCALE = 8;
 const FIT_MARGIN = 16;
+/** How close (in screen px) a dragged element must come to lining up with a neighbour to snap. */
+const SNAP = 8;
+/** A press that moves less than this (in screen px) is a click, not a drag. */
+const DRAG_START = 3;
 
 let view = vscode.getState()?.view ?? { scale: 1, x: 0, y: 0, fitted: true };
 let source: string | null = null;
+/** The positions drawn: the layout file's, with new elements placed around them. */
+let positions: Positions = { nodes: {}, attributes: {} };
+/** The positions the extension has (sent by it, or saved through it), as JSON. */
+let saved = JSON.stringify(positions);
 let requestId = 0;
 let shownId = 0;
+/** Top left corner of the diagram shown, in diagram coordinates (its viewBox). */
+let origin: { x: number; y: number } | null = null;
+
+/** The element being dragged. */
+let moving: {
+  id: string;
+  /** Pointer position when the drag started, in screen px. */
+  startX: number;
+  startY: number;
+  /** The positions when the drag started; the move is drawn relative to them. */
+  base: Positions;
+  move: Move | null;
+  /** The pointer was released; waiting for the last frame to come back. */
+  dropped: boolean;
+} | null = null;
 
 // ---------------------------------------------------------------------------
 // Worker
@@ -65,20 +93,48 @@ function onWorkerMessage(message: FromWorker): void {
     case 'ready':
       // Nothing to do: the worker keeps the newest request until it is ready.
       break;
-    case 'rendered':
+    case 'rendered': {
       // An older drawing finishing late must not replace a newer one.
       if (message.id < shownId) return;
       shownId = message.id;
+      const before = origin;
       canvas.innerHTML = message.svg;
-      if (view.fitted) fit();
-      else apply();
+      origin = viewBoxOrigin();
+      if (view.fitted) {
+        fit();
+      } else {
+        // The drawing's bounds change when a shape is dragged past its edge
+        // or something is added above or to the left; keep the rest still.
+        if (before && origin) {
+          view = {
+            ...view,
+            x: view.x + (origin.x - before.x) * view.scale,
+            y: view.y + (origin.y - before.y) * view.scale,
+          };
+        }
+        apply();
+      }
+      if (moving?.dropped && message.id === requestId) {
+        drop(message.positions);
+      } else if (!moving) {
+        // Elements added to or deleted from the text: keep their places, and
+        // save them once the text is free of syntax errors.
+        positions = message.positions;
+        const json = JSON.stringify(positions);
+        if (message.errors === 0 && json !== saved) {
+          saved = json;
+          vscode.postMessage({ type: 'placed', positions });
+        }
+      }
       showStatus(
         message.errors === 0
           ? ''
           : `${message.errors} syntax ${message.errors === 1 ? 'error' : 'errors'} (see Problems)`,
       );
       break;
+    }
     case 'failed':
+      moving = null;
       showStatus(`Could not draw the diagram: ${message.message}`);
       break;
   }
@@ -91,8 +147,15 @@ function render(): void {
     id: ++requestId,
     text: source,
     theme: currentTheme(),
+    positions: moving ? moving.base : positions,
+    ...(moving?.move ? { move: moving.move } : {}),
   };
   void worker.then((w) => w.postMessage(message));
+}
+
+function viewBoxOrigin(): { x: number; y: number } | null {
+  const box = canvas.querySelector('svg')?.viewBox.baseVal;
+  return box ? { x: box.x, y: box.y } : null;
 }
 
 function showStatus(text: string): void {
@@ -189,31 +252,94 @@ viewport.addEventListener(
   { passive: false },
 );
 
-let drag: { x: number; y: number } | null = null;
+// ---------------------------------------------------------------------------
+// Panning, and dragging shapes and attributes
+// ---------------------------------------------------------------------------
+
+let pan: { x: number; y: number } | null = null;
 viewport.addEventListener('pointerdown', (event) => {
-  if (event.button !== 0) return;
-  drag = { x: event.clientX - view.x, y: event.clientY - view.y };
+  if (event.button !== 0 || moving) return;
   viewport.setPointerCapture(event.pointerId);
   viewport.classList.add('dragging');
+  const element = (event.target as Element).closest('#canvas [data-id]');
+  if (element) {
+    moving = {
+      id: element.getAttribute('data-id')!,
+      startX: event.clientX,
+      startY: event.clientY,
+      base: positions,
+      move: null,
+      dropped: false,
+    };
+  } else {
+    pan = { x: event.clientX - view.x, y: event.clientY - view.y };
+  }
 });
 viewport.addEventListener('pointermove', (event) => {
-  if (!drag) return;
-  view = { ...view, x: event.clientX - drag.x, y: event.clientY - drag.y, fitted: false };
-  apply();
+  if (pan) {
+    view = { ...view, x: event.clientX - pan.x, y: event.clientY - pan.y, fitted: false };
+    apply();
+  } else if (moving && !moving.dropped) {
+    const dx = event.clientX - moving.startX;
+    const dy = event.clientY - moving.startY;
+    if (!moving.move && Math.hypot(dx, dy) < DRAG_START) return;
+    // From here on the view stays put instead of refitting as the drawing changes.
+    view = { ...view, fitted: false };
+    moving.move = {
+      id: moving.id,
+      dx: dx / view.scale,
+      dy: dy / view.scale,
+      snap: event.altKey ? 0 : SNAP / view.scale,
+    };
+    render();
+  }
 });
 const endDrag = () => {
-  drag = null;
+  pan = null;
   viewport.classList.remove('dragging');
+  if (!moving || moving.dropped) return;
+  if (!moving.move) {
+    moving = null; // only a click
+  } else {
+    moving.dropped = true;
+    // Saved when the last frame comes back (see onWorkerMessage), so the file
+    // gets exactly what is shown; if it is already shown, ask for it again.
+    if (shownId === requestId) render();
+  }
 };
 viewport.addEventListener('pointerup', endDrag);
 viewport.addEventListener('pointercancel', endDrag);
 viewport.addEventListener('dblclick', fit);
 
+function drop(dropped: Positions): void {
+  moving = null;
+  positions = dropped;
+  saved = JSON.stringify(positions);
+  vscode.postMessage({ type: 'moved', positions });
+}
+
+function cancelMove(): void {
+  if (!moving) return;
+  moving = null;
+  viewport.classList.remove('dragging');
+  render();
+}
+
 document.getElementById('zoom-in')!.addEventListener('click', () => zoomCenter(1.25));
 document.getElementById('zoom-out')!.addEventListener('click', () => zoomCenter(0.8));
 document.getElementById('zoom-reset')!.addEventListener('click', actualSize);
 document.getElementById('zoom-fit')!.addEventListener('click', fit);
+for (const [button, command] of [
+  ['export-svg', 'exportSvg'],
+  ['export-png', 'exportPng'],
+  ['reset-layout', 'resetLayout'],
+] as const) {
+  document
+    .getElementById(button)!
+    .addEventListener('click', () => vscode.postMessage({ type: 'command', command }));
+}
 window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') cancelMove();
   if (event.ctrlKey || event.metaKey || event.altKey) return;
   if (event.key === '+' || event.key === '=') zoomCenter(1.25);
   else if (event.key === '-') zoomCenter(0.8);
@@ -229,10 +355,16 @@ window.addEventListener('resize', () => {
 // ---------------------------------------------------------------------------
 
 window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
-  if (event.data.type === 'source') {
-    source = event.data.text;
-    render();
+  const message = event.data;
+  if (message.type === 'source') {
+    source = message.text;
+  } else {
+    // A change to the layout file wins over a drag in progress.
+    moving = null;
+    positions = message.positions;
+    saved = JSON.stringify(positions);
   }
+  render();
 });
 
 showStatus('');

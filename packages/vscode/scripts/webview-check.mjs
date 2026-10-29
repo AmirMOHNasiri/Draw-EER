@@ -74,8 +74,10 @@ try {
   });
   // What VS Code provides: theme variables on <body>, and the webview API.
   const stub = `<script nonce="${nonce}">
+window.__messages = [];
 window.acquireVsCodeApi = () => ({
   postMessage(m) {
+    window.__messages.push(m);
     if (m.type === 'ready')
       setTimeout(() => window.postMessage({ type: 'source', text: ${JSON.stringify(source)}, version: 1 }, '*'), 0);
   },
@@ -118,6 +120,13 @@ window.acquireVsCodeApi = () => ({
   check(result.interaction?.zoomedIn, 'the mouse wheel zooms in');
   check(result.interaction?.panned, 'dragging pans');
   check(result.interaction?.refitted, 'double-click fits the diagram again');
+  check(
+    result.drag?.saved,
+    `dragging a shape saves where it was dropped, and pins every shape (moved by ${JSON.stringify(result.drag?.offset)})`,
+  );
+  check(result.drag?.redrawn, 'the dragged shape is drawn at its new place');
+  check(result.drag?.snapped, 'a shape dragged near a partner snaps into line');
+  check(result.drag?.toolbar, 'toolbar buttons send export and reset commands');
   if (screenshot) console.log(`screenshot: ${screenshot}`);
   if (failures.length > 0) process.exitCode = 1;
 } finally {
@@ -211,14 +220,19 @@ async function inspect(url, screenshotPath) {
     const { targetId } = await send('Target.createTarget', { url: 'about:blank' });
     const { sessionId } = await send('Target.attachToTarget', { targetId, flatten: true });
     await send('Page.navigate', { url }, sessionId);
-    const evaluate = async (expression) =>
-      (
-        await send(
-          'Runtime.evaluate',
-          { expression, returnByValue: true, awaitPromise: true },
-          sessionId,
-        )
-      ).result.value;
+    const evaluate = async (expression) => {
+      const { result, exceptionDetails } = await send(
+        'Runtime.evaluate',
+        { expression, returnByValue: true, awaitPromise: true },
+        sessionId,
+      );
+      // An exception in the check itself must not pass for a failed check.
+      if (exceptionDetails) {
+        const error = exceptionDetails.exception?.description ?? exceptionDetails.text;
+        throw new Error(`the check's script failed in the page: ${error}`);
+      }
+      return result.value;
+    };
     const deadline = Date.now() + 20_000;
     while (Date.now() < deadline && !(await evaluate("!!document.querySelector('#canvas svg')"))) {
       await new Promise((resolve) => setTimeout(resolve, 250));
@@ -251,6 +265,55 @@ async function inspect(url, screenshotPath) {
         panned: Math.abs(panned.x - zoomed.x - 60) < 0.01 && Math.abs(panned.y - zoomed.y - 30) < 0.01,
         refitted: refitted.fitted && Math.abs(refitted.scale - fitted) < 1e-9,
       };
+    })()`);
+    // Drag a shape with real pointer events, as a user would.
+    report.drag = await evaluate(`(async () => {
+      const id = 'entity:انتشارات';
+      const shape = () => document.querySelector('#canvas [data-id="' + id + '"] rect');
+      const viewport = document.getElementById('viewport');
+      const scale = window.__state.view.scale;
+      const box = shape().getBoundingClientRect();
+      const start = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+      const at = (type, x, y, extra = {}) => shape().dispatchEvent(new PointerEvent(type, { button: 0, clientX: x, clientY: y, pointerId: 1, bubbles: true, ...extra }));
+      const settle = () => new Promise((resolve) => setTimeout(resolve, 300));
+      const saved = async () => {
+        for (let i = 0; i < 40 && !window.__messages.some((m) => m.type === 'moved'); i++) await settle();
+        return window.__messages.findLast((m) => m.type === 'moved');
+      };
+      const centerX = () => Number(shape().getAttribute('x')) + Number(shape().getAttribute('width')) / 2;
+      const centerY = () => Number(shape().getAttribute('y')) + Number(shape().getAttribute('height')) / 2;
+      const before = { x: centerX(), y: centerY() };
+      // 1. A plain move, without snapping (Alt), by 100 x 50 screen px.
+      at('pointerdown', start.x, start.y);
+      at('pointermove', start.x + 50, start.y + 20, { altKey: true });
+      at('pointermove', start.x + 100, start.y + 50, { altKey: true });
+      at('pointerup', start.x + 100, start.y + 50);
+      const first = await saved();
+      const dropped = first?.positions.nodes[id];
+      const offset = dropped && { x: Math.round(dropped.x - before.x), y: Math.round(dropped.y - before.y) };
+      const result = {
+        offset,
+        // Saved where it was dropped, and the first drag pins every shape.
+        saved: !!offset && Math.abs(offset.x - 100 / scale) <= 1 && Math.abs(offset.y - 50 / scale) <= 1 &&
+          Object.keys(first.positions.nodes).length === document.querySelectorAll('#canvas .entity, #canvas .relationship').length,
+        redrawn: Math.abs(centerX() - before.x - 100 / scale) <= 1,
+      };
+      // 2. Back to 4 px beside the column of its relationship (it sits right
+      // above it): it snaps into line, so its line is straight again.
+      window.__messages.length = 0;
+      const now = shape().getBoundingClientRect();
+      const from = { x: now.x + now.width / 2, y: now.y + now.height / 2 };
+      const dx = (4 - offset.x) * scale;
+      at('pointerdown', from.x, from.y);
+      at('pointermove', from.x + dx, from.y);
+      at('pointerup', from.x + dx, from.y);
+      const second = await saved();
+      result.snapped = second?.positions.nodes[id]?.x === Math.round(before.x);
+      // 3. Toolbar buttons.
+      window.__messages.length = 0;
+      for (const button of ['export-svg', 'export-png', 'reset-layout']) document.getElementById(button).click();
+      result.toolbar = window.__messages.map((m) => m.command).join() === 'exportSvg,exportPng,resetLayout';
+      return result;
     })()`);
     if (screenshotPath) {
       const { data } = await send('Page.captureScreenshot', { format: 'png' }, sessionId);

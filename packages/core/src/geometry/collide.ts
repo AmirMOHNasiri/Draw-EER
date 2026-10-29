@@ -99,3 +99,51 @@ export function segmentHitsEllipse(
   const y = p.y + t * d.y;
   return x * x + y * y < 1;
 }
+
+/**
+ * True if two shapes overlap or come closer than `gap`. Each outline is
+ * sampled and checked against the other shape (both grown by half the gap),
+ * which is exact enough for layout and much tighter than comparing boxes,
+ * where an ellipse's empty corners would count as taken.
+ */
+export function shapesOverlap(p: Shape, pc: Point, q: Shape, qc: Point, gap = 0): boolean {
+  const a = { ...p, width: p.width + gap, height: p.height + gap };
+  const b = { ...q, width: q.width + gap, height: q.height + gap };
+  if (!boxesOverlap(boxAround(pc, a.width, a.height), boxAround(qc, b.width, b.height))) {
+    return false;
+  }
+  if (contains(a, pc, qc) || contains(b, qc, pc)) return true;
+  return (
+    outlinePoints(a, pc).some((point) => contains(b, qc, point)) ||
+    outlinePoints(b, qc).some((point) => contains(a, pc, point))
+  );
+}
+
+/** True if the segment from `a` to `b` passes through the shape. */
+export function segmentHitsShape(a: Point, b: Point, shape: Shape, center: Point): boolean {
+  return shape.kind === 'ellipse'
+    ? segmentHitsEllipse(a, b, center, shape.width, shape.height)
+    : segmentHitsBox(a, b, boxAround(center, shape.width, shape.height));
+}
+
+const OUTLINE_SAMPLES = 48;
+
+/** Points around a shape's outline. */
+function outlinePoints(shape: Shape, center: Point): Point[] {
+  const a = shape.width / 2;
+  const b = shape.height / 2;
+  const points: Point[] = [];
+  for (let i = 0; i < OUTLINE_SAMPLES; i++) {
+    const t = (i / OUTLINE_SAMPLES) * 2 * Math.PI;
+    const [c, s] = [Math.cos(t), Math.sin(t)];
+    // Scale the direction so the point lands on the outline.
+    const k =
+      shape.kind === 'ellipse'
+        ? 1
+        : shape.kind === 'diamond'
+          ? 1 / (Math.abs(c) + Math.abs(s))
+          : 1 / Math.max(Math.abs(c), Math.abs(s));
+    points.push({ x: center.x + a * c * k, y: center.y + b * s * k });
+  }
+  return points;
+}

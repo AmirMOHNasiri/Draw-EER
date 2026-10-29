@@ -21,6 +21,17 @@ beforeAll(async () => {
   measurer = await createNodeMeasurer();
 });
 
+it('has no layout files next to the fixtures', () => {
+  // The snapshots use the automatic layout, but `npm run render` applies a
+  // layout file next to its input, so one left over from trying a fixture in
+  // the preview would make renders differ from the snapshots without notice.
+  const stray = readdirSync(fixturesDir).filter((f) => f.endsWith('.layout.json'));
+  expect(
+    stray,
+    `delete ${stray.join(', ')} in test/fixtures (from trying them in the preview)`,
+  ).toEqual([]);
+});
+
 describe.each(fixtures)('%s', (fixture) => {
   it('renders as in its snapshot', async () => {
     const source = readFileSync(fixturesDir + fixture, 'utf8');

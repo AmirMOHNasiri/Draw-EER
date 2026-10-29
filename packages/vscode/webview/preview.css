@@ -35,6 +35,11 @@ body {
   display: block;
 }
 
+/* Shapes and attributes can be dragged. */
+#canvas [data-id] {
+  cursor: move;
+}
+
 #toolbar {
   position: absolute;
   top: 8px;
@@ -59,6 +64,13 @@ body {
   font: inherit;
   font-size: 12px;
   cursor: pointer;
+}
+
+#toolbar .separator {
+  width: 1px;
+  margin: 3px 2px;
+  background: var(--vscode-editorWidget-border, var(--vscode-foreground));
+  opacity: 0.4;
 }
 
 #toolbar button:hover {

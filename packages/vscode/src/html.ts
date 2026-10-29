@@ -53,11 +53,15 @@ export function previewHtml({ cspSource, asset, nonce, document }: PageOptions):
 </head>
 <body>
 <div id="viewport"><div id="canvas"></div></div>
-<div id="toolbar" role="toolbar" aria-label="Zoom">
+<div id="toolbar" role="toolbar" aria-label="Preview">
   <button id="zoom-out" title="Zoom out (-)" aria-label="Zoom out">−</button>
   <button id="zoom-reset" title="Actual size (0)" aria-label="Actual size">100%</button>
   <button id="zoom-in" title="Zoom in (+)" aria-label="Zoom in">+</button>
   <button id="zoom-fit" title="Fit to window (F)" aria-label="Fit to window">Fit</button>
+  <span class="separator" aria-hidden="true"></span>
+  <button id="reset-layout" title="Reset layout: undo all moves (Ctrl+Z brings them back)" aria-label="Reset layout">Reset</button>
+  <button id="export-svg" title="Export as SVG" aria-label="Export as SVG">SVG</button>
+  <button id="export-png" title="Export as PNG" aria-label="Export as PNG">PNG</button>
 </div>
 <div id="status" role="status"></div>
 <script nonce="${nonce}" id="config" type="application/json">${escapeJson(config)}</script>

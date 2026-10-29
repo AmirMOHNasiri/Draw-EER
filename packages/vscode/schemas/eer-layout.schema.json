@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Draw EER layout file",
+  "description": "Positions of the elements of a Draw EER diagram, saved when shapes are dragged in the preview. Elements listed here never move when the text changes; new ones are placed around them and added. Written by the extension.",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": { "const": 1 },
+    "nodes": {
+      "description": "Entities and relationships: the center of each, in px.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/point" }
+    },
+    "attributes": {
+      "description": "Attributes: where each sits relative to the center of its owner (its shape, or the composite attribute it is part of), in px.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/point" }
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "point": {
+      "type": "object",
+      "required": ["x", "y"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" } },
+      "additionalProperties": false
+    }
+  }
+}

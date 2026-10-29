@@ -5,7 +5,8 @@ classic Chen notation used in database courses (Elmasri/Navathe style). Persian 
 fully supported.
 
 > **Status:** early development. The parser, layout and SVG renderer for basic ER diagrams and
-> the VS Code extension with a live preview work; EER constructs, dragging and export are next.
+> the VS Code extension work: live preview, dragging, and export to SVG and PNG. EER constructs
+> (specialization, categories, part-of, aggregation) are next.
 
 ```
 entity Student {
@@ -37,37 +38,96 @@ See [docs/language.md](docs/language.md) for the full language reference.
   whatever parses is drawn.
 - **Open Preview to the Side** (the preview button in the editor title, or `Ctrl+K V`) shows the
   diagram, redrawn as you type (after `drawEer.preview.updateDelay` ms, 300 by default). It follows
-  the color theme. Scroll to zoom around the pointer, drag to pan, double-click or `F` to fit,
-  `0` for actual size. Open previews come back when VS Code restarts.
+  the color theme. Scroll to zoom around the pointer, drag the background to pan, double-click or
+  `F` to fit, `0` for actual size. Open previews come back when VS Code restarts.
+- **Drag** a shape or an attribute in the preview to move it; a shape's attributes come along. A
+  shape snaps into line with the shapes it is joined to, so its lines can be made straight again
+  (hold `Alt` to place it freely); `Escape` cancels a drag. `Ctrl+Z` and `Ctrl+Shift+Z` undo and
+  redo moves, and **Reset** in the preview's toolbar goes back to the automatic layout. Moves are
+  saved in a layout file next to the diagram (see below).
+- **Export** as SVG or PNG from the preview's toolbar, the Explorer's context menu, or the
+  Command Palette (**Draw EER: Export as SVG…** / **Export as PNG…**). Exports are black on white
+  whatever the color theme. The SVG embeds the font, cut down to the characters the diagram uses
+  (a few KB), so Persian text looks the same on any computer; the PNG is three times the diagram's
+  size (`drawEer.export.pngScale`).
+
+### The layout file
+
+Moves are saved in `<name>.eer.layout.json` next to `<name>.eer`, one element per line and sorted,
+so it diffs well in version control; commit it with the diagram.
+
+```json
+{
+  "version": 1,
+  "nodes": {
+    "entity:Student": { "x": 412, "y": 230 }
+  },
+  "attributes": {
+    "attr:entity:Student/name": { "x": -150, "y": -20 }
+  }
+}
+```
+
+- Without a layout file, the automatic layout places everything. The first drag saves the whole
+  layout as shown, so from then on **nothing moves unless you move it**: editing the text never
+  moves an element that is in the file.
+- A shape (`nodes`) stores its center. An attribute stores where it sits relative to its owner
+  (its shape, or the composite attribute it is part of), so it moves along with the owner.
+- Elements added to the text are placed around the pinned ones, which stay fixed: a new shape
+  goes to the best free spot next to the shapes it is joined to (short, straight lines that cross
+  nothing), further out if nothing nearby is free; new attributes go in the free angles around
+  their owner; a group of new shapes joined to nothing pinned goes where it grows the drawing
+  least. Nothing new ever overlaps anything, and a dragged shape cannot be dropped onto another.
+  New elements are then saved to the file too.
+- Elements deleted from the text are dropped from the file. This waits while the text has syntax
+  errors, so an element hidden for a moment by a half-typed edit keeps its place.
+- Keys are built from names, so a renamed element counts as a new one.
+- **Reset** (in the preview's toolbar) deletes the file and goes back to the automatic layout;
+  `Ctrl+Z` brings the file back. Changes to the file made outside the preview (by hand, or a
+  `git checkout`) show up at once. A file that cannot be read gives a warning, and the automatic
+  layout is used.
 
 To try it from a clone: open the repository in VS Code and press `F5` ("Run Extension"), which
 builds `packages/vscode` and opens a window with the fixtures folder.
 
-**Where the work happens.** The extension host only parses (for the squiggles, Quick Fixes and
-completion), which takes a few milliseconds. Layout and drawing run in a Web Worker inside the preview, so a large diagram never
-blocks the editor or other extensions, and while it is busy only the newest text waits. HarfBuzz
-needs care when bundled: `harfbuzzjs` loads its WebAssembly at import time with a top-level
-`await`, which esbuild cannot emit for the extension host (CommonJS) or the worker. The build
-replaces that one line with an explicit `loadHarfBuzz({ wasmBinary })` (see
-`packages/vscode/scripts/build.mjs`), and `npm run smoke -w packages/vscode` checks that HarfBuzz
-loads, as bundled, in both places. `npm run check:webview -w packages/vscode` goes further: it loads
-the real preview page, with its Content Security Policy, in headless Chrome or Chromium, and checks
-that it draws, loads the font, zooms, pans and fits. (It found that the worker inherits the page's
-policy, which must allow `'wasm-unsafe-eval'` for HarfBuzz to compile.)
+**Where the work happens.** While you type, the extension host only parses (for the squiggles,
+Quick Fixes and completion), which takes a few milliseconds. Layout and drawing run in a Web Worker
+inside the preview, so a large diagram never blocks the editor or other extensions, and while it is
+busy only the newest text waits. The worker keeps the automatic layout of the last text, so while
+a shape is dragged each frame only applies the positions and draws. Exports run in the extension
+host instead (they also work without a preview), since they happen only when asked for.
+
+HarfBuzz needs care when bundled: `harfbuzzjs` loads its WebAssembly at import time with a
+top-level `await`, which esbuild cannot emit for the extension host (CommonJS) or the worker. The
+build replaces that one line with an explicit `loadHarfBuzz({ wasmBinary })` (see
+`packages/vscode/scripts/build.mjs`). Exports use two more WebAssembly modules: HarfBuzz's font
+subsetter (`harfbuzz-subset.wasm`, which ships with harfbuzzjs; it keeps the font's shaping rules,
+so joined Persian letters still work) and resvg for PNG. resvg ignores fonts embedded with
+`@font-face`, so it is given the bundled font directly; without it every label would be left out,
+which the export test checks with a Persian label.
+
+`npm run smoke -w packages/vscode` checks, as bundled, that HarfBuzz loads in the extension host
+and in the worker, that exports work in the host, and that the worker applies a drag.
+`npm run check:webview -w packages/vscode` goes further: it loads the real preview page, with its
+Content Security Policy, in headless Chrome or Chromium, and checks that it draws, loads the font,
+zooms, pans, fits, and that dragging a shape moves it, snaps and reports the new positions. (It
+found that the worker inherits the page's policy, which must allow `'wasm-unsafe-eval'` for
+HarfBuzz to compile.)
 
 `npm run test:integration -w packages/vscode` runs `packages/vscode/test/integration` inside a real
 VS Code (downloaded into `packages/vscode/.vscode-test/` on the first run; on Linux without a
 display, run it under `xvfb-run -a`). It opens `.eer` files and asks for completions, Quick Fixes
-and the colors of names the way the editor does. The parser's fixes, completion logic and grammar
+and the colors of names the way the editor does, exports SVG and PNG, and checks the layout file
+with a preview open (outside edits, reset, undo, redo). The parser's fixes, completion logic and grammar
 scopes have faster unit tests that run with `npm test`.
 
 ## Repository layout
 
-| Path              | Contents                                                                |
-| ----------------- | ----------------------------------------------------------------------- |
-| `packages/core`   | Parser, model, layout and SVG renderer. No DOM or VS Code dependencies. |
-| `packages/vscode` | The VS Code extension: language support and the live preview.           |
-| `packages/web`    | Browser playground (planned).                                           |
+| Path              | Contents                                                                        |
+| ----------------- | ------------------------------------------------------------------------------- |
+| `packages/core`   | Parser, model, layout, layout file, SVG renderer and export. No DOM or VS Code. |
+| `packages/vscode` | The VS Code extension: language support, live preview with dragging, export.    |
+| `packages/web`    | Browser playground (planned).                                                   |
 
 ## Development
 
@@ -79,7 +139,7 @@ npm test            # run all tests
 npm run lint        # ESLint
 npm run typecheck   # TypeScript, strict mode
 npm run format      # Prettier
-npm run render -- path/to/file.eer --png --out-dir out/renders   # render to SVG (and PNG)
+npm run render -- path/to/file.eer --png --out-dir out/renders   # export to SVG (and PNG), with its layout file
 npm run bench       # layout time for every fixture and a 300-element synthetic diagram
 npm run test:update-snapshots   # accept intended changes to the rendered fixtures
 ```
@@ -169,9 +229,19 @@ about 40 shapes and attributes) take 3–320 ms, a 300-element synthetic diagram
 starting shape, fewer rounds). This depends only on the diagram, never on the clock, so the same
 text always gives the same picture.
 
+**With a layout file** (`incremental.ts`), the steps above run only until the first drag. After
+that, pinned elements are fixed obstacles and only new elements are placed: a new shape is tried
+at line-length distances in eight directions around each placed shape it is joined to, ring by
+ring further out, and the cheapest spot where it and its attributes overlap nothing wins (short,
+straight lines that cross no other line and run through no shape). New attributes of a pinned
+owner take the nearest free spot around it. A group of new shapes joined to nothing pinned is laid
+out by steps 1–4 on its own and put where the drawing grows least. A whole layout first pinned
+and then edited this way takes a few milliseconds.
+
 ELK's layered algorithm was tried first and dropped: it forces every line into one main
 direction, so it cannot draw a T or put a participant above a relationship. When the automatic
-result is not what you want, dragging shapes in the preview (planned) overrides it.
+result is not what you want, drag shapes in the preview; from then on they stay where you put
+them.
 
 ## License
 

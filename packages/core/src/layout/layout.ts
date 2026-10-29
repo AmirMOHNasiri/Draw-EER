@@ -370,7 +370,7 @@ function crowdedDirections(
 }
 
 /** True if most names in the diagram are right-to-left (Persian, Arabic, ...). */
-function readsRightToLeft(sized: SizedDiagram): boolean {
+export function readsRightToLeft(sized: SizedDiagram): boolean {
   let rtl = 0;
   let total = 0;
   for (const { label } of sized.geometry.values()) {

@@ -5,6 +5,7 @@
  * - dist/preview.js    the preview's page script (browser)
  * - dist/worker.js     the preview's Web Worker, which runs parse → layout → SVG
  * - dist/harfbuzz.wasm and dist/fonts/*.ttf, loaded at run time
+ * - dist/harfbuzz-subset.wasm and dist/resvg.wasm, loaded by exports
  *
  *   node scripts/build.mjs [--watch] [--production]
  *
@@ -31,6 +32,12 @@ async function copyAssets() {
   const fonts = path.join(path.dirname(require.resolve('@draw-eer/core')), '../assets/fonts');
   await Promise.all([
     copyFile(require.resolve('harfbuzzjs/dist/harfbuzz.wasm'), path.join(dist, 'harfbuzz.wasm')),
+    // For exports, in the extension host: font subsetting and PNG drawing.
+    copyFile(
+      require.resolve('harfbuzzjs/dist/harfbuzz-subset.wasm'),
+      path.join(dist, 'harfbuzz-subset.wasm'),
+    ),
+    copyFile(require.resolve('@resvg/resvg-wasm/index_bg.wasm'), path.join(dist, 'resvg.wasm')),
     copyFile(
       path.join(fonts, 'Vazirmatn-Regular.ttf'),
       path.join(dist, 'fonts/Vazirmatn-Regular.ttf'),
