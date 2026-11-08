@@ -1,5 +1,5 @@
 import type { AttributeNode, Diagram } from '../model/types';
-import { treeCells, type Hierarchy } from './tree';
+import { freeSubtypes, treeCells, type Hierarchy } from './tree';
 
 /**
  * Places entities and relationships in the cells of a grid.
@@ -36,7 +36,9 @@ import { treeCells, type Hierarchy } from './tree';
  * in variants (its participants arranged in different ways around the
  * relationship); the one that fits best is used. A relationship between entities
  * of two different hierarchies should have both in its own row, so its
- * lines are one straight line (`COST.acrossTrees`).
+ * lines are one straight line (`COST.acrossTrees`). A subtype whose
+ * supertypes are not in one tree goes centered below them, and they in one
+ * row (`COST.inheritance`).
  *
  * The greedy pass runs from a few different starting shapes. Each result is
  * then improved by rotating whole branches (parts of the diagram that hang
@@ -50,10 +52,15 @@ export interface Cell {
   row: number;
 }
 
-/** An aggregate laid out on its own: its cells in each variant, relative to the relationship inside. */
+/**
+ * An aggregate laid out on its own: its cells in each variant, relative to
+ * the relationship inside. An aggregate drawn with a tree (see compound.ts)
+ * has the tree's cells too; `members` are then the shapes in its box.
+ */
 export interface AggregateCells {
   inner: string;
   variants: Map<string, Cell>[];
+  members?: string[];
 }
 
 const DIRECTIONS: Cell[] = [
@@ -119,6 +126,14 @@ const COST = {
   /** A binary relationship between two hierarchies whose entities are not both in its row. */
   acrossTrees: 80,
   /**
+   * A subtype outside the trees of its supertypes (see `freeSubtypes` in
+   * tree.ts): for each supertype it is not below, for not being between
+   * them, for the supertypes not in one row, for not being exactly centered
+   * under them. Being below is the owner's rule (never above, even if a line
+   * must cross an aggregate box or another line), so it outweighs crossings.
+   */
+  inheritance: { below: 3000, between: 150, row: 300, center: 40 },
+  /**
    * A line from outside an aggregate to a shape inside it that does not come
    * from the shape's outer side (away from the relationship inside, or from
    * below for the relationship itself), where its attributes left room.
@@ -126,8 +141,9 @@ const COST = {
   intoBox: 60,
   /**
    * An EER line that leaves its tree (to a shape inside an aggregate) and
-   * runs sideways instead of down from the general end; twice this if it
-   * runs up.
+   * runs sideways instead of down from the general end. Running up puts a
+   * subtype above its supertype, which the owner ruled out: that costs
+   * `inheritance.below`.
    */
   notDownward: 40,
 };
@@ -178,6 +194,10 @@ class Graph {
   readonly acrossTrees: [string, string, string][] = [];
   /** EER lines outside any tree: general end → specific ends. */
   readonly downward = new Map<string, Set<string>>();
+  /** Subtypes outside the trees of their supertypes, with those supertypes. */
+  readonly inheritance: { child: string; parents: string[] }[] = [];
+  /** The supertypes in `inheritance`. */
+  readonly isSupertype = new Set<string>();
 
   constructor(diagram: Diagram, hierarchies: Hierarchy[], aggregates: AggregateCells[]) {
     const count = (list: AttributeNode[]): number =>
@@ -196,25 +216,36 @@ class Graph {
       if (!b.includes(link.to)) b.push(link.to);
     }
     for (const hierarchy of hierarchies) {
-      const block = new Block(treeCells(hierarchy), false);
+      const block = new Block(treeCells(hierarchy), []);
       for (const id of hierarchy.members) this.blockOf.set(id, [block]);
     }
-    for (const { inner, variants } of aggregates) {
+    // A tree drawn with an aggregate is in both lists; its block is the aggregate's.
+    for (const { inner, variants, members } of aggregates) {
+      const inBox = members ?? [...variants[0]!.keys()];
       // The relationship first, so that it is placed before the others (see `outward`).
       const blocks = variants.map(
         (cells) =>
           new Block(
             new Map([[inner, cells.get(inner)!], ...[...cells].filter(([id]) => id !== inner)]),
-            true,
+            inBox,
           ),
       );
-      for (const id of variants[0]!.keys()) {
-        this.blockOf.set(id, blocks);
-        this.innerOf.set(id, inner);
-      }
+      for (const id of variants[0]!.keys()) this.blockOf.set(id, blocks);
+      for (const id of inBox) this.innerOf.set(id, inner);
     }
     const tree = new Map<string, number>();
     hierarchies.forEach((h, i) => h.members.forEach((id) => tree.set(id, i)));
+    // The members of an aggregate drawn with its tree are in that tree.
+    const detached = new Set(
+      aggregates.filter((a) => !a.members).flatMap((a) => [...a.variants[0]!.keys()]),
+    );
+    for (const child of freeSubtypes(diagram, detached)) {
+      const parents = diagram.links
+        .filter((l) => l.to === child && (l.kind === 'specialization' || l.kind === 'category'))
+        .map((l) => l.from);
+      this.inheritance.push({ child, parents: [...new Set(parents)] });
+      for (const p of parents) this.isSupertype.add(p);
+    }
     for (const link of diagram.links) {
       if (link.kind === 'participation') continue;
       const block = tree.get(link.from);
@@ -273,7 +304,31 @@ class Graph {
         ? [bCell, aCell]
         : [null, null];
     if (!upper || !lower || lower.row > upper.row) return 0;
-    return lower.row === upper.row ? COST.notDownward : 2 * COST.notDownward;
+    return lower.row === upper.row ? COST.notDownward : COST.inheritance.below;
+  }
+
+  /**
+   * What the placement of the free subtypes around `id` (in `cell`) costs,
+   * among the shapes already in `cells` (see `COST.inheritance`).
+   */
+  inheritanceCost(id: string, cell: Cell, cells: Map<string, Cell>): number {
+    const { below, between, row, center } = COST.inheritance;
+    let cost = 0;
+    for (const { child, parents } of this.inheritance) {
+      if (id !== child && !parents.includes(id)) continue;
+      const at = (x: string) => (x === id ? cell : cells.get(x));
+      const c = at(child);
+      const placed = parents.map(at).filter((p): p is Cell => p !== undefined);
+      if (c) cost += below * placed.filter((p) => c.row <= p.row).length;
+      if (placed.length < parents.length) continue;
+      if (new Set(placed.map((p) => p.row)).size > 1) cost += row;
+      if (!c) continue;
+      const cols = placed.map((p) => p.col);
+      if (c.col < Math.min(...cols) || c.col > Math.max(...cols)) cost += between;
+      const middle = cols.reduce((sum, x) => sum + x, 0) / cols.length;
+      if (Math.abs(c.col - middle) > 0.5) cost += center;
+    }
+    return cost;
   }
 
   /**
@@ -371,38 +426,43 @@ class Graph {
 }
 
 /**
- * A rigid block of cells: a hierarchy (relative to its first root) or an
- * aggregate (relative to the relationship inside), and the cells it keeps
- * free inside. A hierarchy keeps free, on each row, everything between its
- * leftmost and rightmost shape in that row and the rows just above and below
- * (so no shape can end up between its levels, where the rigid block leaves
- * no room); an aggregate keeps its whole box free.
+ * A rigid block of cells: a hierarchy (relative to its first root), an
+ * aggregate (relative to the relationship inside) or both together, and the
+ * cells it keeps free inside. A hierarchy keeps free, on each row, everything
+ * between its leftmost and rightmost shape in that row and the rows just
+ * above and below (so no shape can end up between its levels, where the
+ * rigid block leaves no room); an aggregate keeps its whole box free.
  */
 class Block {
   readonly reserved: { row: number; lo: number; hi: number }[] = [];
-  /** An aggregate's box, in cells; null for a hierarchy. */
+  /** The aggregate's box, in cells; null for a hierarchy alone. */
   readonly box: { minCol: number; maxCol: number; minRow: number; maxRow: number } | null;
 
   constructor(
     readonly cells: Map<string, Cell>,
-    aggregate: boolean,
+    /** The shapes in the aggregate's box (none for a hierarchy). */
+    readonly inBox: string[],
   ) {
-    const rows = [...cells.values()].map((c) => c.row);
-    const cols = [...cells.values()].map((c) => c.col);
-    this.box = aggregate
-      ? {
-          minCol: Math.min(...cols),
-          maxCol: Math.max(...cols),
-          minRow: Math.min(...rows),
-          maxRow: Math.max(...rows),
-        }
-      : null;
-    for (let row = Math.min(...rows); row <= Math.max(...rows); row++) {
-      if (this.box) {
+    const boxCells = inBox.map((id) => cells.get(id)!);
+    const treeCells = [...cells].filter(([id]) => !inBox.includes(id)).map(([, c]) => c);
+    this.box =
+      boxCells.length > 0
+        ? {
+            minCol: Math.min(...boxCells.map((c) => c.col)),
+            maxCol: Math.max(...boxCells.map((c) => c.col)),
+            minRow: Math.min(...boxCells.map((c) => c.row)),
+            maxRow: Math.max(...boxCells.map((c) => c.row)),
+          }
+        : null;
+    if (this.box) {
+      for (let row = this.box.minRow; row <= this.box.maxRow; row++)
         this.reserved.push({ row, lo: this.box.minCol, hi: this.box.maxCol });
-        continue;
-      }
-      const near = [...cells.values()].filter((c) => Math.abs(c.row - row) <= 1);
+    }
+    if (treeCells.length === 0) return;
+    const rows = treeCells.map((c) => c.row);
+    for (let row = Math.min(...rows); row <= Math.max(...rows); row++) {
+      const near = treeCells.filter((c) => Math.abs(c.row - row) <= 1);
+      if (near.length === 0) continue;
       const nearCols = near.map((c) => c.col);
       this.reserved.push({ row, lo: Math.min(...nearCols), hi: Math.max(...nearCols) });
     }
@@ -468,7 +528,7 @@ class GreedyPlacer {
                 };
                 if (tried.has(key(shift))) continue;
                 tried.add(key(shift));
-                const cost = this.blockCost(block, shift);
+                const cost = this.blockCost(block, shift, bestCost);
                 if (cost < bestCost - 1e-9) {
                   best = { block, shift };
                   bestCost = cost;
@@ -482,8 +542,13 @@ class GreedyPlacer {
     return best!;
   }
 
-  /** Cost of a block moved by `shift`; Infinity if it would overlap anything. */
-  private blockCost(block: Block, shift: Cell): number {
+  /**
+   * Cost of a block moved by `shift`; Infinity if it would overlap anything.
+   * Above `bound` (the best so far), it may return any cost that is still
+   * above it: the subtype lookahead is the slow part, so it is skipped when
+   * even its lowest possible value (see `lookaheadFloor`) cannot win.
+   */
+  private blockCost(block: Block, shift: Cell, bound: number): number {
     const moved = [...block.cells].map(([id, c]): [string, Cell] => [
       id,
       { col: c.col + shift.col, row: c.row + shift.row },
@@ -510,7 +575,49 @@ class GreedyPlacer {
       this.place(id, c);
       placed.push(id);
     }
+    // The block keeps its inside free from its subtypes too.
+    const reserved = block.reserved.map((r) => ({
+      row: r.row + shift.row,
+      lo: r.lo + shift.col,
+      hi: r.hi + shift.col,
+    }));
+    if (cost + this.lookaheadFloor(placed) < bound - 1e-9) {
+      this.reserved.push(...reserved);
+      cost += this.subtypeLookahead(placed);
+      this.reserved.length -= reserved.length;
+    }
     for (const id of placed.reverse()) this.unplace(id);
+    return cost;
+  }
+
+  /**
+   * The lowest `subtypeLookahead(ids)` can be: every term of `cost` is at
+   * least 0 except the change in the drawing's shape, which is at least
+   * minus its current aspect cost (the area cost never shrinks).
+   */
+  private lookaheadFloor(ids: string[]): number {
+    const children = this.graph.inheritance.filter(
+      ({ child, parents }) => !this.cells.has(child) && parents.some((p) => ids.includes(p)),
+    ).length;
+    return children === 0 ? 0 : -children * aspectCost([...this.cells.values()]);
+  }
+
+  /**
+   * What the best cell below them would cost each free subtype whose last
+   * supertype is among `ids` (just placed), so that supertypes (and the
+   * aggregates they are in) are placed where their subtype fits below
+   * them: once they are fixed, the subtype may have nowhere good left.
+   */
+  private subtypeLookahead(ids: string[]): number {
+    let cost = 0;
+    for (const { child, parents } of this.graph.inheritance) {
+      if (this.cells.has(child) || !parents.some((p) => ids.includes(p))) continue;
+      let best = Infinity;
+      for (const cell of this.belowSupertypes(child)) {
+        if (!this.taken(cell)) best = Math.min(best, this.cost(child, cell));
+      }
+      if (best < Infinity) cost += best;
+    }
     return cost;
   }
 
@@ -521,14 +628,17 @@ class GreedyPlacer {
       this.reserved.push({ row: r.row + shift.row, lo: r.lo + shift.col, hi: r.hi + shift.col });
     }
     if (block.box) {
-      this.boxes.push({ box: shiftBox(block.box, shift), members: new Set(block.cells.keys()) });
+      this.boxes.push({ box: shiftBox(block.box, shift), members: new Set(block.inBox) });
     }
   }
 
   /** True if a shape is in the cell or a block keeps it free. */
   private taken(cell: Cell): boolean {
     if (this.occupied.has(key(cell))) return true;
-    return this.reserved.some((r) => r.row === cell.row && cell.col >= r.lo && cell.col <= r.hi);
+    // A cell on a half row (see `belowSupertypes`) is between the rows next to it.
+    return this.reserved.some(
+      (r) => Math.abs(r.row - cell.row) < 1 && cell.col >= r.lo && cell.col <= r.hi,
+    );
   }
 
   /** The unplaced shape with the most placed neighbours (then most lines, then model order). */
@@ -551,6 +661,14 @@ class GreedyPlacer {
   private bestCell(id: string): Cell {
     let best: Cell | null = null;
     let bestCost = Infinity;
+    for (const cell of this.belowSupertypes(id)) {
+      if (this.taken(cell)) continue;
+      const cost = this.cost(id, cell);
+      if (cost < bestCost - 1e-9) {
+        best = cell;
+        bestCost = cost;
+      }
+    }
     for (const neighbour of this.placedNeighbours(id)) {
       const from = this.cells.get(neighbour)!;
       // A unary relationship stays right beside, above or below its entity,
@@ -564,7 +682,12 @@ class GreedyPlacer {
             row: from.row + direction.row * length,
           };
           if (this.taken(cell)) continue;
-          const cost = this.cost(id, cell);
+          let cost = this.cost(id, cell);
+          if (this.graph.isSupertype.has(id)) {
+            this.place(id, cell);
+            cost += this.subtypeLookahead([id]);
+            this.unplace(id);
+          }
           if (cost < bestCost - 1e-9) {
             best = cell;
             bestCost = cost;
@@ -573,6 +696,29 @@ class GreedyPlacer {
       }
     }
     return best!;
+  }
+
+  /**
+   * For a free subtype whose supertypes are all placed, every cell in the
+   * three rows below the lowest of them and up to two columns to either
+   * side: the cells straight out from one supertype often miss the one
+   * centered below them all. Also the half row just below them: when the
+   * row under the supertypes is taken (a supertype's own subtree, an
+   * aggregate), the subtype can still sit between the two rows.
+   */
+  private belowSupertypes(id: string): Cell[] {
+    const parents = this.graph.inheritance.find((i) => i.child === id)?.parents ?? [];
+    const placed = parents.map((p) => this.cells.get(p)).filter((c): c is Cell => c !== undefined);
+    if (placed.length === 0 || placed.length < parents.length) return [];
+    const lowest = Math.max(...placed.map((c) => c.row));
+    const cols = placed.map((c) => c.col);
+    const result: Cell[] = [];
+    for (const row of [lowest + 0.5, lowest + 1, lowest + 2, lowest + 3]) {
+      for (let col = Math.min(...cols) - 2; col <= Math.max(...cols) + 2; col++) {
+        result.push({ col, row });
+      }
+    }
+    return result;
   }
 
   /** Cost of putting `id` in `cell`, given everything placed so far. */
@@ -617,6 +763,7 @@ class GreedyPlacer {
     cost += roomCost(newArms, this.graph.attributes.get(id)!);
     cost += COST.aggregate * this.graph.aggregateFaults(id, cell, this.cells);
     cost += COST.acrossTrees * this.graph.acrossTreesFaults(id, cell, this.cells);
+    cost += this.graph.inheritanceCost(id, cell, this.cells);
 
     // The new shape must not sit on an existing line.
     for (const [a, b] of this.edges) {
@@ -726,6 +873,10 @@ function totalCost(graph: Graph, cells: Map<string, Cell>): number {
     cost += (COST.aggregate / 2) * graph.aggregateFaults(id, cell, cells);
     cost += (COST.acrossTrees / 3) * graph.acrossTreesFaults(id, cell, cells);
   }
+  for (const { child } of graph.inheritance) {
+    const c = cells.get(child);
+    if (c) cost += graph.inheritanceCost(child, c, cells);
+  }
   return cost + shapeCost([...cells.values()]);
 }
 
@@ -735,15 +886,21 @@ function shapeCost(cells: Cell[]): number {
   const rows = cells.map((c) => c.row);
   const width = Math.max(...cols) - Math.min(...cols) + 1;
   const height = Math.max(...rows) - Math.min(...rows) + 1;
+  return COST.area * width * height + aspectCost(cells);
+}
+
+/** The part of `shapeCost` for a drawing too tall or too wide. */
+function aspectCost(cells: Cell[]): number {
+  const cols = cells.map((c) => c.col);
+  const rows = cells.map((c) => c.row);
+  const width = Math.max(...cols) - Math.min(...cols) + 1;
+  const height = Math.max(...rows) - Math.min(...rows) + 1;
+  const ratio = (width * COST.columnWidth) / height;
   // The shape of the drawing only matters once it has a few shapes: a lone
   // binary relationship is naturally one short horizontal line.
-  const ratio = (width * COST.columnWidth) / height;
   const weight = Math.min(1, Math.max(0, (cells.length - 3) / 6));
   const { minAspect, maxAspect, tall, wide } = COST.aspect;
-  return (
-    COST.area * width * height +
-    weight * (tall * Math.max(0, minAspect - ratio) + wide * Math.max(0, ratio - maxAspect))
-  );
+  return weight * (tall * Math.max(0, minAspect - ratio) + wide * Math.max(0, ratio - maxAspect));
 }
 
 /**

@@ -15,15 +15,15 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 <line class="line" x1="88.74" y1="398" x2="63.03" y2="413.45"/>
 <line class="line" x1="280.41" y1="398" x2="271.89" y2="426.76"/>
 <line class="line" x1="292.56" y1="86" x2="227.44" y2="46"/>
-<path class="line" d="M263.66,60.04 A7,7 0 0 1 256.34,71.96"/>
+<path class="line" d="M255.82,55.21 A7,7 0 0 1 248.49,67.14"/>
 <line class="line" x1="190" y1="86" x2="190" y2="46"/>
 <path class="line" d="M197,66 A7,7 0 0 1 183,66"/>
 <line class="line" x1="87.44" y1="86" x2="152.56" y2="46"/>
-<path class="line" d="M123.66,71.96 A7,7 0 0 1 116.34,60.04"/>
+<path class="line" d="M131.51,67.14 A7,7 0 0 1 124.18,55.21"/>
 <line class="line" x1="265.8" y1="352" x2="228.54" y2="312"/>
-<path class="line" d="M252.29,327.23 A7,7 0 0 1 242.05,336.77"/>
+<path class="line" d="M249.34,324.06 A7,7 0 0 1 239.1,333.6"/>
 <line class="line" x1="148.44" y1="352" x2="185.7" y2="312"/>
-<path class="line" d="M172.19,336.77 A7,7 0 0 1 161.95,327.23"/>
+<path class="line" d="M175.14,333.6 A7,7 0 0 1 164.9,324.06"/>
 </g>
 <g class="shapes">
 <g class="entity" data-id="entity:موجود زنده">

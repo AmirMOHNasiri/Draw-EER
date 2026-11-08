@@ -40,8 +40,8 @@ export {
 } from './layout/positions';
 export type { Positions } from './layout/positions';
 
-export { renderSvg, LIGHT_THEME } from './render/svg';
-export type { RenderOptions, Theme } from './render/svg';
+export { drawnLines, renderSvg, LIGHT_THEME } from './render/svg';
+export type { DrawnLine, RenderOptions, Theme } from './render/svg';
 export { STYLE } from './render/style';
 export { diagramText, exportSvg, renderPng } from './render/export';
 export type { ResvgModule } from './render/export';

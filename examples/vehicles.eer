@@ -1,0 +1,27 @@
+// ثبت وسیله نقلیه (vehicle registration), in Persian: owners and vehicles as
+// categories, the parts of an engine, and a relationship with a relationship.
+entity شخص { "کد ملی": key, نام }
+entity شرکت { "شناسه شرکت": key, نام }
+entity بانک { "کد بانک": key, نام }
+entity مالک { "شماره مالک": key }
+category مالک { بانک, شرکت, شخص }
+
+entity سواری { "تعداد سرنشین" }
+entity باری { "ظرفیت بار" }
+entity "وسیله نقلیه" { "شماره شاسی": key, مدل, رنگ }
+category "وسیله نقلیه" total { باری, سواری }
+
+aggregate مالکیت {
+  rel "سند مالکیت" {
+    مالک M
+    "وسیله نقلیه" N
+    attrs { "تاریخ خرید" }
+  }
+}
+
+entity "مرکز معاینه فنی" { کد: key, شهر }
+rel "معاینه فنی" {
+  مالکیت
+  "مرکز معاینه فنی"
+  attrs { تاریخ, نتیجه }
+}

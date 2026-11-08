@@ -19,8 +19,8 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 <line class="line" x1="436.29" y1="90.07" x2="380.29" y2="90.07"/>
 <line class="line" x1="192.21" y1="113.07" x2="293.77" y2="174.01"/>
 <line class="line" x1="447.96" y1="113.07" x2="346.4" y2="174.01"/>
-<line class="line" x1="100" y1="294.25" x2="170.37" y2="292.92"/>
-<line class="line" x1="100" y1="328.54" x2="170.37" y2="329.88"/>
+<line class="line" x1="100" y1="294.4" x2="170.37" y2="292.92"/>
+<line class="line" x1="100" y1="328.4" x2="170.37" y2="329.88"/>
 </g>
 <g class="shapes">
 <g class="entity" data-id="entity:دانشجو">

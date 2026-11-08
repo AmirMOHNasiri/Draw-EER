@@ -7,6 +7,8 @@ import { contains, type Point, type Shape } from '../../src/geometry/shapes';
 import { createNodeMeasurer } from '../../src/node';
 import { STYLE } from '../../src/render/style';
 import { boxAround, segmentHitsBox } from '../../src/geometry/collide';
+import { findHierarchies } from '../../src/layout/tree';
+import { itUnlessKnown } from '../known-issues';
 
 const fixturesDir = fileURLToPath(new URL('../fixtures/', import.meta.url));
 const fixtures = readdirSync(fixturesDir).filter((f) => f.endsWith('.eer'));
@@ -68,6 +70,113 @@ describe.each(fixtures)('layout of %s', (fixture) => {
     const second = layoutDiagram(sized(source));
     expect([...second]).toEqual([...first]);
   });
+
+  // The owner's rule: never above, even when the supertypes are not in one
+  // tree and a line has to cross an aggregate's box.
+  it('puts every subtype below its supertypes', async () => {
+    const s = sized(source);
+    const layout = layoutDiagram(s);
+    // Links run from the general end to the specific one: from a supertype,
+    // or from the circle that the supertypes' lines go into.
+    const eer = s.diagram.links.filter((l) => l.kind === 'specialization' || l.kind === 'category');
+    const circles = new Set(s.diagram.nodes.filter((n) => n.kind === 'circle').map((n) => n.id));
+    const above: string[] = [];
+    for (const link of eer) {
+      if (circles.has(link.to)) continue;
+      const supertypes = circles.has(link.from)
+        ? eer.filter((l) => l.to === link.from).map((l) => l.from)
+        : [link.from];
+      for (const supertype of supertypes) {
+        if (layout.get(link.to)!.y <= layout.get(supertype)!.y)
+          above.push(`${supertype} → ${link.to}`);
+      }
+    }
+    expect(above).toEqual([]);
+  });
+
+  // Only a subtype with several supertypes may leave their trees (for a cell
+  // below them all, which can be on a half row between two grid rows). One
+  // with a single supertype, or a single circle above it, stays in the tree,
+  // also inside an aggregate (the owner's rule: general on top, trees
+  // symmetric; see compound.ts). The trees are found with every shape in
+  // them, aggregate members included, so an aggregate drawn apart from its
+  // tree fails here.
+  itUnlessKnown(fixture, 'symmetric tree')(
+    'keeps every subtype with one supertype in a symmetric tree, on its level',
+    async () => {
+      const s = sized(source);
+      const layout = layoutDiagram(s);
+      const hierarchies = findHierarchies(s.diagram);
+      const faults: string[] = [];
+      const near = (a: number, b: number) => Math.abs(a - b) < 0.5;
+      // A child an aggregate pins: a member, one with a member below it, or one
+      // whose subtree has a line from a member (a shared subtype).
+      const members = new Set(s.diagram.aggregates.flatMap((a) => a.members));
+      const pinnedBy = (children: Map<string, string[]>, child: string): boolean => {
+        const under = (id: string): string[] => [id, ...(children.get(id) ?? []).flatMap(under)];
+        const subtree = new Set(under(child));
+        return (
+          [...subtree].some((id) => members.has(id)) ||
+          s.diagram.links.some(
+            (l) =>
+              l.kind !== 'participation' &&
+              members.has(l.from) &&
+              !subtree.has(l.from) &&
+              subtree.has(l.to),
+          )
+        );
+      };
+
+      const eer = s.diagram.links.filter(
+        (l) => l.kind === 'specialization' || l.kind === 'category',
+      );
+      for (const { to } of eer) {
+        const single = eer.filter((l) => l.to === to).length === 1;
+        if (single && !hierarchies.some((h) => h.members.includes(to)))
+          faults.push(`${to} is not in a tree`);
+      }
+
+      for (const h of hierarchies) {
+        // Every shape of a level on one row: nothing between two levels.
+        const rows = new Map<number, number>();
+        for (const id of h.members) {
+          if (h.hexagons.has(id)) continue; // a part-of hexagon sits halfway along its line
+          const [level, y] = [h.level.get(id)!, layout.get(id)!.y];
+          if (!rows.has(level)) rows.set(level, y);
+          else if (!near(rows.get(level)!, y)) faults.push(`${id} is off level ${level}`);
+        }
+        // Each parent centered over its children, which are evenly spaced (in
+        // whatever order the layout drew them). Except a row that gave up
+        // symmetry because an aggregate pushed it too wide (`STYLE.tree.maxSpread`,
+        // see compound.ts): there some child is pinned by the aggregate, every
+        // free child is nearer its parent than every pinned one, and the parent
+        // is centered over its free children (straight above a single one).
+        for (const [parent, children] of h.children) {
+          if (children.length === 0) continue;
+          const x = layout.get(parent)!.x;
+          const xs = children.map((c) => layout.get(c)!.x).sort((a, b) => a - b);
+          if (!near(x, (xs[0]! + xs.at(-1)!) / 2)) {
+            const pinned = children.filter((c) => pinnedBy(h.children, c));
+            const free = children.filter((c) => !pinned.includes(c));
+            const distance = (c: string) => Math.abs(layout.get(c)!.x - x);
+            const nearer =
+              free.length > 0 &&
+              Math.max(...free.map(distance)) < Math.min(...pinned.map(distance));
+            if (pinned.length === 0 || !nearer)
+              faults.push(`${parent} is not centered over its children`);
+            const fx = free.map((c) => layout.get(c)!.x);
+            if (free.length > 0 && !near(x, (Math.min(...fx) + Math.max(...fx)) / 2))
+              faults.push(`${parent} is not centered over its free children`);
+            continue;
+          }
+          const steps = xs.slice(1).map((v, i) => v - xs[i]!);
+          if (steps.some((step) => !near(step, steps[0]!)))
+            faults.push(`the children of ${parent} are not evenly spaced`);
+        }
+      }
+      expect(faults).toEqual([]);
+    },
+  );
 });
 
 describe('attribute placement', () => {
@@ -106,6 +215,20 @@ describe('attribute placement', () => {
       expect(segmentHitsBox(a, r, box), id).toBe(false);
       expect(segmentHitsBox(r, b, box), id).toBe(false);
     }
+  });
+});
+
+describe('trees with an aggregate', () => {
+  // university-fa: the aggregate pins «استاد» far from its sibling «کارمند
+  // اداری», more than `STYLE.tree.maxSpread` spacings: D stays over its free
+  // child, and only the line to «استاد» is long.
+  it('give up symmetry in a row the aggregate spreads too wide', async () => {
+    const layout = layoutDiagram(sized(readFileSync(fixturesDir + 'university-fa.eer', 'utf8')));
+    const at = (prefix: string) => [...layout].find(([id]) => id.startsWith(prefix))![1];
+    const circle = at('spec:کارمند(');
+    const free = Math.abs(at('entity:کارمند اداری').x - circle.x);
+    const pinned = Math.abs(at('entity:استاد').x - circle.x);
+    expect(free).toBeLessThan(pinned / 2);
   });
 });
 

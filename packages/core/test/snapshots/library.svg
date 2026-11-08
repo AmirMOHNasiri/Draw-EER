@@ -40,9 +40,9 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 <line class="line" x1="613.75" y1="430.71" x2="682.14" y2="430.71"/>
 <line class="line" x1="856.68" y1="428.21" x2="785.76" y2="428.21"/>
 <line class="line" x1="731.76" y1="130.12" x2="731.76" y2="397.41"/>
-<line class="line" x1="956.68" y1="409.75" x2="1019.83" y2="407.03"/>
-<line class="line" x1="956.68" y1="414.76" x2="1010.34" y2="412.44"/>
-<line class="line" x1="956.68" y1="444.17" x2="1015.08" y2="446.69"/>
+<line class="line" x1="956.68" y1="412.7" x2="1020.35" y2="406.73"/>
+<line class="line" x1="956.68" y1="417.72" x2="1009.82" y2="412.74"/>
+<line class="line" x1="956.68" y1="441.21" x2="1015.08" y2="446.69"/>
 <line class="line" x1="544.1" y1="451.21" x2="544.1" y2="536.55"/>
 <line class="line" x1="539.1" y1="451.21" x2="539.1" y2="536.55"/>
 <line class="line" x1="541.6" y1="681.2" x2="541.6" y2="597.01"/>
@@ -216,31 +216,31 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 </g>
 </g>
 <g class="labels">
-<rect class="knockout" x="257.86" y="417.71" width="16.7" height="21"/>
-<text x="266.21" y="433.31" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="439.31" y="417.71" width="19.1" height="21"/>
-<text x="448.85" y="433.31" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="260.61" y="417.71" width="16.7" height="21"/>
+<text x="268.96" y="433.31" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="436.35" y="417.71" width="19.1" height="21"/>
+<text x="445.9" y="433.31" font-size="15" text-anchor="middle">M</text>
 <rect class="knockout" x="627.81" y="417.71" width="16.7" height="21"/>
 <text x="636.16" y="433.31" font-size="15" text-anchor="middle">N</text>
 <rect class="knockout" x="824.65" y="417.71" width="14.43" height="21"/>
 <text x="831.86" y="433.31" font-size="15" text-anchor="middle">1</text>
 <rect class="knockout" x="724.55" y="213.17" width="14.43" height="21"/>
 <text x="731.76" y="228.77" font-size="15" text-anchor="middle">1</text>
-<rect class="knockout" x="968.77" y="400.87" width="16.7" height="21"/>
-<text x="977.12" y="416.47" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="969.91" y="434.56" width="14.43" height="21"/>
-<text x="977.12" y="450.16" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="971.53" y="402.54" width="16.7" height="21"/>
+<text x="979.88" y="418.14" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="971.54" y="432.78" width="14.43" height="21"/>
+<text x="978.75" y="448.38" font-size="15" text-anchor="middle">1</text>
 <rect class="knockout" x="534.39" y="470.18" width="14.43" height="21"/>
 <text x="541.6" y="485.78" font-size="15" text-anchor="middle">1</text>
 <rect class="knockout" x="534.39" y="641.23" width="14.43" height="21"/>
 <text x="541.6" y="656.83" font-size="15" text-anchor="middle">1</text>
-<rect class="knockout" x="1182.79" y="698.7" width="14.43" height="21"/>
-<text x="1190" y="714.3" font-size="15" text-anchor="middle">1</text>
-<rect class="knockout" x="975.75" y="698.7" width="16.7" height="21"/>
-<text x="984.1" y="714.3" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="1181.17" y="698.7" width="14.43" height="21"/>
+<text x="1188.39" y="714.3" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="975.86" y="698.7" width="16.7" height="21"/>
+<text x="984.21" y="714.3" font-size="15" text-anchor="middle">N</text>
 <rect class="knockout" x="822.4" y="698.7" width="14.43" height="21"/>
 <text x="829.61" y="714.3" font-size="15" text-anchor="middle">1</text>
-<rect class="knockout" x="610.48" y="698.7" width="16.7" height="21"/>
-<text x="618.83" y="714.3" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="610.6" y="698.7" width="16.7" height="21"/>
+<text x="618.95" y="714.3" font-size="15" text-anchor="middle">N</text>
 </g>
 </svg>

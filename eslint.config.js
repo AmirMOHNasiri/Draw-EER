@@ -26,4 +26,10 @@ export default defineConfig(
       '@typescript-eslint/no-non-null-assertion': 'off',
     },
   },
+  {
+    // The library runs inside the editor and the preview's worker, where
+    // stray output would end up in users' logs.
+    files: ['packages/core/src/**'],
+    rules: { 'no-console': 'error' },
+  },
 );

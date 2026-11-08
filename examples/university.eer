@@ -1,0 +1,42 @@
+// A university in EER: a two-level specialization, a shared subtype, a
+// category and a part-of, with ordinary relationships between them.
+entity Person {
+  ssn: key
+  name { first, last }
+  birth_date
+}
+
+entity Employee { salary }
+entity Student { major }
+entity Faculty { rank }
+entity Staff { position }
+entity Graduate { degree }
+entity Undergraduate { class }
+
+specialize Person overlapping { Employee, Student }
+specialize Employee disjoint total { Faculty, Staff }
+specialize Student disjoint total { Graduate, Undergraduate }
+
+entity Department { code: key, name }
+rel Belongs {
+  Faculty N total
+  Department 1
+}
+
+entity Course { code: key, title, credits }
+rel Offers {
+  Department 1
+  Course N total
+}
+
+entity Company { cid: key }
+entity Foundation { fid: key }
+category Sponsor { Company, Foundation }
+rel Funds {
+  Sponsor 1
+  Department N
+}
+
+entity Campus { name: key }
+entity Building { number: key, floors }
+partof Campus { Building }

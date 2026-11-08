@@ -1,0 +1,105 @@
+name: Release
+
+# Pushing a tag such as v0.1.0 releases that version: every check runs
+# again, then the extension is packaged, published to the VS Code
+# Marketplace and to Open VSX, and attached to a GitHub release.
+#
+# Publishing to the VS Code Marketplace uses Trusted Publishing: no token is
+# stored. GitHub gives this job a short-lived OpenID Connect token
+# (`id-token: write`), and `vsce publish --oidc` exchanges it for a
+# Marketplace credential. The publisher's trusted publishing policy names
+# this repository (AmirMOHNasiri/Draw-EER) and this workflow file
+# (release.yml), with no GitHub environment, so neither may be renamed
+# without updating the policy. Needs @vscode/vsce 4.1.0 or newer (4.0.0's
+# token exchange is rejected by the Marketplace).
+#
+# Open VSX uses an access token from open-vsx.org, for the same namespace,
+# in the repository secret OVSX_PAT.
+#
+# CI (ci.yml) has already run on Windows, macOS and Linux for the commit;
+# this runs the checks once more on Linux before anything is published.
+#
+# Safe to re-run after a partial failure: each publish step skips a version
+# that is already there (--skip-duplicate), and the GitHub release step
+# updates the release if it exists. The Marketplace goes first because a
+# version can never be replaced there, while the later steps are easy to redo.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      # To create the GitHub release.
+      contents: write
+      # For the OpenID Connect token that Marketplace Trusted Publishing uses.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Check that the tag matches the extension's version
+        run: |
+          version=$(node -p "require('./packages/vscode/package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "The tag is $GITHUB_REF_NAME but packages/vscode/package.json says $version."
+            exit 1
+          fi
+
+      # Install scripts stay blocked (see allowScripts in package.json): the
+      # two packaging tools that have them (@vscode/vsce-sign, keytar) are
+      # only for signing packages and storing tokens, neither used here.
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run smoke -w packages/vscode
+      - run: xvfb-run -a npm run test:integration -w packages/vscode
+      - run: node packages/vscode/scripts/webview-check.mjs --require
+
+      # README links and images point at this tag on GitHub.
+      - name: Package
+        run: npm run package -w packages/vscode -- --ref "$GITHUB_REF_NAME"
+      # The package itself, installed into a clean VS Code, before it goes out.
+      - run: xvfb-run -a npm run check:vsix -w packages/vscode
+
+      - name: Publish to the VS Code Marketplace
+        working-directory: packages/vscode
+        run: npx vsce publish --oidc --skip-duplicate --packagePath "draw-eer-${GITHUB_REF_NAME#v}.vsix"
+
+      - name: Publish to Open VSX
+        working-directory: packages/vscode
+        run: npx ovsx publish --skip-duplicate "draw-eer-${GITHUB_REF_NAME#v}.vsix"
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+
+      - name: Create the GitHub release
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          # This version's section of the CHANGELOG, as the release notes.
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          vsix="packages/vscode/draw-eer-$version.vsix"
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            # A re-run: the release exists, so refresh its notes and package.
+            gh release edit "$GITHUB_REF_NAME" --title "Draw EER $version" --notes-file notes.md
+            gh release upload "$GITHUB_REF_NAME" "$vsix" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "$vsix" \
+              --title "Draw EER $version" --notes-file notes.md
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -37,3 +37,8 @@ jobs:
       # The real preview page in headless Chrome (preinstalled on the Linux runners).
       - run: node packages/vscode/scripts/webview-check.mjs --require
         if: runner.os == 'Linux'
+      # The .vsix as users get it, installed into a clean VS Code.
+      - run: npm run package -w packages/vscode
+        if: runner.os == 'Linux'
+      - run: xvfb-run -a npm run check:vsix -w packages/vscode
+        if: runner.os == 'Linux'

@@ -1,0 +1,13 @@
+// Known issue (expected failures, no snapshot): an aggregate touching two trees, one of
+// them holding two of its members. The members leave their trees, so the tree is lopsided.
+// Target: Professor and Student on the same top row inside the aggregate, D centered above
+// them; Supervises below, centered between them, Sponsor beside it; the U tree stays on
+// the right.
+entity Person { id: key, name }
+specialize Person disjoint { Student, Professor }
+entity Bank { bid: key }
+entity Company { cid: key }
+category Sponsor { Bank, Company }
+aggregate Thesis { rel Supervises { Professor 1, Student N, Sponsor } }
+entity Committee { code: key }
+rel Evaluates { Thesis, Committee }

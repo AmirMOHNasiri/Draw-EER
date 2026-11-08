@@ -1,0 +1,15 @@
+// Known issue (expected failures, no snapshot): one tree shared by two aggregates. The
+// aggregates' members leave the tree, so it is drawn lopsided and flat.
+// Target: both aggregates on one row; Person and D centered above the gap between them;
+// Student at the right end of the left aggregate and Professor at the left end of the
+// right aggregate, on the same row; Staff on that row too, centered below D.
+entity Person { id: key, name }
+specialize Person disjoint { Student, Professor, Staff }
+entity Project { pid: key }
+entity Course { cid: key }
+aggregate Supervision { rel Supervises { Professor 1, Project N } }
+aggregate Enrollment { rel Enrolls { Student N, Course M } }
+entity Committee { code: key }
+rel Reviews { Supervision, Committee }
+entity Office { no: key }
+rel Approves { Enrollment, Office }

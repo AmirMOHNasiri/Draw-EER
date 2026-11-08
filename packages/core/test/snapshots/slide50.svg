@@ -12,25 +12,25 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 <line class="line" x1="117.5" y1="86.18" x2="117.5" y2="46"/>
 <line class="line" x1="122.5" y1="86.18" x2="122.5" y2="46"/>
 <line class="line" x1="70.13" y1="160" x2="108.81" y2="115.79"/>
-<path class="line" d="M94.73,142.51 A7,7 0 0 1 84.2,133.29"/>
+<path class="line" d="M100.9,135.45 A7,7 0 0 1 90.37,126.24"/>
 <line class="line" x1="169.88" y1="160" x2="131.19" y2="115.79"/>
-<path class="line" d="M155.8,133.29 A7,7 0 0 1 145.27,142.51"/>
+<path class="line" d="M149.63,126.24 A7,7 0 0 1 139.1,135.45"/>
 <line class="line" x1="420" y1="86" x2="420" y2="46"/>
 <line class="line" x1="370.13" y1="160" x2="408.81" y2="115.79"/>
-<path class="line" d="M394.73,142.51 A7,7 0 0 1 384.2,133.29"/>
+<path class="line" d="M400.9,135.45 A7,7 0 0 1 390.37,126.24"/>
 <line class="line" x1="469.88" y1="160" x2="431.19" y2="115.79"/>
-<path class="line" d="M455.8,133.29 A7,7 0 0 1 445.27,142.51"/>
+<path class="line" d="M449.63,126.24 A7,7 0 0 1 439.1,135.45"/>
 <line class="line" x1="117.5" y1="352.18" x2="117.5" y2="312"/>
 <line class="line" x1="122.5" y1="352.18" x2="122.5" y2="312"/>
 <line class="line" x1="70.13" y1="426" x2="108.81" y2="381.79"/>
-<path class="line" d="M94.73,408.51 A7,7 0 0 1 84.2,399.29"/>
+<path class="line" d="M100.9,401.45 A7,7 0 0 1 90.37,392.24"/>
 <line class="line" x1="169.88" y1="426" x2="131.19" y2="381.79"/>
-<path class="line" d="M155.8,399.29 A7,7 0 0 1 145.27,408.51"/>
+<path class="line" d="M149.63,392.24 A7,7 0 0 1 139.1,401.45"/>
 <line class="line" x1="420" y1="352" x2="420" y2="312"/>
 <line class="line" x1="370.13" y1="426" x2="408.81" y2="381.79"/>
-<path class="line" d="M394.73,408.51 A7,7 0 0 1 384.2,399.29"/>
+<path class="line" d="M400.9,401.45 A7,7 0 0 1 390.37,392.24"/>
 <line class="line" x1="469.88" y1="426" x2="431.19" y2="381.79"/>
-<path class="line" d="M455.8,399.29 A7,7 0 0 1 445.27,408.51"/>
+<path class="line" d="M449.63,392.24 A7,7 0 0 1 439.1,401.45"/>
 </g>
 <g class="shapes">
 <g class="entity" data-id="entity:E1">

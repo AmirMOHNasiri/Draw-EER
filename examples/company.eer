@@ -1,0 +1,61 @@
+// The COMPANY database from Elmasri & Navathe, Fundamentals of Database Systems.
+entity Employee {
+  ssn: key
+  name { first, middle, last }
+  address
+  salary
+  sex
+  birth_date
+}
+
+entity Department {
+  number: key
+  name: key2
+  locations: multi
+  employees: derived
+}
+
+entity Project {
+  number: key
+  name: key2
+  location
+}
+
+weak entity Dependent {
+  name: partial
+  sex
+  birth_date
+  relationship
+}
+
+rel Works_For {
+  Employee N total
+  Department 1 total
+}
+
+rel Manages {
+  Employee 1
+  Department 1 total
+  attrs { start_date }
+}
+
+rel Controls {
+  Department 1
+  Project N total
+}
+
+rel Works_On {
+  Employee M total
+  Project N total
+  attrs { hours }
+}
+
+rel Supervision {
+  Employee 1 as supervisor
+  Employee N as supervisee
+}
+
+identifying rel Dependents_Of {
+  Employee 1
+  Dependent N total
+}

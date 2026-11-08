@@ -19,13 +19,13 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 <line class="line" x1="434.7" y1="341.88" x2="405.65" y2="334.37"/>
 <line class="line" x1="336.06" y1="522.49" x2="319.07" y2="547.21"/>
 <line class="line" x1="101.28" y1="86" x2="68.72" y2="46"/>
-<path class="line" d="M90.43,61.58 A7,7 0 0 1 79.57,70.42"/>
+<path class="line" d="M88.04,58.64 A7,7 0 0 1 77.18,67.48"/>
 <line class="line" x1="138.72" y1="86" x2="171.28" y2="46"/>
-<path class="line" d="M160.43,70.42 A7,7 0 0 1 149.57,61.58"/>
+<path class="line" d="M162.82,67.48 A7,7 0 0 1 151.96,58.64"/>
 <line class="line" x1="372.99" y1="476.49" x2="463.58" y2="377.81"/>
-<path class="line" d="M423.44,431.89 A7,7 0 0 1 413.13,422.42"/>
+<path class="line" d="M453.18,399.49 A7,7 0 0 1 442.87,390.02"/>
 <line class="line" x1="330.76" y1="476.49" x2="240.16" y2="377.81"/>
-<path class="line" d="M290.61,422.42 A7,7 0 0 1 280.3,431.89"/>
+<path class="line" d="M260.87,390.02 A7,7 0 0 1 250.56,399.49"/>
 </g>
 <g class="shapes">
 <g class="entity" data-id="entity:G">

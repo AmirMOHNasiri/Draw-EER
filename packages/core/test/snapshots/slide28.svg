@@ -38,9 +38,9 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 </g>
 </g>
 <g class="labels">
-<rect class="knockout" x="108" y="93.3" width="38.34" height="21"/>
-<text x="127.17" y="108.9" font-size="15" text-anchor="middle">(1,N)</text>
-<rect class="knockout" x="326.76" y="93.3" width="40.73" height="21"/>
-<text x="347.12" y="108.9" font-size="15" text-anchor="middle">(0,M)</text>
+<rect class="knockout" x="114" y="93.3" width="38.34" height="21"/>
+<text x="133.17" y="108.9" font-size="15" text-anchor="middle">(1,N)</text>
+<rect class="knockout" x="320.76" y="93.3" width="40.73" height="21"/>
+<text x="341.12" y="108.9" font-size="15" text-anchor="middle">(0,M)</text>
 </g>
 </svg>

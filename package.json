@@ -3,10 +3,10 @@
   "private": true,
   "description": "Write ER/EER diagrams as text and see them rendered in classic Chen notation.",
   "license": "MIT",
-  "author": "AmirMOHNasiri",
+  "author": "AmirMohammad Nasiri",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AmirMOHNasiri/draw-eer.git"
+    "url": "https://github.com/AmirMOHNasiri/Draw-EER.git"
   },
   "type": "module",
   "workspaces": [
@@ -25,6 +25,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "render": "tsx packages/core/scripts/render.ts",
+    "gallery": "tsx packages/core/scripts/render.ts examples/company.eer examples/library.eer examples/university.eer examples/vehicles.eer --png-only --scale 1.5 --out-dir docs/images",
     "bench": "tsx packages/core/scripts/bench.ts"
   },
   "devDependencies": {

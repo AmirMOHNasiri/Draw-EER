@@ -1,0 +1,16 @@
+// تعمیرگاه (a repair shop), in Persian: kinds of staff, and the parts of an engine.
+entity کارکنان { "کد پرسنلی": key, نام { "نام کوچک", "نام خانوادگی" }, تلفن: multi }
+entity مکانیک { تخصص: multi }
+entity "کارمند اداری" { سمت }
+specialize کارکنان disjoint total { "کارمند اداری", مکانیک }
+
+entity موتور { "شماره موتور": key, حجم }
+entity پیستون { قطر }
+entity "میل لنگ" { جنس }
+partof موتور { "میل لنگ", پیستون }
+
+rel تعمیر {
+  مکانیک N
+  موتور M
+  attrs { تاریخ, هزینه }
+}

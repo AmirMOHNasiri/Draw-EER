@@ -1,11 +1,25 @@
-import { unaryLineEnds, type Point, type Shape } from '../geometry/shapes';
+import {
+  distanceToOutline,
+  exitPoint,
+  unaryLineEnds,
+  type Point,
+  type Shape,
+} from '../geometry/shapes';
 import type { AttributeNode, MainNode } from '../model/types';
 import { boxAround, segmentHitsBox } from '../geometry/collide';
 import { STYLE } from '../render/style';
 import { isRightToLeft } from '../text/direction';
 import { placeAttributes, type AttributeCluster, type Bounds } from './attributes';
-import { placeOnGrid, type Cell } from './grid';
-import { findHierarchies, treeOffsets, type Hierarchy } from './tree';
+import { compoundOffsets, compoundVariants, type CompoundVariant } from './compound';
+import { placeOnGrid, type AggregateCells, type Cell } from './grid';
+import {
+  findHierarchies,
+  NO_SLOPES,
+  SLOPES,
+  treeOffsets,
+  type Hierarchy,
+  type Slopes,
+} from './tree';
 import type { SizedDiagram } from './size';
 
 /** Shapes and attributes beyond which a diagram gets a cheaper search (see `layoutDiagram`). */
@@ -16,6 +30,21 @@ const MAX_ROUNDS = 3;
 const NEARBY = 600;
 /** Smallest share of its grid slope that a slanted line keeps (see `Compactor.solve`). */
 const MIN_SLOPE = 0.6;
+
+/** Center distance (px) beyond which a neighbour no longer blocks the angle it covers (see `obstaclesFor`). */
+const FAN_REACH = 260;
+
+/** How far either way from the outward direction an aggregate's shape keeps free (see `obstaclesFor`). */
+const OUTER_HALF = (80 * Math.PI) / 180;
+
+/**
+ * A line from outside an aggregate: the shape inside it ends at, and the
+ * grid direction (screen angle, y down) from there to its other end.
+ */
+interface Incoming {
+  end: string;
+  angle: number;
+}
 
 /** Blocked directions (screen angles, y down) that keep attributes off a shape's upper side. */
 const UPPER_SIDE = Array.from({ length: 9 }, (_, i) => ((210 + 15 * i) * Math.PI) / 180);
@@ -51,30 +80,93 @@ export function layoutDiagram(sized: SizedDiagram): Layout {
   // same text always gives the same picture.
   const quick = sized.geometry.size > LARGE_DIAGRAM;
   const aggregates = aggregateBlocks(sized, quick);
-  const detached = new Set(aggregates.flatMap((a) => [...a.variants[0]!.cells.keys()]));
-  const hierarchies = findHierarchies(sized.diagram, detached);
+  const { hierarchies, compounds } = withTrees(sized, aggregates);
+  const inCompound = new Set(
+    [...compounds.values()].flatMap((c) => c[0]!.trees.map((t) => t.hierarchy.members[0]!)),
+  );
   const grid = placeOnGrid(
     sized.diagram,
     hierarchies,
-    aggregates.map((a) => ({ inner: a.inner, variants: a.variants.map((v) => v.cells) })),
+    aggregates.map((a): AggregateCells => {
+      const variants = compounds.get(a.inner);
+      if (!variants) return { inner: a.inner, variants: a.variants };
+      return {
+        inner: a.inner,
+        variants: variants.map((v) => v.cells),
+        members: [...a.variants[0]!.keys()],
+      };
+    }),
     quick,
   );
   const parts = grid.map((cells) =>
     layoutPart(
       sized,
       cells,
-      hierarchies.filter((h) => cells.has(h.members[0]!)),
-      aggregates.filter((a) => cells.has(a.inner)).map((a) => chosenVariant(a, cells)),
+      hierarchies.filter((h) => cells.has(h.members[0]!) && !inCompound.has(h.members[0]!)),
+      aggregates
+        .filter((a) => cells.has(a.inner))
+        .map((a) => chosenVariant(sized, a, cells, compounds.get(a.inner))),
       quick,
     ),
   );
   return pack(parts);
 }
 
+/**
+ * The hierarchies, and the aggregates drawn with their trees (see
+ * compound.ts): those whose trees no other aggregate shares, with an
+ * arrangement that fits them (several trees: one member in each). The
+ * members of any other aggregate leave their trees (`detached`), and the
+ * trees are found again without them.
+ */
+function withTrees(
+  sized: SizedDiagram,
+  aggregates: AggregateVariants[],
+): { hierarchies: Hierarchy[]; compounds: Map<string, CompoundVariant[]> } {
+  const members = (a: AggregateVariants) => [...a.variants[0]!.keys()];
+  const lines = sized.diagram.links
+    .filter((l) => l.kind === 'specialization' || l.kind === 'category' || l.kind === 'partOf')
+    .map((l): [string, string] => [l.from, l.to]);
+  const detached = new Set<string>();
+  for (let attempt = 0; ; attempt++) {
+    const hierarchies = findHierarchies(sized.diagram, detached);
+    const compounds = new Map<string, CompoundVariant[]>();
+    const failed: AggregateVariants[] = [];
+    const treesOf = (a: AggregateVariants) =>
+      hierarchies.filter((h) => members(a).some((m) => h.members.includes(m)));
+    for (const a of aggregates) {
+      if (members(a).some((m) => detached.has(m))) continue;
+      const trees = treesOf(a);
+      if (trees.length === 0) continue;
+      const shared = aggregates.some((b) => b !== a && treesOf(b).some((t) => trees.includes(t)));
+      const variants = !shared ? compoundVariants(trees, members(a), a.variants, lines) : [];
+      if (variants.length > 0) compounds.set(a.inner, variants);
+      else failed.push(a);
+    }
+    if (failed.length === 0 || attempt === 2) {
+      // Give up on the ones that still fail: their members leave the trees.
+      if (failed.length > 0) {
+        for (const a of failed) for (const m of members(a)) detached.add(m);
+        for (const a of aggregates)
+          if (members(a).some((m) => detached.has(m))) compounds.delete(a.inner);
+        return { hierarchies: findHierarchies(sized.diagram, detached), compounds };
+      }
+      return { hierarchies, compounds };
+    }
+    for (const a of failed) for (const m of members(a)) detached.add(m);
+  }
+}
+
 /** The ways to lay out one aggregate (see `arrangements`). */
 interface AggregateVariants {
   inner: string;
-  variants: AggregateBlock[];
+  /** The grid cells of each arrangement, relative to the relationship inside. */
+  variants: Map<string, Cell>[];
+  /**
+   * Lays out one arrangement in full (only the one the grid picks is
+   * needed), its attributes clear of the lines from outside (see `incomingLines`).
+   */
+  block: (cells: Map<string, Cell>, incoming: Incoming[]) => AggregateBlock;
 }
 
 /**
@@ -89,6 +181,12 @@ interface AggregateBlock {
   clusters: Map<string, AttributeCluster>;
   /** The dashed box, padding included. */
   box: Bounds;
+  /**
+   * Drawn with a tree (see compound.ts): `offsets` and `box` then hold the
+   * tree too and are worked out again in every round (see `toPixels`), from
+   * the aggregate as laid out on its own (`natural`).
+   */
+  tree?: { variant: CompoundVariant; natural: Map<string, Point> };
 }
 
 /**
@@ -125,10 +223,12 @@ function aggregateBlocks(sized: SizedDiagram, quick: boolean): AggregateVariants
       ),
     );
     const cells = placeOnGrid(diagram, [], [], quick)[0]!;
-    const variants = arrangements(cells, inner).map((v) =>
-      aggregateVariant(own, inner, v, outside, quick),
-    );
-    result.push({ inner, variants });
+    const variants = arrangements(cells, inner).map((v) => relativeCells(v, inner));
+    result.push({
+      inner,
+      variants,
+      block: (chosen, incoming) => aggregateVariant(own, inner, chosen, outside, incoming, quick),
+    });
   }
   return result;
 }
@@ -167,6 +267,7 @@ function aggregateVariant(
   inner: string,
   cells: Map<string, Cell>,
   outside: Set<string>,
+  incoming: Incoming[],
   quick: boolean,
 ): AggregateBlock {
   const originCell = cells.get(inner)!;
@@ -178,7 +279,7 @@ function aggregateVariant(
     const c = relative.get(id)!;
     outward.set(id, id === inner ? Math.PI / 2 : Math.atan2(c.row, c.col));
   }
-  const part = layoutPart(own, cells, [], [], quick, outward);
+  const part = layoutPart(own, cells, [], [], quick, outward, incoming);
   const origin = part.layout.get(inner)!;
   const { padding } = STYLE.aggregate;
   return {
@@ -200,16 +301,55 @@ function aggregateVariant(
   };
 }
 
-/** The variant of an aggregate that the grid placed. */
-function chosenVariant(aggregate: AggregateVariants, cells: Map<string, Cell>): AggregateBlock {
+/** The variant of an aggregate (or of an aggregate with its tree, `compound`) that the grid placed. */
+function chosenVariant(
+  sized: SizedDiagram,
+  aggregate: AggregateVariants,
+  cells: Map<string, Cell>,
+  compound?: CompoundVariant[],
+): AggregateBlock {
   const at = cells.get(aggregate.inner)!;
-  return (
-    aggregate.variants.find((v) =>
-      [...v.cells].every(([id, c]) => {
-        const placed = cells.get(id)!;
-        return placed.col - at.col === c.col && placed.row - at.row === c.row;
-      }),
-    ) ?? aggregate.variants[0]!
+  const placed = (v: Map<string, Cell>) =>
+    [...v].every(([id, c]) => {
+      const p = cells.get(id)!;
+      return p.col - at.col === c.col && p.row - at.row === c.row;
+    });
+  if (compound) {
+    const variant = compound.find((v) => placed(v.cells)) ?? compound[0]!;
+    const members = new Set(variant.arrangement.keys());
+    const natural = aggregate.block(variant.arrangement, incomingLines(sized, members, cells));
+    return { ...natural, tree: { variant, natural: natural.offsets } };
+  }
+  const chosen = aggregate.variants.find(placed) ?? aggregate.variants[0]!;
+  return aggregate.block(chosen, incomingLines(sized, new Set(chosen.keys()), cells));
+}
+
+/**
+ * The lines from outside an aggregate to the shapes inside, as the grid
+ * placed them. They can run past other shapes inside (a subtype below its
+ * supertypes, for one: the owner's rule puts it there even if its line
+ * crosses the box), so the attributes inside are placed clear of them.
+ */
+function incomingLines(
+  sized: SizedDiagram,
+  members: Set<string>,
+  cells: Map<string, Cell>,
+): Incoming[] {
+  const result: Incoming[] = [];
+  for (const link of sized.diagram.links) {
+    if (members.has(link.from) === members.has(link.to)) continue;
+    const [outside, end] = members.has(link.to) ? [link.from, link.to] : [link.to, link.from];
+    const [a, b] = [cells.get(outside), cells.get(end)];
+    if (a && b) result.push({ end, angle: Math.atan2(a.row - b.row, a.col - b.col) });
+  }
+  return result;
+}
+
+/** Cells moved so that the relationship inside is at (0, 0). */
+function relativeCells(cells: Map<string, Cell>, inner: string): Map<string, Cell> {
+  const origin = cells.get(inner)!;
+  return new Map(
+    [...cells].map(([id, c]) => [id, { col: c.col - origin.col, row: c.row - origin.row }]),
   );
 }
 
@@ -227,11 +367,18 @@ function layoutPart(
   quick: boolean,
   /** Directions kept free of each shape's attributes (an aggregate's outer sides). */
   outward = new Map<string, number>(),
+  /** Lines from outside an aggregate (see `incomingLines`). */
+  incoming: Incoming[] = [],
 ): Part {
   const nodes = sized.diagram.nodes.filter((node) => cells.has(node.id));
   const neighbours = neighbourMap(sized);
   const rtl = readsRightToLeft(sized);
-  const hanging = new Set(hierarchies.flatMap((h) => [...h.hanging]));
+  const hanging = new Set(
+    [
+      ...hierarchies,
+      ...aggregates.flatMap((a) => (a.tree ? a.tree.variant.trees.map((t) => t.hierarchy) : [])),
+    ].flatMap((h) => [...h.hanging]),
+  );
   // The attributes inside an aggregate were placed with it and stay put.
   const fixed = new Map(aggregates.flatMap((a) => [...a.clusters]));
 
@@ -240,12 +387,14 @@ function layoutPart(
   // decides the spacing, and the spacing can change the arrangement).
   let centers = new Map([...cells].map(([id, c]) => [id, { x: c.col, y: c.row }]));
   let clusters = new Map<string, AttributeCluster>();
+  // Lines stretched to clear a shape stay stretched in later rounds (see `toPixels`).
+  const stretched = new Map<string, number>();
   for (let round = 0; round < (quick ? 2 : MAX_ROUNDS); round++) {
     const previous = centers;
     clusters = new Map(
       nodes.map((node) => {
         if (fixed.has(node.id)) return [node.id, fixed.get(node.id)!];
-        const { arms, lines, partners, walls } = obstaclesFor(
+        const { arms, lines, partners, walls, shapes } = obstaclesFor(
           sized,
           node,
           centers,
@@ -253,6 +402,7 @@ function layoutPart(
           round > 0,
           hanging,
           outward,
+          incoming,
         );
         const crowded = crowdedDirections(node.id, cells, neighbours);
         const shape = sized.geometry.get(node.id)!.shape;
@@ -263,11 +413,26 @@ function layoutPart(
             rtl,
             partners,
             walls: quick ? [] : walls,
+            occupied: shapes,
           }),
         ];
       }),
     );
-    centers = toPixels(sized, cells, clusters, neighbours, hierarchies, aggregates, quick);
+    centers = toPixels(
+      sized,
+      cells,
+      clusters,
+      neighbours,
+      hierarchies,
+      aggregates,
+      quick,
+      stretched,
+      // Round 0's positions are provisional (attributes arranged for grid
+      // directions): a slope it would need is not what the drawing needs.
+      round > 0 ? SLOPES : NO_SLOPES,
+    );
+    // Never stops after round 0: its positions skip the slope rule (`NO_SLOPES`
+    // above), so round 1 always runs and the drawing keeps the minimum angles.
     if (round > 0 && [...centers].every(([id, p]) => distance(p, previous.get(id)!) < 0.5)) break;
   }
 
@@ -280,8 +445,8 @@ function layoutPart(
     cells,
     rtl,
     hanging,
-    fixed,
     outward,
+    incoming,
   );
 
   const layout: Layout = new Map();
@@ -322,8 +487,10 @@ function layoutPart(
  *
  * A shape that hangs below its parent in a hierarchy keeps its attributes
  * off its upper side (`hanging`): to the sides or below, clear of the tree.
- * A shape inside an aggregate keeps the direction of its outer side free
- * (`outward`) when lines from outside will come in there.
+ * A shape inside an aggregate keeps its outer half free (`outward`, the
+ * direction away from the relationship inside) when lines from outside
+ * will come in there, and its attributes clear of the lines from outside
+ * to the other shapes inside (`incoming`).
  */
 function obstaclesFor(
   sized: SizedDiagram,
@@ -333,18 +500,47 @@ function obstaclesFor(
   measured: boolean,
   hanging: Set<string>,
   outward: Map<string, number>,
-): { arms: number[]; lines: [Point, Point][]; partners: number[]; walls: [Point, Point][] } {
+  incoming: Incoming[],
+): {
+  arms: number[];
+  lines: [Point, Point][];
+  partners: number[];
+  walls: [Point, Point][];
+  shapes: { center: Point; shape: Shape }[];
+  drawn: DrawnLine[];
+} {
   const here = centers.get(node.id)!;
   const arms: number[] = hanging.has(node.id) ? [...UPPER_SIDE] : [];
   const partners: number[] = [];
   const walls: [Point, Point][] = [];
   const lines: [Point, Point][] = [];
+  const shapes: { center: Point; shape: Shape }[] = [];
+  // The lines as drawn, once positions are real: outline to outline.
+  const drawn: DrawnLine[] = [];
+  const asDrawn = (a: string, p: Point, b: string, q: Point) => drawnLine(sized, a, p, b, q);
   const origin = { x: 0, y: 0 };
-  // An outer side kept free for a line that will come in from outside.
+  // The outer half kept free for lines that will come in from outside:
+  // they may come from anywhere in it (see `COST.intoBox` in grid.ts). Once
+  // the grid has placed them (`incoming`), their own directions are enough;
+  // keeping the whole half free would push the attributes far out.
   const free = outward.get(node.id);
-  if (free !== undefined) {
-    arms.push(free);
-    lines.push([origin, { x: Math.cos(free) * 2000, y: Math.sin(free) * 2000 }]);
+  if (free !== undefined && !incoming.some((i) => i.end === node.id)) {
+    for (const a of sector(free, -OUTER_HALF, OUTER_HALF)) {
+      arms.push(a);
+      lines.push([origin, { x: Math.cos(a) * 2000, y: Math.sin(a) * 2000 }]);
+    }
+  }
+  for (const { end, angle } of incoming) {
+    const at = centers.get(end);
+    if (!at) continue;
+    if (end === node.id) {
+      // Its own line from outside, like its other lines.
+      arms.push(angle);
+      lines.push([origin, { x: Math.cos(angle) * 2000, y: Math.sin(angle) * 2000 }]);
+      continue;
+    }
+    const from = { x: at.x - here.x, y: at.y - here.y };
+    lines.push([from, { x: from.x + Math.cos(angle) * 2000, y: from.y + Math.sin(angle) * 2000 }]);
   }
   for (const [other, count] of neighbours.get(node.id)!) {
     const there = centers.get(other)!;
@@ -365,6 +561,8 @@ function obstaclesFor(
         arms.push(a);
         lines.push([origin, { x: Math.cos(a) * 2000, y: Math.sin(a) * 2000 }]);
       }
+      // Nothing between a loop's two lines: the whole angle is taken.
+      if (spread) arms.push(...sector(angle, -spread, spread));
       continue;
     }
 
@@ -374,15 +572,34 @@ function obstaclesFor(
         lines.push([from, to]);
         arms.push(Math.atan2(from.y, from.x), Math.atan2(to.y, to.x));
       }
+      // The loop encloses the angle between its outermost points, as seen
+      // from this shape; no attribute may sit in there.
+      const turns = loop
+        .flat()
+        .map((p) => Math.atan2(p.y, p.x) - angle)
+        .map((t) => Math.atan2(Math.sin(t), Math.cos(t)));
+      arms.push(...sector(angle, Math.min(...turns), Math.max(...turns)));
       lines.push(...roleLabelEdges(sized, node, other, loop));
     } else {
       lines.push([origin, offset]);
+      drawn.push(asDrawn(node.id, origin, other, offset));
       arms.push(angle);
     }
-    const { width, height } = sized.geometry.get(other)!.shape;
+    // A neighbour close by takes the whole angle it covers. One further away
+    // than attributes reach takes only the space it covers: blocking the
+    // angle behind it would push attributes out for nothing. (A loop's
+    // diamond is in the angle the loop closes already.)
+    if (count !== 1) continue;
+    const shape = sized.geometry.get(other)!.shape;
+    const away = Math.hypot(offset.x, offset.y);
+    if (away > FAN_REACH) {
+      shapes.push({ center: offset, shape });
+      continue;
+    }
     const across =
-      Math.abs(Math.sin(angle)) * (width / 2) + Math.abs(Math.cos(angle)) * (height / 2);
-    const extent = Math.atan2(across, Math.hypot(offset.x, offset.y));
+      Math.abs(Math.sin(angle)) * (shape.width / 2) +
+      Math.abs(Math.cos(angle)) * (shape.height / 2);
+    const extent = Math.atan2(across, away);
     arms.push(angle - extent, angle + extent);
   }
   // Lines between other shapes nearby are obstacles too (but do not decide
@@ -396,10 +613,22 @@ function obstaclesFor(
       if (!from || !to) continue;
       const a = { x: from.x - here.x, y: from.y - here.y };
       const b = { x: to.x - here.x, y: to.y - here.y };
-      if (distanceToSegment(origin, a, b) < NEARBY) lines.push([a, b]);
+      if (distanceToSegment(origin, a, b) < NEARBY) {
+        lines.push([a, b]);
+        drawn.push(asDrawn(link.from, a, link.to, b));
+      }
     }
   }
-  return { arms, lines, partners, walls };
+  return { arms, lines, partners, walls, shapes, drawn };
+}
+
+/** Arms every few degrees from `angle + from` to `angle + to`, which close that whole angle. */
+function sector(angle: number, from: number, to: number): number[] {
+  const step = (5 * Math.PI) / 180;
+  const result: number[] = [];
+  for (let t = from; t < to; t += step) result.push(angle + t);
+  result.push(angle + to);
+  return result;
 }
 
 /**
@@ -447,8 +676,12 @@ function unaryLines(
 /**
  * The last compaction can move a slanted relationship line (which
  * compaction cannot treat as an obstacle) onto an attribute, or across an
- * attribute's line. Each shape where that happened gets its attributes
- * placed once more, with everything else fixed and in the way.
+ * attribute's line, or closer to an attribute than `STYLE.lineClearance`.
+ * Each shape where that happened gets its attributes placed once more, with
+ * everything else fixed and in the way, and the lines as drawn kept that far
+ * (`FanOptions.drawn`). This includes the shapes inside an aggregate, whose
+ * attributes are otherwise fixed with it: a line from outside can only be
+ * checked once it is drawn (university-fa's O→«دانشجو» past «معدل»).
  */
 function repairAttributes(
   sized: SizedDiagram,
@@ -459,25 +692,30 @@ function repairAttributes(
   cells: Map<string, Cell>,
   rtl: boolean,
   hanging: Set<string>,
-  fixed: Map<string, AttributeCluster>,
   outward: Map<string, number>,
+  incoming: Incoming[],
 ): void {
-  // Relationship lines, center to center (a unary loop is not a straight line).
+  // Relationship and tree lines, center to center and as drawn (a unary loop
+  // is not a straight line).
   const lines: [Point, Point][] = [];
+  const drawnLines: DrawnLine[] = [];
   for (const [id, map] of neighbours) {
     for (const [other, count] of map) {
-      if (count === 1 && id < other && centers.has(id) && centers.has(other))
-        lines.push([centers.get(id)!, centers.get(other)!]);
+      if (count !== 1 || id >= other || !centers.has(id) || !centers.has(other)) continue;
+      const [p, q] = [centers.get(id)!, centers.get(other)!];
+      lines.push([p, q]);
+      drawnLines.push(drawnLine(sized, id, p, other, q));
     }
   }
   for (const node of nodes) {
-    if (node.attributes.length === 0 || fixed.has(node.id)) continue;
-    if (!attributesInTheWay(sized, node, centers, clusters, lines)) continue;
+    if (node.attributes.length === 0) continue;
+    if (!attributesInTheWay(sized, node, centers, clusters, lines, drawnLines)) continue;
     const {
       arms,
       lines: near,
       partners,
-    } = obstaclesFor(sized, node, centers, neighbours, true, hanging, outward);
+      drawn,
+    } = obstaclesFor(sized, node, centers, neighbours, true, hanging, outward, incoming);
     const shape = sized.geometry.get(node.id)!.shape;
     clusters.set(
       node.id,
@@ -486,18 +724,47 @@ function repairAttributes(
         rtl,
         partners,
         occupied: occupiedAround(sized, node.id, nodes, centers, clusters),
+        drawn,
       }),
     );
   }
 }
 
-/** True if a relationship line runs through one of the node's attributes or crosses an attribute's line. */
+/** A relationship or tree line as drawn, and how far attributes keep from it. */
+interface DrawnLine {
+  line: [Point, Point];
+  clearance: number;
+}
+
+/**
+ * The line between `a` (at `p`) and `b` (at `q`) as drawn, outline to
+ * outline: attributes keep `STYLE.lineClearance` from its strokes, which for
+ * a double line (total participation) lie half its gap either side.
+ */
+function drawnLine(sized: SizedDiagram, a: string, p: Point, b: string, q: Point): DrawnLine {
+  const shape = (id: string) => sized.geometry.get(id)!.shape;
+  const total = sized.diagram.links.some(
+    (l) =>
+      l.participation === 'total' && ((l.from === a && l.to === b) || (l.from === b && l.to === a)),
+  );
+  return {
+    line: [exitPoint(shape(a), p, p, q), exitPoint(shape(b), q, q, p)],
+    clearance: STYLE.lineClearance + (total ? STYLE.doubleGap / 2 : 0),
+  };
+}
+
+/**
+ * True if a relationship line runs through one of the node's attributes or
+ * crosses an attribute's line, or if a line as drawn (`drawn`) comes closer
+ * to one than its clearance.
+ */
 function attributesInTheWay(
   sized: SizedDiagram,
   node: MainNode,
   centers: Map<string, Point>,
   clusters: Map<string, AttributeCluster>,
   lines: [Point, Point][],
+  drawn: DrawnLine[],
 ): boolean {
   const center = centers.get(node.id)!;
   const at = (id: string) => {
@@ -511,6 +778,13 @@ function attributesInTheWay(
       const box = boxAround(p, width, height, 4);
       for (const [a, b] of lines) {
         if (segmentHitsBox(a, b, box) || segmentsCross(a, b, parent, p)) return true;
+      }
+      for (const {
+        line: [a, b],
+        clearance,
+      } of drawn) {
+        if (!segmentHitsBox(a, b, boxAround(p, width, height, clearance))) continue;
+        if (lineTouches(a, b, sized.geometry.get(attribute.id)!.shape, p, clearance)) return true;
       }
       return check(p, attribute.children);
     });
@@ -678,6 +952,8 @@ type Axis = 'x' | 'y';
 interface Obstacle {
   owner: string;
   box: Bounds;
+  /** True for the shape itself, false for its attributes or an aggregate's box. */
+  shape?: boolean;
 }
 
 /** A line between two shapes, with what compaction needs to know about it. */
@@ -713,11 +989,30 @@ function toPixels(
   hierarchies: Hierarchy[],
   aggregates: AggregateBlock[],
   quick: boolean,
+  /** Lines stretched in earlier rounds (see `Compactor.stretch`); updated here. */
+  stretched: Map<string, number>,
+  /** The smallest angles of lines down a tree (see `treeOffsets`). */
+  slopes: Slopes,
 ): Map<string, Point> {
   // Each hierarchy is laid out as a tree around its shapes' attributes, and
-  // then moves as one rigid block, like each aggregate.
+  // then moves as one rigid block, like each aggregate. An aggregate drawn
+  // with its tree is worked out again with the tree's new room.
+  for (const a of aggregates) {
+    if (!a.tree) continue;
+    const { offsets, box } = compoundOffsets(
+      a.tree.variant,
+      { offsets: a.tree.natural, clusters: a.clusters },
+      sized,
+      (id) => clusters.get(id)!.bounds,
+      slopes,
+    );
+    a.offsets = offsets;
+    a.box = box;
+  }
   const blocks = [
-    ...hierarchies.map((h) => treeOffsets(h, sized, (id) => clusters.get(id)!.bounds)),
+    ...hierarchies.map((h) =>
+      treeOffsets(h, sized, (id) => clusters.get(id)!.bounds, undefined, slopes),
+    ),
     ...aggregates.map((a) => a.offsets),
   ];
 
@@ -752,7 +1047,7 @@ function toPixels(
   });
   for (const id of cells.keys()) {
     const { width, height } = sized.geometry.get(id)!.shape;
-    obstacles.push({ owner: id, box: boxOf({ x: 0, y: 0 }, width, height) });
+    obstacles.push({ owner: id, box: boxOf({ x: 0, y: 0 }, width, height), shape: true });
     for (const [attributeId, offset] of clusters.get(id)!.positions) {
       const shape = sized.geometry.get(attributeId)!.shape;
       obstacles.push({
@@ -765,21 +1060,146 @@ function toPixels(
   // An aggregate's box keeps everything else at a distance, like a shape.
   for (const a of aggregates) obstacles.push({ owner: a.inner, box: a.box });
 
-  const solver = new Compactor(sized, cells, obstacles, links, blocks);
+  const solver = new Compactor(sized, cells, obstacles, links, blocks, stretched);
   // Two shapes whose attributes would collide can be kept apart sideways or
   // up and down; whichever axis is solved first gets to decide. Both orders
   // are tried, and the one with shorter lines wins.
-  let best: { centers: Map<string, Point>; length: number } | null = null;
-  for (const first of quick ? (['y'] as const) : (['y', 'x'] as const)) {
-    const centers = solver.run(first, clusters);
-    let length = 0;
-    for (const { a, b } of links) length += distance(centers.get(a)!, centers.get(b)!);
-    if (best === null || length < best.length - 0.5) best = { centers, length };
+  const compact = () => {
+    let best: { centers: Map<string, Point>; length: number } | null = null;
+    for (const first of quick ? (['y'] as const) : (['y', 'x'] as const)) {
+      const centers = solver.run(first, clusters);
+      let length = 0;
+      for (const { a, b } of links) length += distance(centers.get(a)!, centers.get(b)!);
+      if (best === null || length < best.length - 0.5) best = { centers, length };
+    }
+    return best!.centers;
+  };
+  // Compaction keeps shapes apart along the axes, so a slanted line can still
+  // cut the corner of a shape beside it (one in the corner cell of a
+  // diagonal). Such a shape is then kept further from the line's end it
+  // faces, by as much as clears the line, and compaction runs again.
+  // (Very large diagrams skip this, like the rest of their cheaper search.)
+  let centers = compact();
+  for (let round = 0; round < (quick ? 0 : 3); round++) {
+    const touches = shapesOnSlantedLines(sized, cells, centers, links, blocks);
+    if (touches.length === 0) break;
+    for (const t of touches) {
+      if (t.stretch) solver.stretch(t.axis, t.shape, t.end, t.amount);
+      else solver.widen(t.axis, t.shape, t.end, t.amount);
+    }
+    centers = compact();
   }
-  return best!.centers;
+  return centers;
+}
+
+/**
+ * How close (px) a slanted line may come to a shape it does not join: the
+ * rule, plus a little for the renderer moving line ends off box corners.
+ */
+const LINE_CLEARANCE = STYLE.lineClearance + 2;
+
+/**
+ * Shapes that a slanted line comes too close to, each with the line end it
+ * faces, the axis along which they face each other, and how much further
+ * apart along that axis clears the line.
+ *
+ * An end in the same rigid block as the shape (a tree, an aggregate) cannot
+ * be moved away from it. The line itself is then stretched instead
+ * (`stretch`: its ends as `shape` and `end`, and `amount` as the distance
+ * between them along the axis that clears it), moving the shape away from
+ * the other end together with the end in its block (the line from a
+ * specialization circle to a shape outside its tree that cuts the corner of
+ * a sibling, for one).
+ */
+function shapesOnSlantedLines(
+  sized: SizedDiagram,
+  cells: Map<string, Cell>,
+  centers: Map<string, Point>,
+  links: Link[],
+  blocks: Map<string, Point>[],
+): { shape: string; end: string; axis: Axis; amount: number; stretch: boolean }[] {
+  const result: { shape: string; end: string; axis: Axis; amount: number; stretch: boolean }[] = [];
+  const shapeOf = (id: string) => sized.geometry.get(id)!.shape;
+  const together = (x: string, y: string) => blocks.some((b) => b.has(x) && b.has(y));
+  for (const { a, b, unary } of links) {
+    const [p, q] = [centers.get(a)!, centers.get(b)!];
+    if (unary || Math.abs(p.x - q.x) < 0.5 || Math.abs(p.y - q.y) < 0.5) continue;
+    const from = exitPoint(shapeOf(a), p, p, q);
+    const to = exitPoint(shapeOf(b), q, q, p);
+    for (const id of cells.keys()) {
+      if (id === a || id === b) continue;
+      const c = centers.get(id)!;
+      const shape = shapeOf(id);
+      if (!lineTouches(from, to, shape, c, LINE_CLEARANCE)) continue;
+      const rigid = together(id, a) ? a : together(id, b) ? b : null;
+      // The end it faces: overlapping across the axis, so compaction keeps
+      // them apart along it. With an end in its block, the other end, along
+      // whichever axis clears the line first.
+      for (const [end, e] of [
+        [a, p],
+        [b, q],
+      ] as const) {
+        if (end === rigid) continue;
+        const other = shapeOf(end);
+        const facing: Axis | null =
+          Math.abs(c.y - e.y) < (shape.height + other.height) / 2
+            ? 'x'
+            : Math.abs(c.x - e.x) < (shape.width + other.width) / 2
+              ? 'y'
+              : null;
+        const axes: Axis[] = facing ? [facing] : rigid ? ['x', 'y'] : [];
+        const found = axes
+          .map((axis) => {
+            const away = Math.sign(c[axis] - e[axis]) || 1;
+            for (let amount = 4; amount <= 200; amount += 4) {
+              const shift = (at: Point) => ({ ...at, [axis]: at[axis] + away * amount });
+              // The end in its block moves with it.
+              const [f, t] =
+                rigid === a ? [shift(from), to] : rigid === b ? [from, shift(to)] : [from, to];
+              if (!lineTouches(f, t, shape, shift(c), LINE_CLEARANCE)) return { axis, amount };
+            }
+            return null;
+          })
+          .filter((r) => r !== null)
+          .sort((r, s) => r.amount - s.amount)[0];
+        if (found && !rigid) {
+          // Further apart than they are now (their own lines may hold them
+          // further apart than the usual gap): see `Compactor.widen`.
+          const { axis, amount } = found;
+          const size = axis === 'x' ? 'width' : 'height';
+          const now = Math.abs(c[axis] - e[axis]) - (shape[size] + other[size]) / 2;
+          result.push({ shape: id, end, axis, amount: now + amount, stretch: false });
+        }
+        if (found && rigid) {
+          const { axis, amount } = found;
+          const apart = Math.abs(centers.get(rigid)![axis] - e[axis]) + amount;
+          result.push({ shape: rigid, end, axis, amount: apart, stretch: true });
+        }
+        break;
+      }
+    }
+  }
+  return result;
+}
+
+/** True if the segment comes within `margin` of the shape (sampled every few pixels). */
+function lineTouches(a: Point, b: Point, shape: Shape, center: Point, margin: number): boolean {
+  const steps = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / 2));
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const point = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    if (distanceToOutline(shape, center, point) < margin) return true;
+  }
+  return false;
+}
+
+function extraKey(axis: Axis, p: string, q: string): string {
+  return `${axis}|${p < q ? `${p}|${q}` : `${q}|${p}`}`;
 }
 
 class Compactor {
+  /** Extra distance between two shapes along an axis (see `widen`), by `extraKey`. */
+  private readonly extra = new Map<string, number>();
   /** For each axis, the group of every shape (shapes in one group move together). */
   private readonly groups: Record<Axis, Map<string, string>>;
   /** For each axis, how far each shape sits from its group's coordinate. */
@@ -792,6 +1212,8 @@ class Compactor {
     private readonly links: Link[],
     /** Each hierarchy's shapes, at fixed offsets from each other. */
     private readonly blocks: Map<string, Point>[],
+    /** Smallest distance between the ends of a line along an axis (see `stretch`), by `extraKey`. */
+    private readonly stretched: Map<string, number>,
   ) {
     const x = this.groupsAlong('x');
     const y = this.groupsAlong('y', x.groups);
@@ -880,6 +1302,7 @@ class Compactor {
     for (const { a, b } of this.links) {
       if (this.cells.get(a)![index] === this.cells.get(b)![index]) join(a, b, 0);
     }
+    if (axis === 'y') this.joinBetweenRows(find, join);
     const groups = new Map<string, string>();
     const offsets = new Map<string, number>();
     for (const id of this.cells.keys()) {
@@ -911,6 +1334,7 @@ class Compactor {
       const shift = offset.get(o.owner)!;
       return {
         owner: o.owner,
+        shape: o.shape ?? false,
         group: groupOf.get(o.owner)!,
         lo: lo + shift,
         hi: hi + shift,
@@ -927,6 +1351,7 @@ class Compactor {
       const half = STYLE.doubleGap;
       extents.push({
         owner: a,
+        shape: false,
         group: groupOf.get(a)!,
         lo: offset.get(a)! - half,
         hi: offset.get(a)! + half,
@@ -945,6 +1370,7 @@ class Compactor {
         if (extents[i]!.group !== extents[j]!.group) facing.push([i, j]);
       }
     }
+    if (axis === 'x') facing.push(...this.betweenRows(extents));
     const order = this.groupOrder(
       axis,
       along,
@@ -962,7 +1388,9 @@ class Compactor {
       let e = extents[i]!;
       let f = extents[j]!;
       if (rank.get(e.group)! > rank.get(f.group)!) [e, f] = [f, e];
-      keepApart(e.group, f.group, e.hi + gap - f.lo);
+      const extra =
+        e.shape && f.shape ? (this.extra.get(extraKey(axis, e.owner, f.owner)) ?? 0) : 0;
+      keepApart(e.group, f.group, e.hi + gap + extra - f.lo);
     }
     // Lines between groups: at least, and ideally exactly, their target length.
     const targets: { first: string; second: string; length: number }[] = [];
@@ -983,6 +1411,8 @@ class Compactor {
         const slope = Math.abs(cp[index] - cq[index]) / Math.abs(cp[otherIndex] - cq[otherIndex]);
         length = Math.max(length, MIN_SLOPE * slope * Math.abs(across.get(p)! - across.get(q)!));
       }
+      // Stretched to clear a shape beside it (see `shapesOnSlantedLines`).
+      length = Math.max(length, this.stretched.get(extraKey(axis, p, q)) ?? 0);
       // Between the groups' coordinates rather than the two shapes'.
       length += offset.get(p)! - offset.get(q)!;
       keepApart(first, second, length);
@@ -1033,6 +1463,38 @@ class Compactor {
     }
 
     return new Map([...groupOf].map(([id, group]) => [id, position.get(group)! + offset.get(id)!]));
+  }
+
+  /**
+   * Pairs that face each other across x although they are not level: a
+   * shape whose grid row lies between rows of a rigid group (a tree, an
+   * aggregate) that is not its own, and that group's shapes in the rows
+   * next to it. Along y such a shape cannot sit between the group's rows
+   * (a group has one coordinate), so it must stay beside them, in grid
+   * order; otherwise a shape of the group can slide under it while they
+   * are not level, and the shape is then pushed below the whole group.
+   */
+  private betweenRows(
+    extents: { owner: string; shape: boolean; group: string }[],
+  ): [number, number][] {
+    const rowsOf = new Map<string, number[]>();
+    for (const [id, group] of this.groups.y)
+      rowsOf.set(group, [...(rowsOf.get(group) ?? []), this.cells.get(id)!.row]);
+    const shapes = extents.flatMap((e, i) => (e.shape ? [i] : []));
+    const pairs: [number, number][] = [];
+    for (const i of shapes) {
+      const id = extents[i]!.owner;
+      const row = this.cells.get(id)!.row;
+      for (const j of shapes) {
+        const other = extents[j]!.owner;
+        const group = this.groups.y.get(other)!;
+        if (group === this.groups.y.get(id) || extents[i]!.group === extents[j]!.group) continue;
+        const rows = rowsOf.get(group)!;
+        const between = rows.some((r) => r < row) && rows.some((r) => r > row);
+        if (between && Math.abs(this.cells.get(other)!.row - row) <= 1) pairs.push([i, j]);
+      }
+    }
+    return pairs;
   }
 
   /**
@@ -1098,9 +1560,58 @@ class Compactor {
     return result;
   }
 
+  /**
+   * Keeps the outlines of shapes `p` and `q` at least `distance` px apart
+   * along `axis` (never less than the usual gap, never less than asked before).
+   */
+  widen(axis: Axis, p: string, q: string, distance: number): void {
+    const key = extraKey(axis, p, q);
+    const extra = distance - STYLE.layout.gap;
+    this.extra.set(key, Math.max(this.extra.get(key) ?? 0, extra));
+  }
+
+  /** Keeps the two ends of a line at least `distance` apart along an axis (center to center). */
+  stretch(axis: Axis, p: string, q: string, distance: number): void {
+    const key = extraKey(axis, p, q);
+    this.stretched.set(key, Math.max(this.stretched.get(key) ?? 0, distance));
+  }
+
   private half(id: string, axis: Axis): number {
     const { width, height } = this.sized.geometry.get(id)!.shape;
     return (axis === 'x' ? width : height) / 2;
+  }
+
+  /**
+   * A shape on a half row (a subtype just below its supertypes, see
+   * `belowSupertypes` in grid.ts) sits between the row above and the row
+   * below. When its neighbours above and the shapes in the row below are
+   * already in one group (a straight line ties a tree to an aggregate, for
+   * one), ordering whole groups could only put it above or below all of
+   * them; it joins that group instead, centered between the bottom of its
+   * neighbours above and the centers (the lines) of the row below, if it
+   * fits there with `LINE_CLEARANCE` on both sides.
+   */
+  private joinBetweenRows(
+    find: (id: string) => [string, number],
+    join: (a: string, b: string, distance: number) => void,
+  ): void {
+    for (const [id, cell] of this.cells) {
+      if (Number.isInteger(cell.row) || this.blocks.some((b) => b.has(id))) continue;
+      const above = this.links
+        .flatMap(({ a, b }) => (a === id ? [b] : b === id ? [a] : []))
+        .filter((n) => this.cells.get(n)!.row < cell.row);
+      if (above.length === 0) continue;
+      const root = find(above[0]!)[0];
+      if (above.some((n) => find(n)[0] !== root)) continue;
+      const below = [...this.cells]
+        .filter(([n, c]) => c.row === Math.ceil(cell.row) && find(n)[0] === root)
+        .map(([n]) => find(n)[1]);
+      if (below.length === 0) continue;
+      const bottom = Math.max(...above.map((n) => find(n)[1] + this.half(n, 'y')));
+      const top = Math.min(...below);
+      if (top - bottom < 2 * (this.half(id, 'y') + LINE_CLEARANCE)) continue;
+      join(above[0]!, id, (bottom + top) / 2 - find(above[0]!)[1]);
+    }
   }
 }
 

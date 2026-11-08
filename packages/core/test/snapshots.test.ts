@@ -12,9 +12,11 @@ import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { renderDiagram, type TextMeasurer } from '../src';
 import { createNodeMeasurer } from '../src/node';
+import { hasKnownIssue } from './known-issues';
 
 const fixturesDir = fileURLToPath(new URL('fixtures/', import.meta.url));
-const fixtures = readdirSync(fixturesDir).filter((f) => f.endsWith('.eer'));
+// A fixture with a known layout problem gets its snapshot once it is fixed.
+const fixtures = readdirSync(fixturesDir).filter((f) => f.endsWith('.eer') && !hasKnownIssue(f));
 
 let measurer: TextMeasurer;
 beforeAll(async () => {

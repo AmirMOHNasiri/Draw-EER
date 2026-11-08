@@ -1,0 +1,263 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 1822.14 891.49" width="1822.14" height="891.49">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="1822.14" height="891.49" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="761.1" y1="465.66" x2="788.99" y2="525.47"/>
+<line class="line" x1="737.63" y1="465.66" x2="688.18" y2="554.87"/>
+<line class="line" x1="775.48" y1="419.66" x2="824.14" y2="375.07"/>
+<line class="line" x1="858.72" y1="336.36" x2="872.66" y2="316.82"/>
+<line class="line" x1="880.88" y1="353.41" x2="904.79" y2="351.32"/>
+<line class="line" x1="737.63" y1="419.66" x2="662" y2="283.22"/>
+<line class="line" x1="720.94" y1="419.66" x2="626.38" y2="345.78"/>
+<line class="line" x1="1223.9" y1="191.98" x2="1280.76" y2="225.48"/>
+<line class="line" x1="1198.13" y1="191.98" x2="1249.13" y2="280.32"/>
+<line class="line" x1="1157.44" y1="191.98" x2="1134.46" y2="211.27"/>
+<line class="line" x1="1666.35" y1="145.98" x2="1693.2" y2="132.6"/>
+<line class="line" x1="1670.22" y1="170.73" x2="1700.2" y2="171.78"/>
+<line class="line" x1="436.61" y1="145.98" x2="474.47" y2="91.92"/>
+<line class="line" x1="420.11" y1="145.98" x2="418.33" y2="44"/>
+<line class="line" x1="402.21" y1="145.98" x2="361.13" y2="94.33"/>
+<line class="line" x1="411.91" y1="414.66" x2="427.32" y2="350.48"/>
+<line class="line" x1="383.32" y1="414.66" x2="364.85" y2="391.02"/>
+<line class="line" x1="411.91" y1="751.77" x2="418.92" y2="780.94"/>
+<line class="line" x1="368.03" y1="751.77" x2="315.32" y2="791.49"/>
+<line class="line" x1="1170.76" y1="419.66" x2="1117.46" y2="332.69"/>
+<line class="line" x1="1156.76" y1="427.41" x2="1098.76" y2="395.92"/>
+<line class="line" x1="1114.55" y1="691.96" x2="1109.38" y2="720.05"/>
+<line class="line" x1="1056.54" y1="661.16" x2="1033.18" y2="676.12"/>
+<line class="line" x1="700.38" y1="442.66" x2="644.38" y2="442.66"/>
+<line class="line" x1="460.19" y1="440.16" x2="520.58" y2="440.16"/>
+<line class="line" x1="460.19" y1="445.16" x2="520.58" y2="445.16"/>
+<line class="line" x1="405.19" y1="470.66" x2="405.19" y2="526.66"/>
+<line class="line" x1="402.69" y1="695.77" x2="402.69" y2="598.34"/>
+<line class="line" x1="407.69" y1="695.77" x2="407.69" y2="598.34"/>
+<line class="line" x1="385.48" y1="695.77" x2="84.72" y2="194.5"/>
+<line class="line" x1="391.31" y1="695.77" x2="89.36" y2="192.53"/>
+<line class="line" x1="370.51" y1="168.98" x2="144.64" y2="168.98"/>
+<line class="line" x1="800.38" y1="442.66" x2="1129.22" y2="442.66"/>
+<line class="line" x1="1184.85" y1="191.98" x2="1184.85" y2="411.86"/>
+<line class="line" x1="1234.85" y1="166.48" x2="1388.25" y2="166.48"/>
+<line class="line" x1="1234.85" y1="171.48" x2="1388.25" y2="171.48"/>
+<line class="line" x1="1570.22" y1="168.98" x2="1514.22" y2="168.98"/>
+<line class="line" x1="1223.18" y1="145.98" x2="1373.74" y2="55.65"/>
+<line class="line" x1="1577.03" y1="145.98" x2="1428.6" y2="56.93"/>
+<line class="line" x1="1586.74" y1="145.98" x2="1434.05" y2="54.37"/>
+<line class="line" x1="788.71" y1="465.66" x2="1087.32" y2="644.82"/>
+<line class="line" x1="1596.59" y1="191.98" x2="1135.03" y2="641.23"/>
+<line class="line" x1="1154.28" y1="145.98" x2="1152.45" y2="71.5"/>
+<line class="line" x1="1215.42" y1="145.98" x2="1217.25" y2="71.5"/>
+<line class="line" x1="1134.85" y1="168.98" x2="804.38" y2="168.98"/>
+<line class="line" x1="750.38" y1="419.66" x2="750.38" y2="199.78"/>
+<line class="line" x1="470.51" y1="168.98" x2="696.38" y2="168.98"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:بیمار">
+<rect class="shape" x="700.38" y="419.66" width="100" height="46" rx="5"/>
+<text x="750.38" y="448.1" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">بیمار</text>
+</g>
+<g class="attribute" data-id="attr:entity:بیمار/کد ملی">
+<ellipse class="shape" cx="798.99" cy="546.9" rx="44.15" ry="22"/>
+<text x="798.99" y="552.34" font-size="16" text-anchor="middle" direction="rtl">کد ملی</text>
+<line class="line" x1="777.03" y1="555.34" x2="820.94" y2="555.34" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:بیمار/شماره پرونده">
+<ellipse class="shape" cx="676.19" cy="576.49" rx="64.58" ry="22"/>
+<text x="676.19" y="581.93" font-size="16" text-anchor="middle" direction="rtl">شماره پرونده</text>
+<line class="line" x1="635.66" y1="584.93" x2="716.72" y2="584.93" stroke-width="1"/>
+<line class="line" x1="635.66" y1="587.93" x2="716.72" y2="587.93" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:بیمار/نام">
+<ellipse class="shape" cx="844.28" cy="356.61" rx="37" ry="22"/>
+<text x="844.28" y="362.05" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:بیمار/نام/کوچک">
+<ellipse class="shape" cx="887.36" cy="296.21" rx="42" ry="22"/>
+<text x="887.36" y="301.65" font-size="16" text-anchor="middle" direction="rtl">کوچک</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:بیمار/نام/خانوادگی">
+<ellipse class="shape" cx="954.2" cy="347" rx="50.39" ry="22"/>
+<text x="954.2" y="352.44" font-size="16" text-anchor="middle" direction="rtl">خانوادگی</text>
+</g>
+<g class="attribute" data-id="attr:entity:بیمار/تلفن">
+<ellipse class="shape" cx="647.9" cy="257.78" rx="42" ry="27"/>
+<ellipse class="outline" cx="647.9" cy="257.78" rx="37" ry="22"/>
+<text x="647.9" y="263.22" font-size="16" text-anchor="middle" direction="rtl">تلفن</text>
+</g>
+<g class="attribute" data-id="attr:entity:بیمار/سن">
+<ellipse class="shape dashed" cx="603.97" cy="328.27" rx="37" ry="22"/>
+<text x="603.97" y="333.71" font-size="16" text-anchor="middle" direction="rtl">سن</text>
+</g>
+<g class="entity" data-id="entity:پزشک">
+<rect class="shape" x="1134.85" y="145.98" width="100" height="46" rx="5"/>
+<text x="1184.85" y="174.42" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">پزشک</text>
+</g>
+<g class="attribute" data-id="attr:entity:پزشک/کد نظام">
+<ellipse class="shape" cx="1309.99" cy="242.7" rx="46.93" ry="22"/>
+<text x="1309.99" y="248.14" font-size="16" text-anchor="middle" direction="rtl">کد نظام</text>
+<line class="line" x1="1285.5" y1="251.14" x2="1334.47" y2="251.14" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:پزشک/نام">
+<ellipse class="shape" cx="1261.14" cy="301.13" rx="37" ry="22"/>
+<text x="1261.14" y="306.57" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="attribute" data-id="attr:entity:پزشک/تخصص">
+<ellipse class="shape" cx="1111.51" cy="230.52" rx="47.44" ry="22"/>
+<text x="1111.51" y="235.96" font-size="16" text-anchor="middle" direction="rtl">تخصص</text>
+</g>
+<g class="entity" data-id="entity:بخش">
+<rect class="shape" x="1570.22" y="145.98" width="100" height="46" rx="5"/>
+<text x="1620.22" y="174.42" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">بخش</text>
+</g>
+<g class="attribute" data-id="attr:entity:بخش/کد">
+<ellipse class="shape" cx="1721.55" cy="118.46" rx="37" ry="22"/>
+<text x="1721.55" y="123.9" font-size="16" text-anchor="middle" direction="rtl">کد</text>
+<line class="line" x1="1713.74" y1="126.9" x2="1729.35" y2="126.9" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:بخش/نام">
+<ellipse class="shape" cx="1737.14" cy="173.07" rx="37" ry="22"/>
+<text x="1737.14" y="178.51" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="entity" data-id="entity:دارو">
+<rect class="shape" x="370.51" y="145.98" width="100" height="46" rx="5"/>
+<text x="420.51" y="174.42" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">دارو</text>
+</g>
+<g class="attribute" data-id="attr:entity:دارو/کد">
+<ellipse class="shape" cx="488.69" cy="71.61" rx="37" ry="22"/>
+<text x="488.69" y="77.05" font-size="16" text-anchor="middle" direction="rtl">کد</text>
+<line class="line" x1="480.89" y1="80.05" x2="496.5" y2="80.05" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:دارو/نام">
+<ellipse class="shape" cx="417.94" cy="22" rx="37" ry="22"/>
+<text x="417.94" y="27.44" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="attribute" data-id="attr:entity:دارو/قیمت">
+<ellipse class="shape" cx="345.07" cy="74.14" rx="40.44" ry="22"/>
+<text x="345.07" y="79.58" font-size="16" text-anchor="middle" direction="rtl">قیمت</text>
+</g>
+<g class="entity" data-id="entity:نسخه">
+<rect class="shape" x="350.19" y="414.66" width="110" height="56" rx="5"/>
+<rect class="outline" x="355.19" y="419.66" width="100" height="46" rx="3"/>
+<text x="405.19" y="448.1" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">نسخه</text>
+</g>
+<g class="attribute" data-id="attr:entity:نسخه/شماره">
+<ellipse class="shape" cx="432.56" cy="328.66" rx="40.71" ry="22"/>
+<text x="432.56" y="334.1" font-size="16" text-anchor="middle" direction="rtl">شماره</text>
+<line class="line" x1="413.73" y1="337.1" x2="451.39" y2="337.1" stroke-width="1" stroke-dasharray="4 3"/>
+</g>
+<g class="attribute" data-id="attr:entity:نسخه/تاریخ">
+<ellipse class="shape" cx="349.22" cy="371.02" rx="37.5" ry="22"/>
+<text x="349.22" y="376.46" font-size="16" text-anchor="middle" direction="rtl">تاریخ</text>
+</g>
+<g class="entity" data-id="entity:قلم نسخه">
+<rect class="shape" x="345.93" y="695.77" width="118.53" height="56" rx="5"/>
+<rect class="outline" x="350.93" y="700.77" width="108.53" height="46" rx="3"/>
+<text x="405.19" y="729.21" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">قلم نسخه</text>
+</g>
+<g class="attribute" data-id="attr:entity:قلم نسخه/ردیف">
+<ellipse class="shape" cx="424.15" cy="802.73" rx="37.45" ry="22"/>
+<text x="424.15" y="808.17" font-size="16" text-anchor="middle" direction="rtl">ردیف</text>
+<line class="line" x1="408.28" y1="811.17" x2="440.01" y2="811.17" stroke-width="1" stroke-dasharray="4 3"/>
+</g>
+<g class="attribute" data-id="attr:entity:قلم نسخه/تعداد مصرف">
+<ellipse class="shape" cx="288.78" cy="811.49" rx="63.71" ry="22"/>
+<text x="288.78" y="816.93" font-size="16" text-anchor="middle" direction="rtl">تعداد مصرف</text>
+</g>
+<g class="relationship" data-id="rel:صدور(بیمار,نسخه)">
+<polygon class="shape" points="580.28,406.1 644.38,442.66 580.28,479.21 516.19,442.66"/>
+<polygon class="outline" points="580.28,411.86 634.28,442.66 580.28,473.46 526.28,442.66"/>
+<text x="580.28" y="448.1" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">صدور</text>
+</g>
+<g class="relationship" data-id="rel:شامل(نسخه,قلم نسخه)">
+<polygon class="shape" points="405.19,526.66 469.28,563.21 405.19,599.77 341.1,563.21"/>
+<polygon class="outline" points="405.19,532.41 459.19,563.21 405.19,594.01 351.19,563.21"/>
+<text x="405.19" y="568.65" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">شامل</text>
+</g>
+<g class="relationship" data-id="rel:مربوط به(قلم نسخه,دارو)">
+<polygon class="shape" points="72.32,138.18 144.64,168.98 72.32,199.78 0,168.98"/>
+<text x="72.32" y="174.42" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">مربوط به</text>
+</g>
+<g class="relationship" data-id="rel:ویزیت(بیمار,پزشک)">
+<polygon class="shape" points="1184.85,411.86 1240.47,442.66 1184.85,473.46 1129.22,442.66"/>
+<text x="1184.85" y="448.1" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">ویزیت</text>
+</g>
+<g class="attribute" data-id="attr:rel:ویزیت(بیمار,پزشک)/تاریخ">
+<ellipse class="shape" cx="1104.78" cy="311.99" rx="37.5" ry="22"/>
+<text x="1104.78" y="317.43" font-size="16" text-anchor="middle" direction="rtl">تاریخ</text>
+</g>
+<g class="attribute" data-id="attr:rel:ویزیت(بیمار,پزشک)/هزینه">
+<ellipse class="shape" cx="1070.38" cy="380.5" rx="39.78" ry="22"/>
+<text x="1070.38" y="385.94" font-size="16" text-anchor="middle" direction="rtl">هزینه</text>
+</g>
+<g class="relationship" data-id="rel:عضویت(پزشک,بخش)">
+<polygon class="shape" points="1448.57,138.18 1514.22,168.98 1448.57,199.78 1382.92,168.98"/>
+<text x="1448.57" y="174.42" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">عضویت</text>
+</g>
+<g class="relationship" data-id="rel:مدیریت(پزشک,بخش)">
+<polygon class="shape" points="1402.53,7.57 1468.09,38.37 1402.53,69.17 1336.98,38.37"/>
+<text x="1402.53" y="43.81" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">مدیریت</text>
+</g>
+<g class="relationship" data-id="rel:بستری(بیمار,بخش)">
+<polygon class="shape" points="1114.55,630.36 1172.57,661.16 1114.55,691.96 1056.54,661.16"/>
+<text x="1114.55" y="666.6" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">بستری</text>
+</g>
+<g class="attribute" data-id="attr:rel:بستری(بیمار,بخش)/تاریخ ورود">
+<ellipse class="shape" cx="1105.34" cy="741.99" rx="54.77" ry="22"/>
+<text x="1105.34" y="747.43" font-size="16" text-anchor="middle" direction="rtl">تاریخ ورود</text>
+</g>
+<g class="attribute" data-id="attr:rel:بستری(بیمار,بخش)/تاریخ خروج">
+<ellipse class="shape" cx="1003.51" cy="695.11" rx="58.82" ry="22"/>
+<text x="1003.51" y="700.55" font-size="16" text-anchor="middle" direction="rtl">تاریخ خروج</text>
+</g>
+<g class="relationship" data-id="rel:ارجاع(پزشک,پزشک)">
+<polygon class="shape" points="1184.85,28.38 1238.85,59.18 1184.85,89.98 1130.85,59.18"/>
+<text x="1184.85" y="64.62" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">ارجاع</text>
+</g>
+<g class="relationship" data-id="rel:تجویز(پزشک,بیمار,دارو)">
+<polygon class="shape" points="750.38,138.18 804.38,168.98 750.38,199.78 696.38,168.98"/>
+<text x="750.38" y="174.42" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">تجویز</text>
+</g>
+</g>
+<g class="labels">
+<rect class="knockout" x="671.95" y="432.16" width="14.43" height="21"/>
+<text x="679.16" y="447.76" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="474.19" y="432.16" width="16.7" height="21"/>
+<text x="482.54" y="447.76" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="397.98" y="484.66" width="14.43" height="21"/>
+<text x="405.19" y="500.26" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="396.84" y="651.67" width="16.7" height="21"/>
+<text x="405.19" y="667.27" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="274.57" y="509.48" width="16.7" height="21"/>
+<text x="282.92" y="525.08" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="284.24" y="158.48" width="14.43" height="21"/>
+<text x="291.45" y="174.08" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="905.93" y="432.16" width="19.1" height="21"/>
+<text x="915.47" y="447.76" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="1176.5" y="258.44" width="16.7" height="21"/>
+<text x="1184.85" y="274.04" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="1278.32" y="158.48" width="16.7" height="21"/>
+<text x="1286.67" y="174.08" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="1541.79" y="158.48" width="14.43" height="21"/>
+<text x="1549" y="174.08" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="1268.66" y="103.87" width="14.43" height="21"/>
+<text x="1275.88" y="119.47" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="1521.97" y="103.87" width="14.43" height="21"/>
+<text x="1529.19" y="119.47" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="874.05" y="517.87" width="38.34" height="21"/>
+<text x="893.22" y="533.47" font-size="15" text-anchor="middle">(0,N)</text>
+<rect class="knockout" x="1414.68" y="338.72" width="40.73" height="21"/>
+<text x="1435.04" y="354.32" font-size="15" text-anchor="middle">(0,M)</text>
+<rect class="knockout" x="1146.43" y="109.42" width="14.43" height="21"/>
+<text x="1153.64" y="125.02" font-size="15" text-anchor="middle">1</text>
+<text x="1114.02" y="99.91" font-size="15" text-anchor="middle" font-style="italic" direction="rtl">ارجاع‌دهنده</text>
+<rect class="knockout" x="1207.71" y="109.42" width="16.7" height="21"/>
+<text x="1216.06" y="125.02" font-size="15" text-anchor="middle">N</text>
+<text x="1255.18" y="99.89" font-size="15" text-anchor="middle" font-style="italic" direction="rtl">ارجاع‌گیرنده</text>
+</g>
+</svg>

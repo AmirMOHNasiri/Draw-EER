@@ -1,8 +1,15 @@
-# Only dist/, the grammar, the language configuration, icons and the manifest ship.
-src/**
-webview/**
-test/**
-scripts/**
-node_modules/**
-tsconfig.json
+# What ships in the .vsix: the manifest, dist/ (bundled code, WebAssembly,
+# fonts, without source maps), the grammar, the language configuration, the
+# layout file schema, the icons, and README, CHANGELOG and LICENSE (copied in
+# by scripts/package.mjs). Everything else stays out.
 **/*.map
+**/*.ts
+.vscode-test/**
+node_modules/**
+out/**
+scripts/**
+src/**
+test/**
+webview/**
+icons/icon.svg
+tsconfig.json

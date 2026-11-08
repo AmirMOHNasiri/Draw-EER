@@ -1,5 +1,5 @@
 import type { Point, Shape } from '../geometry/shapes';
-import { add, exitPoint, normal, unaryLineEnds } from '../geometry/shapes';
+import { add, contains, exitPoint, normal, unaryLineEnds } from '../geometry/shapes';
 import {
   boxAround,
   boxesOverlap,
@@ -58,6 +58,22 @@ export interface RenderOptions {
   embedFont?: FontData;
 }
 
+/** A straight line as drawn, and the two elements it joins. */
+export interface DrawnLine {
+  from: Point;
+  to: Point;
+  joins: [string, string];
+  /** `link`: between shapes (one stroke of a double line each); `attribute`: to an attribute. */
+  kind: 'link' | 'attribute';
+}
+
+/** Every straight line `renderSvg` draws, for checking a layout as it will look. */
+export function drawnLines(sized: SizedDiagram, layout: Layout): DrawnLine[] {
+  const renderer = new SvgRenderer(sized, layout, LIGHT_THEME);
+  renderer.render(undefined);
+  return renderer.drawn;
+}
+
 /** Draws a laid-out diagram as an SVG document. */
 export function renderSvg(
   sized: SizedDiagram,
@@ -66,6 +82,12 @@ export function renderSvg(
 ): string {
   return new SvgRenderer(sized, layout, options.theme ?? LIGHT_THEME).render(options.embedFont);
 }
+
+/**
+ * Smallest distance (px) along a box's side from where a line meets it to a
+ * corner: past the rounded corner, with room for both strokes of a double line.
+ */
+const CORNER_CLEARANCE = STYLE.entity.cornerRadius + STYLE.doubleGap;
 
 class SvgRenderer {
   private readonly lines: string[] = [];
@@ -76,6 +98,8 @@ class SvgRenderer {
   private readonly segments: [Point, Point][] = [];
   private readonly obstacles: { center: Point; shape: Shape }[] = [];
   private readonly labelBoxes: Box[] = [];
+  /** Every line drawn, with what it joins (see `drawnLines`). */
+  readonly drawn: DrawnLine[] = [];
   /** The dashed box of each aggregate, by id. */
   private readonly aggregateBoxes = new Map<string, Box>();
 
@@ -85,7 +109,7 @@ class SvgRenderer {
     private readonly theme: Theme,
   ) {}
 
-  render(embedFont: FontData | undefined): string {
+  render(embedFont?: FontData): string {
     const { diagram } = this.sized;
     for (const node of diagram.nodes) {
       this.mainNode(node);
@@ -277,7 +301,7 @@ class SvgRenderer {
       this.include(c, shape);
       this.obstacles.push({ center: c, shape });
       const start = attributeLineStart(parentShape, parent, c);
-      this.addLine(start, exitPoint(shape, c, c, start));
+      this.addLine(start, exitPoint(shape, c, c, start), [parentId, attribute.id], 'attribute');
 
       const rx = shape.width / 2;
       const ry = shape.height / 2;
@@ -353,14 +377,24 @@ class SvgRenderer {
           const n = normal(start, end);
           const half = STYLE.doubleGap / 2;
           for (const side of [-half, half]) {
-            this.addLine(...this.clipped(link, add(start, n, side), add(end, n, side)));
+            this.addLine(...this.clipped(link, add(start, n, side), add(end, n, side)), [
+              link.from,
+              link.to,
+            ]);
           }
         } else if (link.aggregate !== null) {
           this.aggregateLine(start, end, this.aggregateBoxes.get(link.aggregate));
+          this.drawn.push({ from: start, to: end, joins: [link.from, link.to], kind: 'link' });
         } else {
-          this.addLine(start, end);
+          this.addLine(start, end, [link.from, link.to]);
         }
-        if (link.subset) this.subsetArc(...this.outsideBoxes(start, end));
+        if (link.subset) {
+          // A category's symbol is on the lines into its U circle (slide 56).
+          const atStart = this.isCircle(link.to) && !this.isCircle(link.from);
+          // Measured along the whole line: a circle or supertype inside an
+          // aggregate box keeps its symbol next to it, inside the box.
+          this.subsetArc(start, end, link.to, atStart);
+        }
         // On a unary loop, a role name goes outside the loop, away from the other line.
         const other = links.length === 2 ? segments[1 - i]! : null;
         pending.push(() => {
@@ -382,10 +416,18 @@ class SvgRenderer {
     const n = normal(entity, rel);
     const from = add(entity, n, offset);
     const to = add(rel, n, offset);
+    const end = (id: string, center: Point, a: Point, b: Point) => {
+      const { shape } = this.geometry(id);
+      return offCorner(shape, center, exitPoint(shape, center, a, b));
+    };
     return [
-      this.isJunction(entityId) ? from : exitPoint(this.geometry(entityId).shape, entity, from, to),
-      this.isJunction(relId) ? to : exitPoint(this.geometry(relId).shape, rel, to, from),
+      this.isJunction(entityId) ? from : end(entityId, entity, from, to),
+      this.isJunction(relId) ? to : end(relId, rel, to, from),
     ];
+  }
+
+  private isCircle(id: string): boolean {
+    return this.sized.diagram.nodes.find((n) => n.id === id)?.kind === 'circle';
   }
 
   private isJunction(id: string): boolean {
@@ -394,14 +436,57 @@ class SvgRenderer {
   }
 
   /**
-   * The subset symbol: a half circle across the middle of the line, open
-   * toward `end` (the more general side) and curving toward `start`.
+   * The subset symbol: a half circle on the line, open toward `end` (the
+   * more general side) and curving toward `start`, where the shape
+   * `pointsTo` is. Its center sits `STYLE.subset.fromCircle` from the circle
+   * at `end`, or at `start` (`circleAtStart`: a category's U), as on the
+   * slides; a line without a circle counts from its general end. It moves
+   * from there only to keep `STYLE.subset.gap` from every shape, attribute
+   * and aggregate box (a short line, one that leaves a shape near a corner
+   * or runs past another): to the nearest clear place along the line, its
+   * open ends at least a radius from either end. With no such place, it
+   * slides toward `end` until it is clear of `pointsTo` at least.
    */
-  private subsetArc(start: Point, end: Point): void {
-    const r = STYLE.subset.radius;
-    const middle = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+  private subsetArc(start: Point, end: Point, pointsTo: string, circleAtStart: boolean): void {
+    const { radius: r, gap, fromCircle } = STYLE.subset;
     const n = normal(start, end);
     const d = unit(end, start);
+    const length = Math.hypot(end.x - start.x, end.y - start.y);
+    const arc = (middle: Point) =>
+      Array.from({ length: 13 }, (_, i) => (i / 12) * Math.PI).map((a) =>
+        add(add(middle, n, r * Math.cos(a)), d, r * Math.sin(a)),
+      );
+    const target = { shape: this.geometry(pointsTo).shape, center: this.position(pointsTo) };
+    const reach = length / 2 + gap + 2 * r;
+    const halfway = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+    const nearby = [...this.layout.keys()]
+      .filter((id) => !this.isJunction(id) && this.sized.geometry.has(id))
+      .map((id) => ({ shape: this.geometry(id).shape, center: this.position(id) }))
+      .filter(
+        ({ shape, center }) =>
+          Math.hypot(center.x - halfway.x, center.y - halfway.y) <
+          reach + Math.max(shape.width, shape.height) / 2,
+      );
+    const boxes = [...this.aggregateBoxes.values()];
+    const clearOf = (t: number, outlines: { shape: Shape; center: Point }[], all = true) =>
+      arc(add(start, d, -t)).every(
+        (point) =>
+          outlines.every(({ shape, center }) => isClear(shape, center, point, gap)) &&
+          (!all || boxes.every((box) => fromBoxOutline(box, point) >= gap)),
+      );
+    const fixed = circleAtStart ? fromCircle : length - fromCircle;
+    let t = Math.min(length - r, Math.max(r, fixed));
+    let found = false;
+    for (let k = 0; !found && (t + k <= length - r || t - k >= r); k++) {
+      for (const candidate of [t + k, t - k]) {
+        if (candidate < r || candidate > length - r || !clearOf(candidate, nearby)) continue;
+        t = candidate;
+        found = true;
+        break;
+      }
+    }
+    if (!found) while (t + 1 <= length - r && !clearOf(t, [target], false)) t += 1;
+    const middle = add(start, d, -t);
     const p = add(middle, n, r);
     const q = add(middle, n, -r);
     // Sweep so that the arc passes through middle + d·r (screen y points down).
@@ -410,22 +495,6 @@ class SvgRenderer {
     this.lines.push(
       `<path class="line" d="M${f(p.x)},${f(p.y)} A${r},${r} 0 0 ${sweep} ${f(q.x)},${f(q.y)}"/>`,
     );
-  }
-
-  /**
-   * The part of a line outside every aggregate box (a line that comes from
-   * outside into a box, or the whole line), so that a subset symbol in its
-   * middle does not land on a box's border.
-   */
-  private outsideBoxes(start: Point, end: Point): [Point, Point] {
-    let [s, e] = [start, end];
-    for (const box of this.aggregateBoxes.values()) {
-      if (inBox(box, s) && !inBox(box, e))
-        s = add(s, { x: e.x - s.x, y: e.y - s.y }, boxExit(box, s, e));
-      if (inBox(box, e) && !inBox(box, s))
-        e = add(e, { x: s.x - e.x, y: s.y - e.y }, boxExit(box, e, s));
-    }
-    return [s, e];
   }
 
   /**
@@ -445,11 +514,9 @@ class SvgRenderer {
 
   /** The two lines of a unary (recursive) relationship (see `unaryLineEnds`). */
   private unarySegments(entityId: string, relId: string): [Point, Point][] {
-    return unaryLineEnds(
-      this.geometry(entityId).shape,
-      this.position(entityId),
-      this.geometry(relId).shape,
-      this.position(relId),
+    const [shape, center] = [this.geometry(entityId).shape, this.position(entityId)];
+    return unaryLineEnds(shape, center, this.geometry(relId).shape, this.position(relId)).map(
+      ([start, end]) => [offCorner(shape, center, start), end],
     );
   }
 
@@ -572,7 +639,13 @@ class SvgRenderer {
     return hits;
   }
 
-  private addLine(a: Point, b: Point): void {
+  private addLine(
+    a: Point,
+    b: Point,
+    joins: [string, string],
+    kind: DrawnLine['kind'] = 'link',
+  ): void {
+    this.drawn.push({ from: a, to: b, joins, kind });
     this.segments.push([a, b]);
     this.lines.push(line(a, b));
   }
@@ -622,10 +695,6 @@ class SvgRenderer {
   }
 }
 
-function inBox(box: Box, p: Point): boolean {
-  return p.x > box.minX && p.x < box.maxX && p.y > box.minY && p.y < box.maxY;
-}
-
 /**
  * How far along the segment from `from` (inside the box) to `to` it leaves
  * the box, from 0 to 1 (1 if it never does).
@@ -664,6 +733,23 @@ function attributeLineStart(shape: Shape, center: Point, to: Point): Point {
     }
   }
   return exitPoint(shape, center, center, to);
+}
+
+/**
+ * Where a line meets a box: moved along its side, if needed, to keep
+ * `CORNER_CLEARANCE` from the corners (a line meets a side, never the
+ * rounded corner). Other shapes are left as they are.
+ */
+function offCorner(shape: Shape, center: Point, p: Point): Point {
+  if (shape.kind !== 'rect') return p;
+  const [a, b, m] = [shape.width / 2, shape.height / 2, CORNER_CLEARANCE];
+  const [x, y] = [p.x - center.x, p.y - center.y];
+  const clamp = (v: number, limit: number) =>
+    limit <= m ? v : Math.max(m - limit, Math.min(limit - m, v));
+  // On the top or bottom side (at a corner: the side the line comes in through).
+  return Math.abs(y) / b >= Math.abs(x) / a
+    ? { x: center.x + clamp(x, a), y: p.y }
+    : { x: p.x, y: center.y + clamp(y, b) };
 }
 
 /** Unit vector from `a` toward `b`. */
@@ -736,4 +822,26 @@ function escape(text: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+/** Distance from `point` to the outline of `box`, from inside or outside. */
+function fromBoxOutline(box: Box, point: Point): number {
+  const dx = Math.max(box.minX - point.x, 0, point.x - box.maxX);
+  const dy = Math.max(box.minY - point.y, 0, point.y - box.maxY);
+  if (dx > 0 || dy > 0) return Math.hypot(dx, dy);
+  return Math.min(point.x - box.minX, box.maxX - point.x, point.y - box.minY, box.maxY - point.y);
+}
+
+/**
+ * True if `point` is at least `gap` from the shape's outline, outside it.
+ * Exact for boxes and circles, the shapes a subset symbol points to.
+ */
+function isClear(shape: Shape, center: Point, point: Point, gap: number): boolean {
+  if (shape.kind === 'rect') {
+    const x = Math.max(0, Math.abs(point.x - center.x) - shape.width / 2);
+    const y = Math.max(0, Math.abs(point.y - center.y) - shape.height / 2);
+    return Math.hypot(x, y) >= gap;
+  }
+  const grown = { ...shape, width: shape.width + 2 * gap, height: shape.height + 2 * gap };
+  return !contains(grown, center, point);
 }

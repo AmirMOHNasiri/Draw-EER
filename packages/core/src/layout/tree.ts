@@ -1,4 +1,4 @@
-import { exitPoint, type Point } from '../geometry/shapes';
+import { distanceToOutline, exitPoint, type Point } from '../geometry/shapes';
 import type { Diagram, MainNode } from '../model/types';
 import { STYLE } from '../render/style';
 import { isRightToLeft } from '../text/direction';
@@ -48,9 +48,15 @@ export interface Hierarchy {
 
 /**
  * The hierarchies in a diagram (blocks of shapes joined by EER lines).
- * Shapes in `detached` (the members of aggregates, which keep their own
- * compact block) are left out: the lines to them are drawn, but the rest of
- * the hierarchy forms its tree without them.
+ * Shapes in `detached` (the members of aggregates that cannot be drawn with
+ * their tree, see compound.ts) are left out: the lines to them are drawn,
+ * but the rest of the hierarchy forms its tree without them.
+ *
+ * A subtype whose supertypes do not all belong to one tree (one is inside
+ * an aggregate, or they are in different trees) is in none of them: it
+ * cannot sit below both, so it is placed on its own, centered below its
+ * supertypes (see `freeSubtypes` and grid.ts), with its own subtypes, if
+ * any, as a tree below it.
  */
 export function findHierarchies(diagram: Diagram, detached = new Set<string>()): Hierarchy[] {
   const nodes = new Map(diagram.nodes.map((n) => [n.id, n]));
@@ -64,10 +70,11 @@ export function findHierarchies(diagram: Diagram, detached = new Set<string>()):
     if (link.kind === 'partOf' && nodes.get(link.to)?.kind === 'partOf')
       wholes.set(link.to, link.from);
   }
+  const free = freeSubtypes(diagram, detached);
   const edges: [string, string][] = [];
   for (const link of diagram.links) {
     if (link.kind === 'participation' || link.from === link.to) continue;
-    if (detached.has(link.from) || detached.has(link.to)) continue;
+    if (detached.has(link.from) || detached.has(link.to) || free.has(link.to)) continue;
     if (link.kind === 'partOf') {
       if (nodes.get(link.to)?.kind === 'partOf') continue; // whole → hexagon: the other half
       const whole = wholes.get(link.from);
@@ -105,6 +112,48 @@ export function findHierarchies(diagram: Diagram, detached = new Set<string>()):
     const own = edges.filter(([a]) => inBlock.has(a));
     return buildHierarchy(members, own, hexagons, nodes, order);
   });
+}
+
+/**
+ * Subtypes (or a category's U) with several supertypes that do not all
+ * belong to one tree: a supertype is in `detached` (inside an aggregate), or
+ * the supertypes are not joined without this subtype. Supertypes that have
+ * no supertypes and no other subtypes are not a reason: they form a row
+ * above it, in its tree (a category's superclasses, slide 52's E and F).
+ */
+export function freeSubtypes(diagram: Diagram, detached = new Set<string>()): Set<string> {
+  const eer = diagram.links.filter(
+    (l) => (l.kind === 'specialization' || l.kind === 'category') && l.from !== l.to,
+  );
+  const parents = new Map<string, string[]>();
+  const children = new Map<string, string[]>();
+  for (const { from, to } of eer) {
+    parents.set(to, [...(parents.get(to) ?? []), from]);
+    children.set(from, [...(children.get(from) ?? []), to]);
+  }
+  const free = new Set<string>();
+  for (const [child, own] of parents) {
+    if (new Set(own).size < 2) continue;
+    const alone = own.every((p) => !parents.has(p) && children.get(p)!.length === 1);
+    if (alone) continue;
+    if (own.some((p) => detached.has(p))) {
+      free.add(child);
+      continue;
+    }
+    // Are the supertypes joined to each other without this subtype?
+    const root = new Map<string, string>();
+    const find = (id: string): string => {
+      while (root.has(id)) id = root.get(id)!;
+      return id;
+    };
+    for (const { from, to } of eer) {
+      if (to === child || from === child || detached.has(from) || detached.has(to)) continue;
+      const [a, b] = [find(from), find(to)];
+      if (a !== b) root.set(b, a);
+    }
+    if (new Set(own.map(find)).size > 1) free.add(child);
+  }
+  return free;
 }
 
 function buildHierarchy(
@@ -189,6 +238,66 @@ function buildHierarchy(
   return { members, level, children: treeChildren, above, roots, hexagons, hanging };
 }
 
+/**
+ * The hierarchy with every row of siblings (and of roots, and of parents
+ * above a shape) reordered so that the shapes leading to `anchors` (the
+ * members of an aggregate drawn with this tree, see compound.ts) are at
+ * its `side` end; the others keep their order. On every level the
+ * aggregate's members are then at that end, and its box can take that side
+ * without enclosing anything else of the tree.
+ *
+ * A shape leads to the anchors in its subtree and to those joined to its
+ * subtree by other EER lines (`lines`, general end first: a second
+ * supertype). The one leading to the highest anchor goes outermost, so
+ * that its line up to the box passes over the lines of the others down to
+ * theirs (a shared subtype beside a circle, say); then the nearest.
+ */
+export function withAnchorsAt(
+  h: Hierarchy,
+  anchors: Set<string>,
+  side: 'left' | 'right',
+  lines: [string, string][],
+): Hierarchy {
+  const below = (id: string) => [...(h.children.get(id) ?? []), ...(h.above.get(id) ?? [])];
+  const reach = new Map<string, { level: number; depth: number }>();
+  const leads = (id: string): { level: number; depth: number } => {
+    if (reach.has(id)) return reach.get(id)!;
+    let best = { level: Infinity, depth: Infinity };
+    reach.set(id, best); // guards against a cycle
+    const consider = (level: number, depth: number) => {
+      if (level < best.level || (level === best.level && depth < best.depth))
+        best = { level, depth };
+    };
+    if (anchors.has(id)) consider(h.level.get(id)!, 0);
+    for (const [from, to] of lines) {
+      const other = to === id ? from : from === id ? to : null;
+      if (other !== null && anchors.has(other) && h.level.has(other))
+        consider(h.level.get(other)!, 1);
+    }
+    for (const c of below(id)) {
+      const r = leads(c);
+      consider(r.level, r.depth + 1);
+    }
+    reach.set(id, best);
+    return best;
+  };
+  const reorder = (ids: string[]): string[] => {
+    const others = ids.filter((id) => leads(id).level === Infinity);
+    // Outermost first.
+    const leading = ids
+      .filter((id) => leads(id).level < Infinity)
+      .sort((a, b) => leads(a).level - leads(b).level || leads(a).depth - leads(b).depth);
+    return side === 'right' ? [...others, ...leading.reverse()] : [...leading, ...others];
+  };
+  const children = new Map([...h.children].map(([id, kids]) => [id, reorder(kids)]));
+  return {
+    ...h,
+    children,
+    above: new Map([...h.above].map(([id, parents]) => [id, reorder(parents)])),
+    roots: reorder(h.roots),
+  };
+}
+
 function edgeIndex(edges: [string, string][], from: string, to: string): number {
   return edges.findIndex(([a, b]) => a === from && b === to);
 }
@@ -208,8 +317,19 @@ type Width = (id: string) => [number, number];
  * each subtree is built bottom-up with its outline per level, siblings are
  * pushed apart until their outlines keep `gap` between them on every level
  * they share, then spaced evenly, and the parent is centered over them.
+ * `extra` widens the steps between the children of a shape (the roots
+ * under ''), `away` moves a child (with its subtree) after its parent is
+ * centered, and `centerOver` centers a parent over some of its children
+ * only, as a tree drawn with an aggregate needs (see compound.ts).
  */
-function placeColumns(h: Hierarchy, width: Width, gap: number): Map<string, number> {
+function placeColumns(
+  h: Hierarchy,
+  width: Width,
+  gap: number,
+  extra = new Map<string, number>(),
+  away = new Map<string, number>(),
+  centerOver = new Map<string, string[]>(),
+): Map<string, number> {
   type Subtree = { x: Map<string, number>; contour: Map<number, [number, number]> };
   const level = (id: string) => h.level.get(id)!;
   const addBox = (s: Subtree, id: string, at: number) => {
@@ -232,7 +352,7 @@ function placeColumns(h: Hierarchy, width: Width, gap: number): Map<string, numb
     }
   };
   /** Offsets that keep each subtree clear of all the ones before it. */
-  const row = (subtrees: Subtree[], roots: string[], even: boolean): number[] => {
+  const row = (subtrees: Subtree[], roots: string[], even: boolean, more: number): number[] => {
     const acc: Subtree = { x: new Map(), contour: new Map() };
     const xs: number[] = [];
     subtrees.forEach((s, i) => {
@@ -247,10 +367,10 @@ function placeColumns(h: Hierarchy, width: Width, gap: number): Map<string, numb
       xs.push(x);
       merge(acc, s, x);
     });
-    if (!even || xs.length < 3) return xs;
+    if (!even || xs.length < 3) return xs.map((x, i) => x + i * more);
     // Evenly spaced: every step as wide as the widest one (never closer than before).
     const step = Math.max(...xs.slice(1).map((x, i) => x - xs[i]!));
-    return xs.map((_, i) => i * step);
+    return xs.map((_, i) => i * (step + more));
   };
   /** A row of shapes centered on 0, evenly spaced. */
   const centeredRow = (ids: string[]): number[] => {
@@ -267,15 +387,16 @@ function placeColumns(h: Hierarchy, width: Width, gap: number): Map<string, numb
     const kids = h.children.get(id) ?? [];
     if (kids.length > 0) {
       const subtrees = kids.map(subtree);
-      const xs = row(subtrees, kids, true);
-      const middle = (xs[0]! + xs.at(-1)!) / 2;
-      subtrees.forEach((t, i) => merge(s, t, xs[i]! - middle));
+      const xs = row(subtrees, kids, true, extra.get(id) ?? 0);
+      const over = (centerOver.get(id) ?? kids).map((k) => xs[kids.indexOf(k)]!);
+      const middle = (Math.min(...over) + Math.max(...over)) / 2;
+      subtrees.forEach((t, i) => merge(s, t, xs[i]! - middle + (away.get(kids[i]!) ?? 0)));
     }
     return s;
   };
   const all: Subtree = { x: new Map(), contour: new Map() };
   const trees = h.roots.map(subtree);
-  const xs = row(trees, h.roots, false);
+  const xs = row(trees, h.roots, false, extra.get('') ?? 0);
   trees.forEach((t, i) => merge(all, t, xs[i]!));
   return all.x;
 }
@@ -285,8 +406,13 @@ function placeColumns(h: Hierarchy, width: Width, gap: number): Map<string, numb
  * two columns between siblings (so a parent of two sits between them), and
  * each hexagon halfway between its whole and its part.
  */
-export function treeCells(h: Hierarchy): Map<string, Cell> {
-  const cols = placeColumns(h, () => [0, 0], 2);
+export function treeCells(
+  h: Hierarchy,
+  extra = new Map<string, number>(),
+  away = new Map<string, number>(),
+  centerOver = new Map<string, string[]>(),
+): Map<string, Cell> {
+  const cols = placeColumns(h, () => [0, 0], 2, extra, away, centerOver);
   const cells = new Map<string, Cell>();
   for (const [id, col] of cols) cells.set(id, { col, row: h.level.get(id)! });
   for (const [hexagon, [whole, part]] of h.hexagons) {
@@ -300,18 +426,79 @@ export function treeCells(h: Hierarchy): Map<string, Cell> {
   );
 }
 
+/** How far (px) a level goes down at a time to clear a line, and how often (see `treeOffsets`). */
+const LOWER_STEP = 4;
+const LOWER_TRIES = 100;
+
+/** Distance from the line between `a` and `b` (as drawn, outline to outline) to the outline of `id`. */
+export function lineDistance(
+  sized: SizedDiagram,
+  at: Map<string, Point>,
+  a: string,
+  b: string,
+  id: string,
+): number {
+  const shape = (x: string) => sized.geometry.get(x)!.shape;
+  const [p, q] = [at.get(a)!, at.get(b)!];
+  const from = exitPoint(shape(a), p, p, q);
+  const to = exitPoint(shape(b), q, q, p);
+  const steps = Math.max(1, Math.ceil(Math.hypot(to.x - from.x, to.y - from.y) / 2));
+  let best = Infinity;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const point = { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t };
+    best = Math.min(best, distanceToOutline(shape(id), at.get(id)!, point));
+  }
+  return best;
+}
+
+/**
+ * Smallest angles (degrees, from horizontal) of the lines down a tree:
+ * `tree` for its own lines, `shared` for a shared subtype's lines from its
+ * second and later supertypes. The layout's first round, before attributes are placed
+ * at real positions, uses none (see `layoutPart`).
+ */
+export interface Slopes {
+  tree: number;
+  shared: number;
+}
+
+export const SLOPES: Slopes = { tree: STYLE.tree.minSlope, shared: STYLE.tree.sharedSlope };
+export const NO_SLOPES: Slopes = { tree: 0, shared: 0 };
+
+/**
+ * Room added to a tree: between the children of a shape, beside one child
+ * (`away`), above a level; and the children a parent is centered over
+ * (`centerOver`, all of them if not given; see `placeColumns`).
+ */
+export interface TreeStretch {
+  x: Map<string, number>;
+  away?: Map<string, number>;
+  centerOver?: Map<string, string[]>;
+  y: Map<number, number>;
+}
+
 /**
  * Pixel offsets of a hierarchy's shapes, relative to its first root, given
  * the room each shape takes with its attributes (`bounds`, relative to its
- * center).
+ * center), with room added where `stretch` says.
  */
 export function treeOffsets(
   h: Hierarchy,
   sized: SizedDiagram,
   bounds: (id: string) => Bounds,
+  stretch: TreeStretch = { x: new Map(), y: new Map() },
+  slopes: Slopes = SLOPES,
 ): Map<string, Point> {
   const { siblingGap, levelGap, partGap } = STYLE.tree;
-  const xs = placeColumns(h, (id) => [-bounds(id).minX, bounds(id).maxX], siblingGap);
+  const xs = placeColumns(
+    h,
+    (id) => [-bounds(id).minX, bounds(id).maxX],
+    siblingGap,
+    stretch.x,
+    stretch.away,
+    stretch.centerOver,
+  );
 
   // Each level below the previous one: clear of the attributes above, and
   // with room for the lines (and the hexagons on part-of lines) between them.
@@ -329,32 +516,83 @@ export function treeOffsets(
   for (const [hexagon, [whole, part]] of h.hexagons) {
     lineGap.set(`${whole}|${part}`, sized.geometry.get(hexagon)!.shape.width + 2 * partGap);
   }
-  const y = new Map<number, number>();
+  // The tree's own lines, before the shared subtypes' lines are added.
+  const tree = new Set(lineGap.keys());
+  // A shared subtype's lines from its second and later supertypes in the
+  // tree (drawn, but not tree edges: it hangs from its first supertype) slope
+  // down too, less steeply (`slopes.shared`). Lines up a cycle are skipped.
+  for (const link of sized.diagram.links) {
+    if (link.kind !== 'specialization' && link.kind !== 'category') continue;
+    const [a, b] = [link.from, link.to];
+    if (!xs.has(a) || !xs.has(b) || lineGap.has(`${a}|${b}`)) continue;
+    if (h.level.get(b)! > h.level.get(a)!) lineGap.set(`${a}|${b}`, levelGap);
+  }
+  // Steep enough for the room across (`minSlope`): center to center, the
+  // drawn line's own angle.
+  const tan = (degrees: number) => Math.tan((degrees * Math.PI) / 180);
   const depth = Math.max(...levels.keys());
-  for (let l = 0; l <= depth; l++) {
-    if (l === 0) {
-      y.set(0, 0);
-      continue;
+  const levelsAt = (drop: Map<number, number>) => {
+    const y = new Map<number, number>([[0, 0]]);
+    for (let l = 1; l <= depth; l++) {
+      const upper = levels.get(l - 1) ?? [];
+      const lower = levels.get(l) ?? [];
+      const bottom = Math.max(0, ...upper.map((id) => bounds(id).maxY));
+      const topOf = Math.max(0, ...lower.map((id) => -bounds(id).minY));
+      let step = bottom + STYLE.layout.gap + topOf;
+      for (const [key, gap] of lineGap) {
+        const [a, b] = key.split('|') as [string, string];
+        if (h.level.get(b) !== l) continue;
+        // A line spanning several levels needs its room over all of them.
+        const from = h.level.get(a)!;
+        const slope = tan(tree.has(key) ? slopes.tree : slopes.shared);
+        const down = Math.max(half(a) + gap + half(b), slope * Math.abs(xs.get(a)! - xs.get(b)!));
+        step = Math.max(step, down - (y.get(l - 1)! - y.get(from)!));
+      }
+      y.set(l, y.get(l - 1)! + step + (stretch.y.get(l) ?? 0) + (drop.get(l) ?? 0));
     }
-    const upper = levels.get(l - 1) ?? [];
-    const lower = levels.get(l) ?? [];
-    let step = 0;
-    const bottom = Math.max(0, ...upper.map((id) => bounds(id).maxY));
-    const topOf = Math.max(0, ...lower.map((id) => -bounds(id).minY));
-    step = Math.max(step, bottom + STYLE.layout.gap + topOf);
-    for (const [key, gap] of lineGap) {
+    return y;
+  };
+  const place = (y: Map<number, number>) => {
+    const at = new Map<string, Point>();
+    for (const [id, x] of xs) at.set(id, { x, y: y.get(h.level.get(id)!)! });
+    return at;
+  };
+
+  // A line down the tree that passes a shape closer than `lineClearance`
+  // (the line to an outer child past the corner of a middle one): the level
+  // it goes down to is lowered until the line is clear.
+  const passed = [...xs.keys()].filter((id) => {
+    const node = sized.diagram.nodes.find((n) => n.id === id);
+    return !(node?.kind === 'circle' && node.symbol === null);
+  });
+  const drop = new Map<number, number>();
+  let offsets = place(levelsAt(drop));
+  for (let i = 0; i < LOWER_TRIES; i++) {
+    const close = [...lineGap.keys()].find((key) => {
       const [a, b] = key.split('|') as [string, string];
-      if (h.level.get(b) !== l) continue;
-      // A line spanning several levels needs its room over all of them.
-      const from = h.level.get(a)!;
-      const needed = half(a) + gap + half(b) - (y.get(l - 1)! - y.get(from)!);
-      step = Math.max(step, needed);
-    }
-    y.set(l, y.get(l - 1)! + step);
+      const [p, q] = [offsets.get(a)!, offsets.get(b)!];
+      return passed.some((id) => {
+        if (id === a || id === b) return false;
+        // Far from the box around the line's two centers: clear, no need to measure.
+        const c = offsets.get(id)!;
+        const { width, height } = sized.geometry.get(id)!.shape;
+        const reach = STYLE.lineClearance;
+        if (
+          c.x + width / 2 + reach < Math.min(p.x, q.x) ||
+          c.x - width / 2 - reach > Math.max(p.x, q.x) ||
+          c.y + height / 2 + reach < Math.min(p.y, q.y) ||
+          c.y - height / 2 - reach > Math.max(p.y, q.y)
+        )
+          return false;
+        return lineDistance(sized, offsets, a, b, id) < STYLE.lineClearance - 0.5;
+      });
+    });
+    if (close === undefined) break;
+    const l = h.level.get(close.split('|')[1]!)!;
+    drop.set(l, (drop.get(l) ?? 0) + LOWER_STEP);
+    offsets = place(levelsAt(drop));
   }
 
-  const offsets = new Map<string, Point>();
-  for (const [id, x] of xs) offsets.set(id, { x, y: y.get(h.level.get(id)!)! });
   // Hexagons halfway along the visible part of the line from whole to part.
   for (const [hexagon, [whole, part]] of h.hexagons) {
     const a = offsets.get(whole)!;

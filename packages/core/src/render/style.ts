@@ -28,15 +28,34 @@ export const STYLE = {
   circle: { diameter: 34, fontSize: 18, junction: 8 },
   /** The "Has" hexagon of part-of: `tip` is how far each pointed end reaches past the sides. */
   partOf: { paddingX: 5, paddingY: 4, tip: 10 },
-  /** The subset symbol on lines toward a subtype: a half circle of this radius. */
-  subset: { radius: 7 },
+  /**
+   * The subset symbol on lines toward a subtype: a half circle of this
+   * radius, its center `fromCircle` from the circle's outline (or from the
+   * general end of a line without one), at least `gap` from every outline.
+   */
+  subset: { radius: 7, gap: 12, fromCircle: 20 },
   /**
    * Hierarchies (see layout/tree.ts): `siblingGap` between neighbouring
    * subtrees (attributes included), `levelGap` between the outlines of a
    * shape and the shapes one level below it, `partGap` between a part-of
-   * hexagon and each shape it joins.
+   * hexagon and each shape it joins, `minSlope` the smallest angle (degrees,
+   * from horizontal) of a line down the tree: a wide row of children gets a
+   * taller row gap, so the tree still reads top-down. `sharedSlope` is that
+   * angle for a shared subtype's line from its second (or later) supertype,
+   * which may cross the whole tree: at 30° it pushed the subtype's row far
+   * down (owner's choice, 2026-11-08). `maxSpread`: how far (in normal
+   * sibling spacings) an aggregate may push a free child away from its
+   * parent to keep the row symmetric; beyond it, the row gives up symmetry
+   * and only the child the aggregate pins moves (see layout/compound.ts).
    */
-  tree: { siblingGap: 40, levelGap: 40, partGap: 22 },
+  tree: {
+    siblingGap: 40,
+    levelGap: 40,
+    partGap: 22,
+    minSlope: 30,
+    sharedSlope: 20,
+    maxSpread: 1.5,
+  },
   /** The dashed box around an aggregate: space between it and what it holds. */
   aggregate: { padding: 24, cornerRadius: 16 },
   /** `paddingY`: space above and below the text inside an ellipse. */
@@ -52,7 +71,7 @@ export const STYLE = {
    * the entity) the label's center sits; `fromEntity` and `fromRelationship`
    * are the smallest gaps between the label and the two shapes.
    */
-  label: { position: 0.35, fromEntity: 8, fromRelationship: 6, padding: 3, heightEm: 1 },
+  label: { position: 0.35, fromEntity: 14, fromRelationship: 6, padding: 3, heightEm: 1 },
   /** Distance between parallel lines that join the same two shapes (three or more lines). */
   parallelSpacing: 26,
   margin: 24,
@@ -65,4 +84,6 @@ export const STYLE = {
    * relationship.
    */
   layout: { gap: 26, minLine: 56, labelMargin: 22, unaryLine: 18, componentSpacing: 60 },
+  /** Smallest distance (px) between a line and a shape it passes without joining it. */
+  lineClearance: 24,
 } as const;

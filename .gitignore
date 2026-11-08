@@ -9,8 +9,11 @@ dist/
 out/
 *.tsbuildinfo
 
-# Packaged extensions
+# Packaged extensions, and the files copied into the extension for packaging
 *.vsix
+packages/vscode/README.md
+packages/vscode/CHANGELOG.md
+packages/vscode/LICENSE
 
 # Tests and coverage
 coverage/

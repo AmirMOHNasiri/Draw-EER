@@ -52,6 +52,8 @@ interface Placed {
   center: Point;
   shape: Shape;
   connector: [Point, Point];
+  /** For a line as drawn: how far attributes keep from it (see `FanOptions.drawn`). */
+  clearance?: number;
 }
 
 /** A range of free angles, `start < end`. */
@@ -131,6 +133,14 @@ export interface FanOptions {
    * cross where they fit: the middle of each straight line to a partner.
    */
   walls?: [Point, Point][];
+  /**
+   * Relationship and tree lines as drawn (outline to outline, relative to
+   * the owner's center), each with how far every attribute keeps from it
+   * (`STYLE.lineClearance`, plus half the gap of a double line). The `lines`
+   * given to `placeAttributes` are rougher (from the owner's center, or
+   * provisional rays) and only must not touch the attributes.
+   */
+  drawn?: { line: [Point, Point]; clearance: number }[];
   /**
    * Shapes and attributes that belong to others, with the lines to them
    * (relative to the owner's center). Used only to repair a fan after
@@ -219,6 +229,8 @@ export function placeAttributes(
   // The relationship lines themselves are obstacles too, so that composite
   // attributes cannot spread their children across them.
   const obstacles = lines.map(asLineObstacle);
+  for (const { line, clearance } of options.drawn ?? [])
+    obstacles.push({ ...asLineObstacle(line), clearance });
   for (const { center, shape, connector } of options.occupied ?? []) {
     // A rectangle as the ellipse around it, which covers its corners.
     const covering: Shape =
@@ -512,12 +524,50 @@ function placeKeyGroup(
           // Not found near the target: try the next distance or direction.
           angle + KEY_GROUP_REACH,
         );
-        if (result) return result.placed;
+        if (result && !crossesItself(result.placed)) return result.placed;
+        if (result)
+          return (
+            clearRow(owner, unit, free, geometry, distance, existing, targets, ctx) ?? result.placed
+          );
       }
     }
   }
   const angle = closestFreeAngle(free, targets) ?? targets[0]!;
   return placeUnit(owner, unit, angle, geometry, distance, ctx);
+}
+
+/**
+ * A composite key's row where the line to each part keeps clear of the
+ * others (a row beside its owner can line the far part's line up with the
+ * near part): at each distance, the clear spot nearest the target
+ * direction, on either side of it, within KEY_GROUP_REACH.
+ */
+function clearRow(
+  owner: Shape,
+  unit: Unit,
+  free: Range[],
+  geometry: Geometry,
+  distance: number,
+  existing: Placed[],
+  targets: number[],
+  ctx: Context,
+): Placed[] | null {
+  const step = ctx.search.step;
+  for (const extra of ctx.search.distances) {
+    for (const target of targets) {
+      const angle = closestFreeAngle(free, [target]);
+      if (angle === null) continue;
+      for (let turn = 0; turn <= KEY_GROUP_REACH; turn += step) {
+        for (const a of turn === 0 ? [angle] : [angle + turn, angle - turn]) {
+          for (const ring of ctx.search.rings) {
+            const items = placeUnit(owner, unit, a, geometry, distance + extra + ring, ctx);
+            if (!overlapsAny(items, existing) && !crossesItself(items)) return items;
+          }
+        }
+      }
+    }
+  }
+  return null;
 }
 
 /** Rough size of a unit: the widths of all its ellipses, children included. */
@@ -967,9 +1017,63 @@ function lineHits(line: Placed, item: Placed): boolean {
   // Relationship lines must stay well clear of the whole box; attribute
   // lines may pass the empty corners of an ellipse's box, but not touch it.
   if (line.id === RELATIONSHIP_LINE) {
-    return segmentHitsBox(from, to, boxAround(item.center, item.shape.width, item.shape.height, 4));
+    const { width, height } = item.shape;
+    if (line.clearance !== undefined) return nearEllipse(from, to, item, line.clearance);
+    return segmentHitsBox(from, to, boxAround(item.center, width, height, 4));
   }
   return segmentHitsEllipse(from, to, item.center, item.shape.width, item.shape.height, 3);
+}
+
+/**
+ * True if the segment comes closer than `clearance` to the ellipse's outline
+ * (or runs through it): the distance to 48 points around the outline, after
+ * a cheap test against the ellipse's box.
+ */
+function nearEllipse(from: Point, to: Point, item: Placed, clearance: number): boolean {
+  const { center, shape } = item;
+  const box = boxAround(center, shape.width, shape.height, clearance);
+  if (!segmentHitsBox(from, to, box)) return false;
+  if (segmentHitsEllipse(from, to, center, shape.width, shape.height)) return true;
+  return OUTLINE.some(
+    (c) =>
+      distanceToSegment(
+        { x: center.x + (shape.width / 2) * c.x, y: center.y + (shape.height / 2) * c.y },
+        from,
+        to,
+      ) < clearance,
+  );
+}
+
+/** 48 points around the unit circle, for `nearEllipse`. */
+const OUTLINE: Point[] = Array.from({ length: 48 }, (_, i) => ({
+  x: Math.cos((i / 48) * 2 * Math.PI),
+  y: Math.sin((i / 48) * 2 * Math.PI),
+}));
+
+/** Distance from `p` to the segment from `a` to `b`. */
+function distanceToSegment(p: Point, a: Point, b: Point): number {
+  const d = { x: b.x - a.x, y: b.y - a.y };
+  const length2 = d.x * d.x + d.y * d.y;
+  const t =
+    length2 === 0 ? 0 : Math.max(0, Math.min(1, ((p.x - a.x) * d.x + (p.y - a.y) * d.y) / length2));
+  return Math.hypot(p.x - a.x - t * d.x, p.y - a.y - t * d.y);
+}
+
+/**
+ * True if the line to one part of a unit (a composite key's row) passes
+ * through or touches another of its ellipses, as when a row beside its
+ * owner lines up with the line to its far end.
+ */
+function crossesItself(items: Placed[]): boolean {
+  return items.some(({ connector: [a, b], id }) =>
+    items.some(
+      (other) =>
+        other.id !== id &&
+        !same(other.center, b) &&
+        !same(other.center, a) &&
+        segmentHitsEllipse(a, b, other.center, other.shape.width, other.shape.height, 2),
+    ),
+  );
 }
 
 function same(p: Point, q: Point): boolean {

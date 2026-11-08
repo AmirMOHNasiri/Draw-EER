@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Draw EER: an entity, a relationship and an attribute in Chen notation. -->
+  <rect x="0" y="0" width="256" height="256" rx="48" fill="#1b3a5c"/>
+  <g stroke="#ffffff" stroke-width="10" stroke-linejoin="round" fill="#1b3a5c">
+    <line x1="84" y1="76" x2="184" y2="156"/>
+    <line x1="84" y1="76" x2="84" y2="196"/>
+    <rect x="30" y="46" width="108" height="60" rx="8"/>
+    <polygon points="184,112 230,156 184,200 138,156"/>
+    <ellipse cx="84" cy="200" rx="46" ry="26"/>
+  </g>
+</svg>

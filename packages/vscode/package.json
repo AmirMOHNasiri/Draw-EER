@@ -1,28 +1,47 @@
 {
   "name": "draw-eer",
   "displayName": "Draw EER",
-  "description": "Write ER/EER diagrams as text and see them live in classic Chen notation. Persian (RTL) names supported.",
+  "description": "Write ER and EER diagrams as text and see them live in classic Chen notation, as taught in database courses. Persian (right-to-left) names fully supported.",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "publisher": "AmirMOHNasiri",
+  "publisher": "amirmohnasiri",
+  "author": {
+    "name": "AmirMohammad Nasiri"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AmirMOHNasiri/draw-eer.git"
+    "url": "https://github.com/AmirMOHNasiri/Draw-EER.git",
+    "directory": "packages/vscode"
+  },
+  "homepage": "https://github.com/AmirMOHNasiri/Draw-EER#readme",
+  "bugs": {
+    "url": "https://github.com/AmirMOHNasiri/Draw-EER/issues"
+  },
+  "icon": "icons/icon.png",
+  "galleryBanner": {
+    "color": "#1b3a5c",
+    "theme": "dark"
   },
   "engines": {
     "vscode": "^1.90.0"
   },
   "categories": [
     "Programming Languages",
-    "Visualization"
+    "Visualization",
+    "Education"
   ],
   "keywords": [
     "ER diagram",
     "EER",
+    "entity relationship",
     "Chen notation",
     "database",
-    "Persian"
+    "data modeling",
+    "diagram",
+    "specialization",
+    "Persian",
+    "RTL"
   ],
   "main": "./dist/extension.js",
   "activationEvents": [
@@ -210,7 +229,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p webview/tsconfig.json --noEmit",
     "smoke": "node scripts/build.mjs && node scripts/smoke.mjs",
     "check:webview": "node scripts/build.mjs && node scripts/webview-check.mjs",
-    "test:integration": "node scripts/build.mjs && node scripts/integration.mjs"
+    "test:integration": "node scripts/build.mjs && node scripts/integration.mjs",
+    "package": "node scripts/package.mjs",
+    "demo": "node scripts/build.mjs && node scripts/demo.mjs",
+    "check:vsix": "node scripts/vsix-check.mjs"
   },
   "dependencies": {
     "@draw-eer/core": "0.1.0",
@@ -220,8 +242,10 @@
     "@types/mocha": "^10.0.10",
     "@types/vscode": "1.90.0",
     "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "4.1.0",
     "esbuild": "0.28.2",
     "mocha": "^12.0.3",
+    "ovsx": "1.2.0",
     "vscode-oniguruma": "2.0.1",
     "vscode-textmate": "9.3.2"
   }

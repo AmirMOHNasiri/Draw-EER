@@ -10,15 +10,15 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 <rect x="-24" y="-29" width="288" height="530" fill="#ffffff"/>
 <g class="lines">
 <line class="line" x1="108.81" y1="90.21" x2="70.13" y2="46"/>
-<path class="line" d="M94.73,63.49 A7,7 0 0 1 84.2,72.71"/>
+<path class="line" d="M100.9,70.55 A7,7 0 0 1 90.37,79.76"/>
 <line class="line" x1="131.19" y1="90.21" x2="169.88" y2="46"/>
-<path class="line" d="M155.8,72.71 A7,7 0 0 1 145.27,63.49"/>
+<path class="line" d="M149.63,79.76 A7,7 0 0 1 139.1,70.55"/>
 <line class="line" x1="117.5" y1="160" x2="117.5" y2="119.82"/>
 <line class="line" x1="122.5" y1="160" x2="122.5" y2="119.82"/>
 <line class="line" x1="108.81" y1="356.21" x2="70.13" y2="312"/>
-<path class="line" d="M94.73,329.49 A7,7 0 0 1 84.2,338.71"/>
+<path class="line" d="M100.9,336.55 A7,7 0 0 1 90.37,345.76"/>
 <line class="line" x1="131.19" y1="356.21" x2="169.88" y2="312"/>
-<path class="line" d="M155.8,338.71 A7,7 0 0 1 145.27,329.49"/>
+<path class="line" d="M149.63,345.76 A7,7 0 0 1 139.1,336.55"/>
 <line class="line" x1="120" y1="426" x2="120" y2="386"/>
 </g>
 <g class="shapes">

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 1598.01 776.21" width="1598.01" height="776.21">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 1659.25 848.45" width="1659.25" height="848.45">
 <style>
 text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 .line { stroke: #000000; stroke-width: 1.75; fill: none; }
@@ -7,256 +7,256 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 .dashed { stroke-dasharray: 6 4; }
 .knockout { fill: #ffffff; stroke: none; }
 </style>
-<rect x="-24" y="-29" width="1598.01" height="776.21" fill="#ffffff"/>
+<rect x="-24" y="-29" width="1659.25" height="848.45" fill="#ffffff"/>
 <g class="lines">
-<line class="line" x1="983.28" y1="442.28" x2="989.51" y2="544.09"/>
-<line class="line" x1="965.47" y1="396.28" x2="937.6" y2="357.2"/>
-<line class="line" x1="1001.52" y1="442.28" x2="1044.38" y2="492.47"/>
-<line class="line" x1="992.6" y1="396.28" x2="1028.1" y2="320.15"/>
-<line class="line" x1="1034.26" y1="266.76" x2="1023.46" y2="219.99"/>
-<line class="line" x1="1058.94" y1="267.73" x2="1100.75" y2="209.11"/>
-<line class="line" x1="1087.27" y1="274.72" x2="1131.77" y2="256.74"/>
-<line class="line" x1="584.89" y1="442.28" x2="554.35" y2="674.28"/>
-<line class="line" x1="568.96" y1="442.28" x2="467.19" y2="565.74"/>
-<line class="line" x1="580" y1="442.28" x2="516.19" y2="627.6"/>
-<line class="line" x1="590.34" y1="442.28" x2="607.06" y2="601.4"/>
-<line class="line" x1="129.6" y1="419.76" x2="99.6" y2="420.02"/>
-<line class="line" x1="133.79" y1="396.28" x2="73.73" y2="368.91"/>
-<line class="line" x1="767.16" y1="286.48" x2="753.3" y2="259.87"/>
-<line class="line" x1="799.48" y1="286.48" x2="843.21" y2="237.05"/>
-<line class="line" x1="1397.04" y1="447.28" x2="1450.77" y2="485.61"/>
-<line class="line" x1="1412.78" y1="430.47" x2="1477.46" y2="443.63"/>
-<line class="line" x1="1412.78" y1="405.57" x2="1441.89" y2="398.31"/>
-<line class="line" x1="1339.94" y1="102.86" x2="1323.83" y2="77.56"/>
-<line class="line" x1="1371.44" y1="102.86" x2="1400.37" y2="43.54"/>
-<line class="line" x1="571.99" y1="286.72" x2="554.78" y2="262.15"/>
-<line class="line" x1="597.39" y1="283.46" x2="619.97" y2="221.44"/>
-<line class="line" x1="779.13" y1="450.08" x2="784.75" y2="478.47"/>
-<line class="line" x1="741.61" y1="403.74" x2="713.89" y2="392.26"/>
-<line class="line" x1="1039.02" y1="419.28" x2="1095.02" y2="419.28"/>
-<line class="line" x1="1302.78" y1="421.78" x2="1241.56" y2="421.78"/>
-<line class="line" x1="1302.78" y1="416.78" x2="1241.56" y2="416.78"/>
-<line class="line" x1="1357.78" y1="391.28" x2="1357.78" y2="311.23"/>
-<line class="line" x1="1360.28" y1="158.86" x2="1360.28" y2="239.87"/>
-<line class="line" x1="1355.28" y1="158.86" x2="1355.28" y2="239.87"/>
-<line class="line" x1="1293.39" y1="133.36" x2="464.49" y2="133.36"/>
-<line class="line" x1="1293.39" y1="128.36" x2="464.49" y2="128.36"/>
-<line class="line" x1="574.12" y1="396.28" x2="428.64" y2="153.81"/>
-<line class="line" x1="537.54" y1="419.28" x2="481.54" y2="419.28"/>
-<line class="line" x1="238.91" y1="419.28" x2="296.01" y2="419.28"/>
-<line class="line" x1="144.05" y1="442.28" x2="120.06" y2="516.76"/>
-<line class="line" x1="224.46" y1="442.28" x2="248.45" y2="516.76"/>
-<line class="line" x1="729.13" y1="309.48" x2="648.94" y2="309.48"/>
-<line class="line" x1="587.92" y1="396.28" x2="587.92" y2="340.28"/>
-<line class="line" x1="924.73" y1="419.28" x2="854.86" y2="419.28"/>
-<line class="line" x1="638.3" y1="419.28" x2="703.4" y2="419.28"/>
-<line class="line" x1="779.13" y1="332.48" x2="779.13" y2="388.48"/>
-<line class="line" x1="954.03" y1="442.28" x2="805.92" y2="564.63"/>
-<line class="line" x1="614.73" y1="442.28" x2="757.06" y2="564.37"/>
+<line class="line" x1="1044.82" y1="514.52" x2="1051.04" y2="616.33"/>
+<line class="line" x1="1027" y1="468.52" x2="999.13" y2="429.44"/>
+<line class="line" x1="1063.05" y1="514.52" x2="1105.92" y2="564.7"/>
+<line class="line" x1="1054.13" y1="468.52" x2="1089.63" y2="392.39"/>
+<line class="line" x1="1095.79" y1="338.99" x2="1084.99" y2="292.22"/>
+<line class="line" x1="1120.48" y1="339.96" x2="1162.29" y2="281.35"/>
+<line class="line" x1="1148.8" y1="346.96" x2="1193.31" y2="328.98"/>
+<line class="line" x1="584.89" y1="514.52" x2="554.35" y2="746.51"/>
+<line class="line" x1="568.96" y1="514.52" x2="467.19" y2="637.98"/>
+<line class="line" x1="580" y1="514.52" x2="516.19" y2="699.84"/>
+<line class="line" x1="590.34" y1="514.52" x2="607.06" y2="673.64"/>
+<line class="line" x1="129.6" y1="491.99" x2="99.6" y2="492.25"/>
+<line class="line" x1="133.79" y1="468.52" x2="73.73" y2="441.15"/>
+<line class="line" x1="828.69" y1="284.52" x2="814.84" y2="257.91"/>
+<line class="line" x1="861.01" y1="284.52" x2="904.74" y2="235.09"/>
+<line class="line" x1="1457.85" y1="519.52" x2="1511.25" y2="558.31"/>
+<line class="line" x1="1474.32" y1="503.21" x2="1538.87" y2="516.93"/>
+<line class="line" x1="1474.32" y1="478.31" x2="1503.49" y2="471.31"/>
+<line class="line" x1="1401.48" y1="102.86" x2="1385.36" y2="77.56"/>
+<line class="line" x1="1432.97" y1="102.86" x2="1461.9" y2="43.54"/>
+<line class="line" x1="565" y1="288.29" x2="542.02" y2="269.01"/>
+<line class="line" x1="587.92" y1="276.72" x2="587.15" y2="210.86"/>
+<line class="line" x1="818.77" y1="469.62" x2="733.91" y2="384.77"/>
+<line class="line" x1="804.95" y1="475.24" x2="695.75" y2="425.48"/>
+<line class="line" x1="1100.56" y1="491.52" x2="1156.56" y2="491.52"/>
+<line class="line" x1="1364.32" y1="494.02" x2="1303.1" y2="494.02"/>
+<line class="line" x1="1364.32" y1="489.02" x2="1303.1" y2="489.02"/>
+<line class="line" x1="1419.32" y1="463.52" x2="1419.32" y2="347.35"/>
+<line class="line" x1="1421.82" y1="158.86" x2="1421.82" y2="275.99"/>
+<line class="line" x1="1416.82" y1="158.86" x2="1416.82" y2="275.99"/>
+<line class="line" x1="1354.92" y1="133.36" x2="421.14" y2="133.36"/>
+<line class="line" x1="1354.92" y1="128.36" x2="421.14" y2="128.36"/>
+<line class="line" x1="574.12" y1="468.52" x2="385.3" y2="153.81"/>
+<line class="line" x1="537.54" y1="491.52" x2="481.54" y2="491.52"/>
+<line class="line" x1="238.91" y1="491.52" x2="296.01" y2="491.52"/>
+<line class="line" x1="144.05" y1="514.52" x2="120.06" y2="589"/>
+<line class="line" x1="224.46" y1="514.52" x2="248.45" y2="589"/>
+<line class="line" x1="790.66" y1="307.52" x2="648.94" y2="307.52"/>
+<line class="line" x1="587.92" y1="468.52" x2="587.92" y2="338.32"/>
+<line class="line" x1="986.26" y1="491.52" x2="916.4" y2="491.52"/>
+<line class="line" x1="638.3" y1="491.52" x2="764.93" y2="491.52"/>
+<line class="line" x1="840.66" y1="330.52" x2="840.66" y2="460.72"/>
+<line class="line" x1="1005.07" y1="514.52" x2="842.18" y2="612.25"/>
+<line class="line" x1="625.03" y1="514.52" x2="782.3" y2="612.01"/>
 </g>
 <g class="shapes">
 <g class="entity" data-id="entity:Customer">
-<rect class="shape" x="924.73" y="396.28" width="114.3" height="46" rx="5"/>
-<text x="981.87" y="424.72" font-size="16" font-weight="bold" text-anchor="middle">Customer</text>
+<rect class="shape" x="986.26" y="468.52" width="114.3" height="46" rx="5"/>
+<text x="1043.41" y="496.96" font-size="16" font-weight="bold" text-anchor="middle">Customer</text>
 </g>
 <g class="attribute" data-id="attr:entity:Customer/id">
-<ellipse class="shape" cx="990.85" cy="566.08" rx="37" ry="22"/>
-<text x="990.85" y="571.52" font-size="16" text-anchor="middle">id</text>
-<line class="line" x1="984.4" y1="574.52" x2="997.31" y2="574.52" stroke-width="1"/>
+<ellipse class="shape" cx="1052.39" cy="638.31" rx="37" ry="22"/>
+<text x="1052.39" y="643.75" font-size="16" text-anchor="middle">id</text>
+<line class="line" x1="1045.93" y1="646.75" x2="1058.84" y2="646.75" stroke-width="1"/>
 </g>
 <g class="attribute" data-id="attr:entity:Customer/name">
-<ellipse class="shape" cx="922.89" cy="336.59" rx="42.03" ry="22"/>
-<text x="922.89" y="342.03" font-size="16" text-anchor="middle">name</text>
+<ellipse class="shape" cx="984.43" cy="408.83" rx="42.03" ry="22"/>
+<text x="984.43" y="414.27" font-size="16" text-anchor="middle">name</text>
 </g>
 <g class="attribute" data-id="attr:entity:Customer/email">
-<ellipse class="shape" cx="1061.5" cy="512.5" rx="41.45" ry="22"/>
-<text x="1061.5" y="517.94" font-size="16" text-anchor="middle">email</text>
-<line class="line" x1="1042" y1="520.94" x2="1081" y2="520.94" stroke-width="1"/>
-<line class="line" x1="1042" y1="523.94" x2="1081" y2="523.94" stroke-width="1"/>
+<ellipse class="shape" cx="1123.03" cy="584.74" rx="41.45" ry="22"/>
+<text x="1123.03" y="590.18" font-size="16" text-anchor="middle">email</text>
+<line class="line" x1="1103.53" y1="593.18" x2="1142.53" y2="593.18" stroke-width="1"/>
+<line class="line" x1="1103.53" y1="596.18" x2="1142.53" y2="596.18" stroke-width="1"/>
 </g>
 <g class="attribute" data-id="attr:entity:Customer/addresses">
-<ellipse class="shape" cx="1040.46" cy="293.63" rx="65.57" ry="27"/>
-<ellipse class="outline" cx="1040.46" cy="293.63" rx="60.57" ry="22"/>
-<text x="1040.46" y="299.07" font-size="16" text-anchor="middle">addresses</text>
+<ellipse class="shape" cx="1102" cy="365.87" rx="65.57" ry="27"/>
+<ellipse class="outline" cx="1102" cy="365.87" rx="60.57" ry="22"/>
+<text x="1102" y="371.31" font-size="16" text-anchor="middle">addresses</text>
 </g>
 <g class="attribute" data-id="attr:attr:entity:Customer/addresses/street">
-<ellipse class="shape" cx="1018.42" cy="198.14" rx="42.53" ry="22"/>
-<text x="1018.42" y="203.58" font-size="16" text-anchor="middle">street</text>
+<ellipse class="shape" cx="1079.95" cy="270.38" rx="42.53" ry="22"/>
+<text x="1079.95" y="275.82" font-size="16" text-anchor="middle">street</text>
 </g>
 <g class="attribute" data-id="attr:attr:entity:Customer/addresses/city">
-<ellipse class="shape" cx="1115.2" cy="188.86" rx="37" ry="22"/>
-<text x="1115.2" y="194.3" font-size="16" text-anchor="middle">city</text>
+<ellipse class="shape" cx="1176.73" cy="261.09" rx="37" ry="22"/>
+<text x="1176.73" y="266.53" font-size="16" text-anchor="middle">city</text>
 </g>
 <g class="attribute" data-id="attr:attr:entity:Customer/addresses/zip">
-<ellipse class="shape" cx="1162.38" cy="244.38" rx="37" ry="22"/>
-<text x="1162.38" y="249.82" font-size="16" text-anchor="middle">zip</text>
+<ellipse class="shape" cx="1223.91" cy="316.61" rx="37" ry="22"/>
+<text x="1223.91" y="322.05" font-size="16" text-anchor="middle">zip</text>
 </g>
 <g class="entity" data-id="entity:Product">
-<rect class="shape" x="537.54" y="396.28" width="100.77" height="46" rx="5"/>
-<text x="587.92" y="424.72" font-size="16" font-weight="bold" text-anchor="middle">Product</text>
+<rect class="shape" x="537.54" y="468.52" width="100.77" height="46" rx="5"/>
+<text x="587.92" y="496.96" font-size="16" font-weight="bold" text-anchor="middle">Product</text>
 </g>
 <g class="attribute" data-id="attr:entity:Product/sku">
-<ellipse class="shape" cx="551.46" cy="696.21" rx="37" ry="22"/>
-<text x="551.46" y="701.65" font-size="16" text-anchor="middle">sku</text>
-<line class="line" x1="538.87" y1="704.65" x2="564.06" y2="704.65" stroke-width="1"/>
+<ellipse class="shape" cx="551.46" cy="768.45" rx="37" ry="22"/>
+<text x="551.46" y="773.89" font-size="16" text-anchor="middle">sku</text>
+<line class="line" x1="538.87" y1="776.89" x2="564.06" y2="776.89" stroke-width="1"/>
 </g>
 <g class="attribute" data-id="attr:entity:Product/title">
-<ellipse class="shape" cx="450.9" cy="585.49" rx="37" ry="22"/>
-<text x="450.9" y="590.93" font-size="16" text-anchor="middle">title</text>
+<ellipse class="shape" cx="450.9" cy="657.73" rx="37" ry="22"/>
+<text x="450.9" y="663.17" font-size="16" text-anchor="middle">title</text>
 </g>
 <g class="attribute" data-id="attr:entity:Product/price">
-<ellipse class="shape" cx="508.75" cy="649.2" rx="39.34" ry="22"/>
-<text x="508.75" y="654.64" font-size="16" text-anchor="middle">price</text>
+<ellipse class="shape" cx="508.75" cy="721.44" rx="39.34" ry="22"/>
+<text x="508.75" y="726.88" font-size="16" text-anchor="middle">price</text>
 </g>
 <g class="attribute" data-id="attr:entity:Product/rating">
-<ellipse class="shape dashed" cx="609.37" cy="623.37" rx="42.42" ry="22"/>
-<text x="609.37" y="628.81" font-size="16" text-anchor="middle">rating</text>
+<ellipse class="shape dashed" cx="609.37" cy="695.61" rx="42.42" ry="22"/>
+<text x="609.37" y="701.05" font-size="16" text-anchor="middle">rating</text>
 </g>
 <g class="entity" data-id="entity:Category">
-<rect class="shape" x="129.6" y="396.28" width="109.31" height="46" rx="5"/>
-<text x="184.26" y="424.72" font-size="16" font-weight="bold" text-anchor="middle">Category</text>
+<rect class="shape" x="129.6" y="468.52" width="109.31" height="46" rx="5"/>
+<text x="184.26" y="496.96" font-size="16" font-weight="bold" text-anchor="middle">Category</text>
 </g>
 <g class="attribute" data-id="attr:entity:Category/id">
-<ellipse class="shape" cx="62.6" cy="420.34" rx="37" ry="22"/>
-<text x="62.6" y="425.78" font-size="16" text-anchor="middle">id</text>
-<line class="line" x1="56.15" y1="428.78" x2="69.06" y2="428.78" stroke-width="1"/>
+<ellipse class="shape" cx="62.6" cy="492.58" rx="37" ry="22"/>
+<text x="62.6" y="498.02" font-size="16" text-anchor="middle">id</text>
+<line class="line" x1="56.15" y1="501.02" x2="69.06" y2="501.02" stroke-width="1"/>
 </g>
 <g class="attribute" data-id="attr:entity:Category/name">
-<ellipse class="shape" cx="42.03" cy="354.46" rx="42.03" ry="22"/>
-<text x="42.03" y="359.9" font-size="16" text-anchor="middle">name</text>
+<ellipse class="shape" cx="42.03" cy="426.7" rx="42.03" ry="22"/>
+<text x="42.03" y="432.14" font-size="16" text-anchor="middle">name</text>
 </g>
 <g class="entity" data-id="entity:Seller">
-<rect class="shape" x="729.13" y="286.48" width="100" height="46" rx="5"/>
-<text x="779.13" y="314.92" font-size="16" font-weight="bold" text-anchor="middle">Seller</text>
+<rect class="shape" x="790.66" y="284.52" width="100" height="46" rx="5"/>
+<text x="840.66" y="312.96" font-size="16" font-weight="bold" text-anchor="middle">Seller</text>
 </g>
 <g class="attribute" data-id="attr:entity:Seller/id">
-<ellipse class="shape" cx="742.36" cy="238.85" rx="37" ry="22"/>
-<text x="742.36" y="244.29" font-size="16" text-anchor="middle">id</text>
-<line class="line" x1="735.91" y1="247.29" x2="748.82" y2="247.29" stroke-width="1"/>
+<ellipse class="shape" cx="803.9" cy="236.89" rx="37" ry="22"/>
+<text x="803.9" y="242.33" font-size="16" text-anchor="middle">id</text>
+<line class="line" x1="797.44" y1="245.33" x2="810.35" y2="245.33" stroke-width="1"/>
 </g>
 <g class="attribute" data-id="attr:entity:Seller/store name">
-<ellipse class="shape" cx="861.84" cy="215.99" rx="64.31" ry="22"/>
-<text x="861.84" y="221.43" font-size="16" text-anchor="middle">store name</text>
+<ellipse class="shape" cx="923.37" cy="214.03" rx="64.31" ry="22"/>
+<text x="923.37" y="219.47" font-size="16" text-anchor="middle">store name</text>
 </g>
 <g class="entity" data-id="entity:Order">
-<rect class="shape" x="1302.78" y="391.28" width="110" height="56" rx="5"/>
-<rect class="outline" x="1307.78" y="396.28" width="100" height="46" rx="3"/>
-<text x="1357.78" y="424.72" font-size="16" font-weight="bold" text-anchor="middle">Order</text>
+<rect class="shape" x="1364.32" y="463.52" width="110" height="56" rx="5"/>
+<rect class="outline" x="1369.32" y="468.52" width="100" height="46" rx="3"/>
+<text x="1419.32" y="496.96" font-size="16" font-weight="bold" text-anchor="middle">Order</text>
 </g>
 <g class="attribute" data-id="attr:entity:Order/number">
-<ellipse class="shape" cx="1477.02" cy="504.33" rx="50.02" ry="22"/>
-<text x="1477.02" y="509.77" font-size="16" text-anchor="middle">number</text>
-<line class="line" x1="1449.73" y1="512.77" x2="1504.31" y2="512.77" stroke-width="1" stroke-dasharray="4 3"/>
+<ellipse class="shape" cx="1537.15" cy="577.13" rx="50.02" ry="22"/>
+<text x="1537.15" y="582.57" font-size="16" text-anchor="middle">number</text>
+<line class="line" x1="1509.86" y1="585.57" x2="1564.44" y2="585.57" stroke-width="1" stroke-dasharray="4 3"/>
 </g>
 <g class="attribute" data-id="attr:entity:Order/date">
-<ellipse class="shape" cx="1512.71" cy="450.8" rx="37.29" ry="22"/>
-<text x="1512.71" y="456.24" font-size="16" text-anchor="middle">date</text>
+<ellipse class="shape" cx="1573.96" cy="524.39" rx="37.29" ry="22"/>
+<text x="1573.96" y="529.83" font-size="16" text-anchor="middle">date</text>
 </g>
 <g class="attribute" data-id="attr:entity:Order/total">
-<ellipse class="shape dashed" cx="1476.49" cy="389.68" rx="37.62" ry="22"/>
-<text x="1476.49" y="395.12" font-size="16" text-anchor="middle">total</text>
+<ellipse class="shape dashed" cx="1538.29" cy="462.95" rx="37.62" ry="22"/>
+<text x="1538.29" y="468.39" font-size="16" text-anchor="middle">total</text>
 </g>
 <g class="entity" data-id="entity:Order Line">
-<rect class="shape" x="1293.39" y="102.86" width="128.78" height="56" rx="5"/>
-<rect class="outline" x="1298.39" y="107.86" width="118.78" height="46" rx="3"/>
-<text x="1357.78" y="136.3" font-size="16" font-weight="bold" text-anchor="middle">Order Line</text>
+<rect class="shape" x="1354.92" y="102.86" width="128.78" height="56" rx="5"/>
+<rect class="outline" x="1359.92" y="107.86" width="118.78" height="46" rx="3"/>
+<text x="1419.32" y="136.3" font-size="16" font-weight="bold" text-anchor="middle">Order Line</text>
 </g>
 <g class="attribute" data-id="attr:entity:Order Line/line">
-<ellipse class="shape" cx="1310.72" cy="56.98" rx="37" ry="22"/>
-<text x="1310.72" y="62.42" font-size="16" text-anchor="middle">line</text>
-<line class="line" x1="1298.17" y1="65.42" x2="1323.27" y2="65.42" stroke-width="1" stroke-dasharray="4 3"/>
+<ellipse class="shape" cx="1372.25" cy="56.98" rx="37" ry="22"/>
+<text x="1372.25" y="62.42" font-size="16" text-anchor="middle">line</text>
+<line class="line" x1="1359.7" y1="65.42" x2="1384.8" y2="65.42" stroke-width="1" stroke-dasharray="4 3"/>
 </g>
 <g class="attribute" data-id="attr:entity:Order Line/quantity">
-<ellipse class="shape" cx="1410.88" cy="22" rx="51.56" ry="22"/>
-<text x="1410.88" y="27.44" font-size="16" text-anchor="middle">quantity</text>
+<ellipse class="shape" cx="1472.41" cy="22" rx="51.56" ry="22"/>
+<text x="1472.41" y="27.44" font-size="16" text-anchor="middle">quantity</text>
 </g>
 <g class="relationship" data-id="rel:Places(Customer,Order)">
-<polygon class="shape" points="1170.9,382.94 1246.78,419.28 1170.9,455.62 1095.02,419.28"/>
-<polygon class="outline" points="1170.9,388.48 1235.21,419.28 1170.9,450.08 1106.6,419.28"/>
-<text x="1170.9" y="424.72" font-size="16" font-weight="bold" text-anchor="middle">Places</text>
+<polygon class="shape" points="1232.44,455.17 1308.32,491.52 1232.44,527.86 1156.56,491.52"/>
+<polygon class="outline" points="1232.44,460.72 1296.74,491.52 1232.44,522.32 1168.13,491.52"/>
+<text x="1232.44" y="496.96" font-size="16" font-weight="bold" text-anchor="middle">Places</text>
 </g>
 <g class="relationship" data-id="rel:Contains(Order,Order Line)">
-<polygon class="shape" points="1357.78,238.91 1451.55,275.07 1357.78,311.23 1264.02,275.07"/>
-<polygon class="outline" points="1357.78,244.27 1437.65,275.07 1357.78,305.87 1277.91,275.07"/>
-<text x="1357.78" y="280.51" font-size="16" font-weight="bold" text-anchor="middle">Contains</text>
+<polygon class="shape" points="1419.32,275.03 1513.08,311.19 1419.32,347.35 1325.55,311.19"/>
+<polygon class="outline" points="1419.32,280.39 1499.18,311.19 1419.32,341.99 1339.45,311.19"/>
+<text x="1419.32" y="316.63" font-size="16" font-weight="bold" text-anchor="middle">Contains</text>
 </g>
 <g class="relationship" data-id="rel:Of(Order Line,Product)">
-<polygon class="shape" points="414.87,100.06 468.87,130.86 414.87,161.66 360.87,130.86"/>
-<text x="414.87" y="136.3" font-size="16" font-weight="bold" text-anchor="middle">Of</text>
+<polygon class="shape" points="371.53,100.06 425.53,130.86 371.53,161.66 317.53,130.86"/>
+<text x="371.53" y="136.3" font-size="16" font-weight="bold" text-anchor="middle">Of</text>
 </g>
 <g class="relationship" data-id="rel:Belongs to(Product,Category)">
-<polygon class="shape" points="388.77,388.48 481.54,419.28 388.77,450.08 296.01,419.28"/>
-<text x="388.77" y="424.72" font-size="16" font-weight="bold" text-anchor="middle">Belongs to</text>
+<polygon class="shape" points="388.77,460.72 481.54,491.52 388.77,522.32 296.01,491.52"/>
+<text x="388.77" y="496.96" font-size="16" font-weight="bold" text-anchor="middle">Belongs to</text>
 </g>
 <g class="relationship" data-id="rel:Subcategory(Category,Category)">
-<polygon class="shape" points="184.26,498.28 291.25,529.08 184.26,559.88 77.26,529.08"/>
-<text x="184.26" y="534.52" font-size="16" font-weight="bold" text-anchor="middle">Subcategory</text>
+<polygon class="shape" points="184.26,570.52 291.25,601.32 184.26,632.12 77.26,601.32"/>
+<text x="184.26" y="606.76" font-size="16" font-weight="bold" text-anchor="middle">Subcategory</text>
 </g>
 <g class="relationship" data-id="rel:Offers(Seller,Product)">
-<polygon class="shape" points="587.92,278.68 648.94,309.48 587.92,340.28 526.91,309.48"/>
-<text x="587.92" y="314.92" font-size="16" font-weight="bold" text-anchor="middle">Offers</text>
+<polygon class="shape" points="587.92,276.72 648.94,307.52 587.92,338.32 526.91,307.52"/>
+<text x="587.92" y="312.96" font-size="16" font-weight="bold" text-anchor="middle">Offers</text>
 </g>
 <g class="attribute" data-id="attr:rel:Offers(Seller,Product)/price">
-<ellipse class="shape" cx="540.44" cy="241.66" rx="39.34" ry="22"/>
-<text x="540.44" y="247.1" font-size="16" text-anchor="middle">price</text>
+<ellipse class="shape" cx="520.21" cy="250.7" rx="39.34" ry="22"/>
+<text x="520.21" y="256.14" font-size="16" text-anchor="middle">price</text>
 </g>
 <g class="attribute" data-id="attr:rel:Offers(Seller,Product)/stock">
-<ellipse class="shape" cx="627.83" cy="199.84" rx="41.42" ry="22"/>
-<text x="627.83" y="205.28" font-size="16" text-anchor="middle">stock</text>
+<ellipse class="shape" cx="586.89" cy="188.86" rx="41.42" ry="22"/>
+<text x="586.89" y="194.3" font-size="16" text-anchor="middle">stock</text>
 </g>
 <g class="relationship" data-id="rel:Reviews(Customer,Product,Seller)">
-<polygon class="shape" points="779.13,388.48 854.86,419.28 779.13,450.08 703.4,419.28"/>
-<text x="779.13" y="424.72" font-size="16" font-weight="bold" text-anchor="middle">Reviews</text>
+<polygon class="shape" points="840.66,460.72 916.4,491.52 840.66,522.32 764.93,491.52"/>
+<text x="840.66" y="496.96" font-size="16" font-weight="bold" text-anchor="middle">Reviews</text>
 </g>
 <g class="attribute" data-id="attr:rel:Reviews(Customer,Product,Seller)/stars">
-<ellipse class="shape" cx="789.08" cy="500.34" rx="39.73" ry="22"/>
-<text x="789.08" y="505.78" font-size="16" text-anchor="middle">stars</text>
+<ellipse class="shape" cx="714.67" cy="365.52" rx="39.73" ry="22"/>
+<text x="714.67" y="370.96" font-size="16" text-anchor="middle">stars</text>
 </g>
 <g class="attribute" data-id="attr:rel:Reviews(Customer,Product,Seller)/text">
-<ellipse class="shape" cx="683.53" cy="379.68" rx="37" ry="22"/>
-<text x="683.53" y="385.12" font-size="16" text-anchor="middle">text</text>
+<ellipse class="shape" cx="666.39" cy="412.09" rx="37" ry="22"/>
+<text x="666.39" y="417.53" font-size="16" text-anchor="middle">text</text>
 </g>
 <g class="relationship" data-id="rel:Wishlist(Customer,Product)">
-<polygon class="shape" points="781.19,554.26 854.7,585.06 781.19,615.86 707.67,585.06"/>
-<text x="781.19" y="590.5" font-size="16" font-weight="bold" text-anchor="middle">Wishlist</text>
+<polygon class="shape" points="811.95,599.59 885.47,630.39 811.95,661.19 738.44,630.39"/>
+<text x="811.95" y="635.83" font-size="16" font-weight="bold" text-anchor="middle">Wishlist</text>
 </g>
 </g>
 <g class="labels">
-<rect class="knockout" x="1051.41" y="408.78" width="14.43" height="21"/>
-<text x="1058.62" y="424.38" font-size="15" text-anchor="middle">1</text>
-<rect class="knockout" x="1274.83" y="408.78" width="16.7" height="21"/>
-<text x="1283.18" y="424.38" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="1350.57" y="352.76" width="14.43" height="21"/>
-<text x="1357.78" y="368.36" font-size="15" text-anchor="middle">1</text>
-<rect class="knockout" x="1349.43" y="176.38" width="16.7" height="21"/>
-<text x="1357.78" y="191.98" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="996.46" y="120.36" width="16.7" height="21"/>
-<text x="1004.81" y="135.96" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="515.99" y="300.91" width="14.43" height="21"/>
-<text x="523.2" y="316.51" font-size="15" text-anchor="middle">1</text>
-<rect class="knockout" x="509.59" y="408.78" width="16.7" height="21"/>
-<text x="517.94" y="424.38" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="249.35" y="408.78" width="19.1" height="21"/>
-<text x="258.9" y="424.38" font-size="15" text-anchor="middle">M</text>
-<rect class="knockout" x="128.44" y="457.85" width="14.43" height="21"/>
-<text x="135.66" y="473.45" font-size="15" text-anchor="middle">1</text>
-<text x="103.38" y="483.6" font-size="15" text-anchor="middle" font-style="italic">parent</text>
-<rect class="knockout" x="224.51" y="457.85" width="16.7" height="21"/>
-<text x="232.86" y="473.45" font-size="15" text-anchor="middle">N</text>
-<text x="260.24" y="485.18" font-size="15" text-anchor="middle" font-style="italic">child</text>
-<rect class="knockout" x="691.51" y="298.98" width="19.1" height="21"/>
-<text x="701.06" y="314.58" font-size="15" text-anchor="middle">M</text>
-<rect class="knockout" x="579.57" y="366.18" width="16.7" height="21"/>
-<text x="587.92" y="381.78" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="890.73" y="408.78" width="19.1" height="21"/>
-<text x="900.27" y="424.38" font-size="15" text-anchor="middle">M</text>
-<rect class="knockout" x="652.74" y="408.78" width="16.7" height="21"/>
-<text x="661.09" y="424.38" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="771.42" y="341.58" width="15.41" height="21"/>
-<text x="779.13" y="357.18" font-size="15" text-anchor="middle">K</text>
-<rect class="knockout" x="892.65" y="474.6" width="19.1" height="21"/>
-<text x="902.19" y="490.2" font-size="15" text-anchor="middle">M</text>
-<rect class="knockout" x="656.2" y="474.51" width="16.7" height="21"/>
-<text x="664.55" y="490.11" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="1114.56" y="481.02" width="14.43" height="21"/>
+<text x="1121.77" y="496.62" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="1333.61" y="481.02" width="16.7" height="21"/>
+<text x="1341.97" y="496.62" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="1412.1" y="412.36" width="14.43" height="21"/>
+<text x="1419.32" y="427.96" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="1410.97" y="189.02" width="16.7" height="21"/>
+<text x="1419.32" y="204.62" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="1021.29" y="120.36" width="16.7" height="21"/>
+<text x="1029.64" y="135.96" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="500.82" y="347.87" width="14.43" height="21"/>
+<text x="508.03" y="363.47" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="506.84" y="481.02" width="16.7" height="21"/>
+<text x="515.19" y="496.62" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="252.91" y="481.02" width="19.1" height="21"/>
+<text x="262.46" y="496.62" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="128.44" y="530.08" width="14.43" height="21"/>
+<text x="135.66" y="545.68" font-size="15" text-anchor="middle">1</text>
+<text x="103.38" y="555.84" font-size="15" text-anchor="middle" font-style="italic">parent</text>
+<rect class="knockout" x="224.51" y="530.08" width="16.7" height="21"/>
+<text x="232.86" y="545.68" font-size="15" text-anchor="middle">N</text>
+<text x="260.24" y="557.42" font-size="15" text-anchor="middle" font-style="italic">child</text>
+<rect class="knockout" x="731.51" y="297.02" width="19.1" height="21"/>
+<text x="741.06" y="312.62" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="579.57" y="412.45" width="16.7" height="21"/>
+<text x="587.92" y="428.05" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="952.26" y="481.02" width="19.1" height="21"/>
+<text x="961.81" y="496.62" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="674.27" y="481.02" width="16.7" height="21"/>
+<text x="682.62" y="496.62" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="832.96" y="365.59" width="15.41" height="21"/>
+<text x="840.66" y="381.19" font-size="15" text-anchor="middle">K</text>
+<rect class="knockout" x="938.51" y="538.22" width="19.1" height="21"/>
+<text x="948.06" y="553.82" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="671.72" y="538.14" width="16.7" height="21"/>
+<text x="680.07" y="553.74" font-size="15" text-anchor="middle">N</text>
 </g>
 </svg>

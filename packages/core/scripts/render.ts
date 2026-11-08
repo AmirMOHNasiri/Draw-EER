@@ -2,11 +2,12 @@
  * Renders .eer files to SVG (and optionally PNG) from the command line, the
  * same way the extension exports them:
  *
- *   npm run render -- examples/university.eer [more.eer ...] [--png] [--out-dir dir]
+ *   npm run render -- examples/company.eer [more.eer ...] [--png] [--out-dir dir]
+ *     [--scale n] [--png-only]
  *
- * Each input `name.eer` produces `name.svg` (and `name.png`, at twice the
- * size) in the output directory, or next to the input when no directory is
- * given. A layout file `name.eer.layout.json` next to the input is applied.
+ * Each input `name.eer` produces `name.svg` (and with `--png`, `name.png`,
+ * `--scale` times the size, 2 by default) in the output directory, or next
+ * to the input when no directory is given. `--png-only` leaves out the SVG. A layout file `name.eer.layout.json` next to the input is applied.
  * Syntax errors are printed, and whatever parsed is still drawn.
  */
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -26,12 +27,18 @@ import { createNodeMeasurer, loadFonts, loadResvg, loadSubsetter } from '../src/
 
 async function main() {
   const args = process.argv.slice(2);
-  const png = args.includes('--png');
-  const outDirIndex = args.indexOf('--out-dir');
-  const outDir = outDirIndex >= 0 ? args[outDirIndex + 1] : undefined;
-  const inputs = args.filter(
-    (a, i) => !a.startsWith('--') && (outDirIndex < 0 || i !== outDirIndex + 1),
+  const pngOnly = args.includes('--png-only');
+  const png = pngOnly || args.includes('--png');
+  const valueOf = (flag: string) => {
+    const i = args.indexOf(flag);
+    return i >= 0 ? args[i + 1] : undefined;
+  };
+  const outDir = valueOf('--out-dir');
+  const scale = Number(valueOf('--scale') ?? 2);
+  const values = new Set(
+    ['--out-dir', '--scale'].map((f) => args.indexOf(f) + 1).filter((i) => i > 0),
   );
+  const inputs = args.filter((a, i) => !a.startsWith('--') && !values.has(i));
   if (inputs.length === 0) {
     console.error('Usage: npm run render -- <file.eer> [...] [--png] [--out-dir <dir>]');
     process.exit(1);
@@ -54,11 +61,13 @@ async function main() {
     const { layout } = arrange(sized, await positionsFor(input));
     const svg = exportSvg(sized, layout, fonts, subsetter);
     const base = path.join(outDir ?? path.dirname(input), path.basename(input, '.eer'));
-    await writeFile(`${base}.svg`, svg);
-    console.log(`wrote ${base}.svg`);
+    if (!pngOnly) {
+      await writeFile(`${base}.svg`, svg);
+      console.log(`wrote ${base}.svg`);
+    }
 
     if (png) {
-      await writeFile(`${base}.png`, renderPng(svg, await loadResvg(), fonts, 2));
+      await writeFile(`${base}.png`, renderPng(svg, await loadResvg(), fonts, scale));
       console.log(`wrote ${base}.png`);
     }
   }

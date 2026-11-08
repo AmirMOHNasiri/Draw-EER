@@ -10,7 +10,7 @@ import { activate, openEer, waitFor } from './helpers';
 
 /**
  * The Quick Fixes offered for `range`, as the light bulb asks for them.
- * VS Code adds its own actions (such as Copilot's, kind `quickfix.copilot`),
+ * VS Code adds actions of its own (with other kinds, such as `quickfix.<name>`),
  * and the command's result leaves out `diagnostics`, so ours are picked by kind.
  */
 async function quickFixes(uri: vscode.Uri, range: vscode.Range): Promise<vscode.CodeAction[]> {

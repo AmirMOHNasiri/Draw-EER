@@ -1,0 +1,298 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -29 1812.76 1332.95" width="1812.76" height="1332.95">
+<style>
+text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
+.line { stroke: #000000; stroke-width: 1.75; fill: none; }
+.shape { stroke: #000000; stroke-width: 1.75; fill: #ffffff; }
+.outline { stroke: #000000; stroke-width: 1.75; fill: none; }
+.dashed { stroke-dasharray: 6 4; }
+.knockout { fill: #ffffff; stroke: none; }
+</style>
+<rect x="-24" y="-29" width="1812.76" height="1332.95" fill="#ffffff"/>
+<g class="lines">
+<line class="line" x1="794.41" y1="169.22" x2="821.81" y2="157.02"/>
+<line class="line" x1="745.01" y1="168.48" x2="745.79" y2="138.49"/>
+<line class="line" x1="759.48" y1="95.92" x2="785.27" y2="55.44"/>
+<line class="line" x1="732.15" y1="96.19" x2="718.38" y2="76.53"/>
+<line class="line" x1="714.97" y1="168.48" x2="662.96" y2="127.85"/>
+<line class="line" x1="694.41" y1="183.56" x2="664.77" y2="178.87"/>
+<line class="line" x1="418.09" y1="452.39" x2="388.13" y2="453.96"/>
+<line class="line" x1="1070.72" y1="449.33" x2="1100.72" y2="449.07"/>
+<line class="line" x1="1070.72" y1="469.97" x2="1131.91" y2="494.69"/>
+<line class="line" x1="810.79" y1="909.09" x2="816.77" y2="938.49"/>
+<line class="line" x1="589.33" y1="646.57" x2="616.18" y2="659.96"/>
+<line class="line" x1="483.31" y1="97.51" x2="519.74" y2="42.47"/>
+<line class="line" x1="457.61" y1="97.51" x2="445.17" y2="70.21"/>
+<line class="line" x1="136.65" y1="97.51" x2="144.41" y2="68.53"/>
+<line class="line" x1="201.34" y1="286.61" x2="192.31" y2="315.22"/>
+<line class="line" x1="1697.23" y1="703.09" x2="1708.95" y2="675.47"/>
+<line class="line" x1="1545.46" y1="703.09" x2="1542.84" y2="673.2"/>
+<line class="line" x1="1229.81" y1="909.09" x2="1222.8" y2="938.26"/>
+<line class="line" x1="1234.73" y1="863.09" x2="1233.94" y2="833.1"/>
+<line class="line" x1="1019.31" y1="1201.02" x2="1017.48" y2="1230.97"/>
+<line class="line" x1="405.28" y1="285.14" x2="385.02" y2="291.02"/>
+<line class="line" x1="962.79" y1="1068.22" x2="941.34" y2="1073.2"/>
+<g class="aggregate" data-id="aggregate:راهنمایی">
+<rect class="outline dashed" x="732.11" y="402.38" width="577.22" height="609.04" rx="16"/>
+</g>
+<line class="line" x1="465.59" y1="426.77" x2="465.59" y2="314.71"/>
+<line class="line" x1="470.59" y1="426.77" x2="470.59" y2="314.71"/>
+<line class="line" x1="468.09" y1="143.51" x2="468.09" y2="254.34"/>
+<line class="line" x1="418.09" y1="120.51" x2="362.09" y2="120.51"/>
+<line class="line" x1="181.73" y1="120.51" x2="237.73" y2="120.51"/>
+<line class="line" x1="1285.33" y1="886.09" x2="1341.33" y2="886.09"/>
+<line class="line" x1="1567.47" y1="886.09" x2="1511.47" y2="886.09"/>
+<line class="line" x1="856.11" y1="886.09" x2="912.11" y2="886.09"/>
+<line class="line" x1="1020.72" y1="472.77" x2="1020.72" y2="855.29"/>
+<line class="line" x1="1185.33" y1="886.09" x2="1129.33" y2="886.09"/>
+<line class="line dashed" x1="1020.72" y1="916.89" x2="1020.72" y2="1011.42"/>
+<line class="line" x1="1020.72" y1="1011.42" x2="1020.72" y2="1037.42"/>
+<line class="line" x1="1020.72" y1="1155.02" x2="1020.72" y2="1099.02"/>
+<line class="line" x1="533.26" y1="600.57" x2="478.03" y2="472.77"/>
+<path class="line" d="M492.39,488.35 A7,7 0 0 1 479.54,493.9"/>
+<line class="line" x1="602.41" y1="600.57" x2="970.72" y2="462.77"/>
+<path class="line" d="M954.44,476.33 A7,7 0 0 1 949.54,463.22"/>
+<line class="line" x1="741.91" y1="254.67" x2="741.91" y2="214.48"/>
+<line class="line" x1="746.91" y1="254.67" x2="746.91" y2="214.48"/>
+<line class="line" x1="503.74" y1="426.77" x2="730.12" y2="280.7"/>
+<path class="line" d="M717.11,297.42 A7,7 0 0 1 709.52,285.66"/>
+<line class="line" x1="985.07" y1="426.77" x2="758.69" y2="280.7"/>
+<path class="line" d="M779.29,285.66 A7,7 0 0 1 771.7,297.42"/>
+<line class="line" x1="399.73" y1="607.97" x2="458.15" y2="472.77"/>
+<line class="line" x1="769.92" y1="863.09" x2="407.33" y2="632.69"/>
+<path class="line" d="M427.97,637.51 A7,7 0 0 1 420.46,649.32"/>
+<line class="line" x1="392.98" y1="863.09" x2="392.98" y2="640.57"/>
+<path class="line" d="M399.98,660.57 A7,7 0 0 1 385.98,660.57"/>
+<line class="line" x1="156.82" y1="168.75" x2="143.04" y2="143.51"/>
+<line class="line" x1="196.03" y1="240.61" x2="182.26" y2="215.36"/>
+<line class="line" x1="104.15" y1="168.75" x2="117.93" y2="143.51"/>
+<line class="line" x1="64.94" y1="240.61" x2="78.71" y2="215.36"/>
+<line class="line" x1="1628.66" y1="793.3" x2="1667.34" y2="749.09"/>
+<path class="line" d="M1647.1,782.85 A7,7 0 0 1 1636.57,773.63"/>
+<line class="line" x1="1606.28" y1="793.3" x2="1567.59" y2="749.09"/>
+<path class="line" d="M1598.37,773.63 A7,7 0 0 1 1587.84,782.85"/>
+<line class="line" x1="1617.47" y1="863.09" x2="1617.47" y2="823.09"/>
+</g>
+<g class="shapes">
+<g class="entity" data-id="entity:شخص">
+<rect class="shape" x="694.41" y="168.48" width="100" height="46" rx="5"/>
+<text x="744.41" y="196.92" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">شخص</text>
+</g>
+<g class="attribute" data-id="attr:entity:شخص/کد ملی">
+<ellipse class="shape" cx="854.73" cy="142.36" rx="44.15" ry="22"/>
+<text x="854.73" y="147.8" font-size="16" text-anchor="middle" direction="rtl">کد ملی</text>
+<line class="line" x1="832.78" y1="150.8" x2="876.69" y2="150.8" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:شخص/نام">
+<ellipse class="shape" cx="746.37" cy="116.5" rx="37" ry="22"/>
+<text x="746.37" y="121.94" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:شخص/نام/کوچک">
+<ellipse class="shape" cx="798.56" cy="34.57" rx="42" ry="22"/>
+<text x="798.56" y="40.01" font-size="16" text-anchor="middle" direction="rtl">کوچک</text>
+</g>
+<g class="attribute" data-id="attr:attr:entity:شخص/نام/خانوادگی">
+<ellipse class="shape" cx="703.65" cy="55.49" rx="50.39" ry="22"/>
+<text x="703.65" y="60.93" font-size="16" text-anchor="middle" direction="rtl">خانوادگی</text>
+</g>
+<g class="attribute" data-id="attr:entity:شخص/تلفن">
+<ellipse class="shape" cx="636.27" cy="107" rx="42" ry="27"/>
+<ellipse class="outline" cx="636.27" cy="107" rx="37" ry="22"/>
+<text x="636.27" y="112.44" font-size="16" text-anchor="middle" direction="rtl">تلفن</text>
+</g>
+<g class="attribute" data-id="attr:entity:شخص/سن">
+<ellipse class="shape dashed" cx="629.02" cy="173.21" rx="37" ry="22"/>
+<text x="629.02" y="178.65" font-size="16" text-anchor="middle" direction="rtl">سن</text>
+</g>
+<g class="entity" data-id="entity:کارمند">
+<rect class="shape" x="418.09" y="426.77" width="100" height="46" rx="5"/>
+<text x="468.09" y="455.21" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند</text>
+</g>
+<g class="attribute" data-id="attr:entity:کارمند/حقوق">
+<ellipse class="shape" cx="348.03" cy="456.06" rx="40.28" ry="22"/>
+<text x="348.03" y="461.5" font-size="16" text-anchor="middle" direction="rtl">حقوق</text>
+</g>
+<g class="entity" data-id="entity:دانشجو">
+<rect class="shape" x="970.72" y="426.77" width="100" height="46" rx="5"/>
+<text x="1020.72" y="455.21" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">دانشجو</text>
+</g>
+<g class="attribute" data-id="attr:entity:دانشجو/شماره دانشجویی">
+<ellipse class="shape" cx="1179.51" cy="448.38" rx="78.83" ry="22"/>
+<text x="1179.51" y="453.82" font-size="16" text-anchor="middle" direction="rtl">شماره دانشجویی</text>
+<line class="line" x1="1126.03" y1="456.82" x2="1233" y2="456.82" stroke-width="1"/>
+<line class="line" x1="1126.03" y1="459.82" x2="1233" y2="459.82" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:دانشجو/معدل">
+<ellipse class="shape dashed" cx="1164.17" cy="507.72" rx="40.04" ry="22"/>
+<text x="1164.17" y="513.16" font-size="16" text-anchor="middle" direction="rtl">معدل</text>
+</g>
+<g class="entity" data-id="entity:استاد">
+<rect class="shape" x="756.11" y="863.09" width="100" height="46" rx="5"/>
+<text x="806.11" y="891.53" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">استاد</text>
+</g>
+<g class="attribute" data-id="attr:entity:استاد/مرتبه علمی">
+<ellipse class="shape" cx="821.23" cy="960.42" rx="58.44" ry="22"/>
+<text x="821.23" y="965.86" font-size="16" text-anchor="middle" direction="rtl">مرتبه علمی</text>
+</g>
+<g class="entity" data-id="entity:کارمند اداری">
+<rect class="shape" x="332.69" y="863.09" width="120.59" height="46" rx="5"/>
+<text x="392.98" y="891.53" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کارمند اداری</text>
+</g>
+<g class="entity" data-id="entity:دستیار آموزشی">
+<rect class="shape" x="473.98" y="600.57" width="138.43" height="46" rx="5"/>
+<text x="543.2" y="629.01" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">دستیار آموزشی</text>
+</g>
+<g class="attribute" data-id="attr:entity:دستیار آموزشی/ساعات کار">
+<ellipse class="shape" cx="650.7" cy="677.17" rx="55.41" ry="22"/>
+<text x="650.7" y="682.61" font-size="16" text-anchor="middle" direction="rtl">ساعات کار</text>
+</g>
+<g class="entity" data-id="entity:دانشکده">
+<rect class="shape" x="418.09" y="97.51" width="100" height="46" rx="5"/>
+<text x="468.09" y="125.95" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">دانشکده</text>
+</g>
+<g class="attribute" data-id="attr:entity:دانشکده/نام">
+<ellipse class="shape" cx="533.29" cy="22" rx="37" ry="22"/>
+<text x="533.29" y="27.44" font-size="16" text-anchor="middle" direction="rtl">نام</text>
+<line class="line" x1="524.16" y1="30.44" x2="542.42" y2="30.44" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:دانشکده/بودجه">
+<ellipse class="shape" cx="435.43" cy="48.83" rx="41.18" ry="22"/>
+<text x="435.43" y="54.27" font-size="16" text-anchor="middle" direction="rtl">بودجه</text>
+</g>
+<g class="entity" data-id="entity:ساختمان">
+<rect class="shape" x="79.24" y="97.51" width="102.49" height="46" rx="5"/>
+<text x="130.49" y="125.95" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">ساختمان</text>
+</g>
+<g class="attribute" data-id="attr:entity:ساختمان/کد">
+<ellipse class="shape" cx="150.23" cy="46.8" rx="37" ry="22"/>
+<text x="150.23" y="52.24" font-size="16" text-anchor="middle" direction="rtl">کد</text>
+<line class="line" x1="142.43" y1="55.24" x2="158.04" y2="55.24" stroke-width="1"/>
+</g>
+<g class="entity" data-id="entity:کلاس">
+<rect class="shape" x="158.59" y="240.61" width="100" height="46" rx="5"/>
+<text x="208.59" y="269.05" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کلاس</text>
+</g>
+<g class="attribute" data-id="attr:entity:کلاس/شماره">
+<ellipse class="shape" cx="185.48" cy="336.91" rx="40.71" ry="22"/>
+<text x="185.48" y="342.35" font-size="16" text-anchor="middle" direction="rtl">شماره</text>
+<line class="line" x1="166.65" y1="345.35" x2="204.3" y2="345.35" stroke-width="1"/>
+</g>
+<g class="entity" data-id="entity:آزمایشگاه">
+<rect class="shape" x="0" y="240.61" width="104.77" height="46" rx="5"/>
+<text x="52.38" y="269.05" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">آزمایشگاه</text>
+</g>
+<g class="entity" data-id="entity:بانک">
+<rect class="shape" x="1637.47" y="703.09" width="100" height="46" rx="5"/>
+<text x="1687.47" y="731.53" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">بانک</text>
+</g>
+<g class="attribute" data-id="attr:entity:بانک/کد بانک">
+<ellipse class="shape" cx="1718.11" cy="653.9" rx="46.64" ry="22"/>
+<text x="1718.11" y="659.34" font-size="16" text-anchor="middle" direction="rtl">کد بانک</text>
+<line class="line" x1="1693.89" y1="662.34" x2="1742.33" y2="662.34" stroke-width="1"/>
+</g>
+<g class="entity" data-id="entity:شرکت">
+<rect class="shape" x="1497.47" y="703.09" width="100" height="46" rx="5"/>
+<text x="1547.47" y="731.53" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">شرکت</text>
+</g>
+<g class="attribute" data-id="attr:entity:شرکت/کد شرکت">
+<ellipse class="shape" cx="1540.92" cy="651.22" rx="52.55" ry="22"/>
+<text x="1540.92" y="656.66" font-size="16" text-anchor="middle" direction="rtl">کد شرکت</text>
+<line class="line" x1="1511.33" y1="659.66" x2="1570.51" y2="659.66" stroke-width="1"/>
+</g>
+<g class="entity" data-id="entity:حامی">
+<rect class="shape" x="1567.47" y="863.09" width="100" height="46" rx="5"/>
+<text x="1617.47" y="891.53" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">حامی</text>
+</g>
+<g class="entity" data-id="entity:پروژه">
+<rect class="shape" x="1185.33" y="863.09" width="100" height="46" rx="5"/>
+<text x="1235.33" y="891.53" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">پروژه</text>
+</g>
+<g class="attribute" data-id="attr:entity:پروژه/کد">
+<ellipse class="shape" cx="1217.58" cy="960.04" rx="37" ry="22"/>
+<text x="1217.58" y="965.48" font-size="16" text-anchor="middle" direction="rtl">کد</text>
+<line class="line" x1="1209.77" y1="968.48" x2="1225.38" y2="968.48" stroke-width="1"/>
+</g>
+<g class="attribute" data-id="attr:entity:پروژه/عنوان">
+<ellipse class="shape" cx="1233.37" cy="811.1" rx="39.46" ry="22"/>
+<text x="1233.37" y="816.54" font-size="16" text-anchor="middle" direction="rtl">عنوان</text>
+</g>
+<g class="entity" data-id="entity:کمیته">
+<rect class="shape" x="970.72" y="1155.02" width="100" height="46" rx="5"/>
+<text x="1020.72" y="1183.46" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">کمیته</text>
+</g>
+<g class="attribute" data-id="attr:entity:کمیته/کد">
+<ellipse class="shape" cx="1016.14" cy="1252.95" rx="37" ry="22"/>
+<text x="1016.14" y="1258.39" font-size="16" text-anchor="middle" direction="rtl">کد</text>
+<line class="line" x1="1008.33" y1="1261.39" x2="1023.94" y2="1261.39" stroke-width="1"/>
+</g>
+<g class="relationship" data-id="rel:اشتغال(کارمند,دانشکده)">
+<polygon class="shape" points="468.09,254.34 530.9,285.14 468.09,315.94 405.28,285.14"/>
+<text x="468.09" y="290.58" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">اشتغال</text>
+</g>
+<g class="attribute" data-id="attr:rel:اشتغال(کارمند,دانشکده)/از تاریخ">
+<ellipse class="shape" cx="346.39" cy="302.24" rx="44.91" ry="22"/>
+<text x="346.39" y="307.68" font-size="16" text-anchor="middle" direction="rtl">از تاریخ</text>
+</g>
+<g class="relationship" data-id="rel:استقرار(دانشکده,ساختمان)">
+<polygon class="shape" points="299.91,89.71 362.09,120.51 299.91,151.31 237.73,120.51"/>
+<text x="299.91" y="125.95" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">استقرار</text>
+</g>
+<g class="relationship" data-id="rel:تأمین مالی(پروژه,حامی)">
+<polygon class="shape" points="1426.4,855.29 1511.47,886.09 1426.4,916.89 1341.33,886.09"/>
+<text x="1426.4" y="891.53" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">تأمین مالی</text>
+</g>
+<g class="relationship" data-id="rel:راهنمایی پروژه(استاد,دانشجو,پروژه)">
+<polygon class="shape" points="1020.72,855.29 1129.33,886.09 1020.72,916.89 912.11,886.09"/>
+<text x="1020.72" y="891.53" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">راهنمایی پروژه</text>
+</g>
+<g class="relationship" data-id="rel:ارزیابی(راهنمایی,کمیته)">
+<polygon class="shape" points="1020.72,1037.42 1078.65,1068.22 1020.72,1099.02 962.79,1068.22"/>
+<text x="1020.72" y="1073.66" font-size="16" font-weight="bold" text-anchor="middle" direction="rtl">ارزیابی</text>
+</g>
+<g class="attribute" data-id="attr:rel:ارزیابی(راهنمایی,کمیته)/نمره">
+<ellipse class="shape" cx="906.87" cy="1081.19" rx="37" ry="22"/>
+<text x="906.87" y="1086.63" font-size="16" text-anchor="middle" direction="rtl">نمره</text>
+</g>
+<g class="circle" data-id="spec:شخص(کارمند,دانشجو)">
+<ellipse class="shape" cx="744.41" cy="271.48" rx="17" ry="17"/>
+<text x="744.41" y="277.6" font-size="18" font-weight="bold" text-anchor="middle">O</text>
+</g>
+<g class="circle" data-id="spec:کارمند(استاد,کارمند اداری)">
+<ellipse class="shape" cx="392.98" cy="623.57" rx="17" ry="17"/>
+<text x="392.98" y="629.69" font-size="18" font-weight="bold" text-anchor="middle">D</text>
+</g>
+<g class="partOf" data-id="partof:ساختمان/کلاس">
+<g transform="rotate(61.37 169.54 192.06)">
+<polygon class="shape" points="142.99,192.06 152.99,178.31 186.09,178.31 196.09,192.06 186.09,205.81 152.99,205.81"/>
+<text x="169.54" y="197.16" font-size="15" font-weight="bold" text-anchor="middle" direction="rtl">دارد</text>
+</g>
+</g>
+<g class="partOf" data-id="partof:ساختمان/آزمایشگاه">
+<g transform="rotate(-61.37 91.43 192.06)">
+<polygon class="shape" points="64.88,192.06 74.88,178.31 107.98,178.31 117.98,192.06 107.98,205.81 74.88,205.81"/>
+<text x="91.43" y="197.16" font-size="15" font-weight="bold" text-anchor="middle" direction="rtl">دارد</text>
+</g>
+</g>
+<g class="circle" data-id="union:حامی(بانک,شرکت)">
+<ellipse class="shape" cx="1617.47" cy="806.09" rx="17" ry="17"/>
+<text x="1617.47" y="812.21" font-size="18" font-weight="bold" text-anchor="middle">U</text>
+</g>
+</g>
+<g class="labels">
+<rect class="knockout" x="459.74" y="377.48" width="16.7" height="21"/>
+<text x="468.09" y="393.08" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="460.88" y="171.8" width="14.43" height="21"/>
+<text x="468.09" y="187.4" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="387.39" y="110.01" width="16.7" height="21"/>
+<text x="395.74" y="125.61" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="195.73" y="110.01" width="14.43" height="21"/>
+<text x="202.95" y="125.61" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="1299.33" y="875.59" width="16.7" height="21"/>
+<text x="1307.68" y="891.19" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="1539.04" y="875.59" width="14.43" height="21"/>
+<text x="1546.25" y="891.19" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="870.11" y="875.59" width="14.43" height="21"/>
+<text x="877.33" y="891.19" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="1012.37" y="596.15" width="16.7" height="21"/>
+<text x="1020.72" y="611.75" font-size="15" text-anchor="middle">N</text>
+</g>
+</svg>

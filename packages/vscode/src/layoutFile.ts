@@ -26,6 +26,9 @@ export class LayoutFile implements vscode.Disposable {
   private readonly redoStack: Positions[] = [];
   /** The text last written, so the watcher can tell our own writes from other changes. */
   private written: string | null = null;
+  /** Counts writes and reads, so a read that finishes late cannot undo what came after it. */
+  private writes = 0;
+  private reads = 0;
   private readonly changed = new vscode.EventEmitter<Positions>();
   private readonly disposables: vscode.Disposable[] = [this.changed];
   private warned = false;
@@ -59,7 +62,13 @@ export class LayoutFile implements vscode.Disposable {
 
   /** Reads the file (again); called once at the start and by the watcher. */
   async reload(): Promise<void> {
+    const read = ++this.reads;
+    const writes = this.writes;
     const text = await readLayoutText(this.uri);
+    // A write (a reset, say) or a newer read since this one started is more
+    // recent than what was read: the watcher often reports one change twice,
+    // and the second read can still return the text from before the write.
+    if (read !== this.reads || writes !== this.writes) return;
     if (text === this.written) return;
     this.written = text;
     const { positions, error } =
@@ -118,6 +127,7 @@ export class LayoutFile implements vscode.Disposable {
   }
 
   private async write(positions: Positions, notify: boolean): Promise<void> {
+    this.writes++;
     this.current = positions;
     if (notify) this.changed.fire(positions);
     if (!this.uri) return;

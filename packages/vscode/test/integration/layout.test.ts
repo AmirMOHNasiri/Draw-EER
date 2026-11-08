@@ -123,7 +123,8 @@ describe('layout file with a preview open', () => {
 
     await vscode.commands.executeCommand('drawEer.resetLayout', document.uri);
     await waitFor(() => (existsSync(layoutFile(document)) ? undefined : true), 'the file to go');
-    assert.equal(await bAt(document), auto);
+    // Exports use the positions the preview holds, which follow the reset a moment later.
+    await poll(async () => (await bAt(document)) === auto, 'the automatic layout');
 
     // The preview is the active editor, so undo and redo apply to it.
     await vscode.commands.executeCommand('drawEer.undoLayoutChange');

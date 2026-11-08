@@ -177,8 +177,8 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 <text x="390.93" y="557.27" font-size="15" text-anchor="middle">M</text>
 <rect class="knockout" x="498.28" y="365.03" width="16.7" height="21"/>
 <text x="506.63" y="380.63" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="292.82" y="365.03" width="15.41" height="21"/>
-<text x="300.53" y="380.63" font-size="15" text-anchor="middle">K</text>
+<rect class="knockout" x="294.93" y="365.03" width="15.41" height="21"/>
+<text x="302.64" y="380.63" font-size="15" text-anchor="middle">K</text>
 <rect class="knockout" x="550.4" y="303.38" width="16.7" height="21"/>
 <text x="558.75" y="318.98" font-size="15" text-anchor="middle">N</text>
 <text x="515.15" y="292.16" font-size="15" text-anchor="middle" font-style="italic">component</text>
@@ -189,18 +189,18 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 <text x="468.29" y="658.8" font-size="15" text-anchor="middle">N</text>
 <rect class="knockout" x="663.68" y="643.2" width="14.43" height="21"/>
 <text x="670.89" y="658.8" font-size="15" text-anchor="middle">1</text>
-<rect class="knockout" x="651.11" y="365.03" width="16.7" height="21"/>
-<text x="659.46" y="380.63" font-size="15" text-anchor="middle">N</text>
-<rect class="knockout" x="831.42" y="365.03" width="19.1" height="21"/>
-<text x="840.97" y="380.63" font-size="15" text-anchor="middle">M</text>
+<rect class="knockout" x="653.86" y="365.03" width="16.7" height="21"/>
+<text x="662.21" y="380.63" font-size="15" text-anchor="middle">N</text>
+<rect class="knockout" x="827.86" y="365.03" width="19.1" height="21"/>
+<text x="837.4" y="380.63" font-size="15" text-anchor="middle">M</text>
 <rect class="knockout" x="814.64" y="643.2" width="14.43" height="21"/>
 <text x="821.85" y="658.8" font-size="15" text-anchor="middle">1</text>
 <rect class="knockout" x="914.84" y="466.56" width="16.7" height="21"/>
 <text x="923.19" y="482.16" font-size="15" text-anchor="middle">N</text>
 <rect class="knockout" x="223.71" y="303.16" width="14.43" height="21"/>
 <text x="230.93" y="318.76" font-size="15" text-anchor="middle">1</text>
-<rect class="knockout" x="223.71" y="132.99" width="14.43" height="21"/>
-<text x="230.93" y="148.59" font-size="15" text-anchor="middle">1</text>
+<rect class="knockout" x="223.71" y="137.89" width="14.43" height="21"/>
+<text x="230.93" y="153.49" font-size="15" text-anchor="middle">1</text>
 <rect class="knockout" x="154.15" y="308.67" width="14.43" height="21"/>
 <text x="161.36" y="324.27" font-size="15" text-anchor="middle">1</text>
 <rect class="knockout" x="153.01" y="146.74" width="16.7" height="21"/>

@@ -41,6 +41,36 @@ export function borderPoint(shape: Shape, center: Point, toward: Point): Point {
   return exitPoint(shape, center, center, toward);
 }
 
+/**
+ * Distance from `point` to the outline of the shape centered at `center`;
+ * 0 inside it. Exact for boxes, diamonds and circles; an ellipse's outline
+ * is sampled (every 1.5°), close enough for clearances of a few pixels.
+ */
+export function distanceToOutline(shape: Shape, center: Point, point: Point): number {
+  if (contains(shape, center, point)) return 0;
+  const [a, b] = [shape.width / 2, shape.height / 2];
+  const [x, y] = [Math.abs(point.x - center.x), Math.abs(point.y - center.y)];
+  switch (shape.kind) {
+    case 'rect':
+      return Math.hypot(Math.max(0, x - a), Math.max(0, y - b));
+    case 'diamond': {
+      // The edge from (a, 0) to (0, b), in the point's quadrant.
+      const [ex, ey] = [-a, b];
+      const t = Math.max(0, Math.min(1, ((x - a) * ex + y * ey) / (ex * ex + ey * ey)));
+      return Math.hypot(x - (a + t * ex), y - t * ey);
+    }
+    case 'ellipse': {
+      if (Math.abs(a - b) < 1e-9) return Math.hypot(x, y) - a;
+      let best = Infinity;
+      for (let i = 0; i <= 60; i++) {
+        const t = (i / 60) * (Math.PI / 2);
+        best = Math.min(best, Math.hypot(x - a * Math.cos(t), y - b * Math.sin(t)));
+      }
+      return best;
+    }
+  }
+}
+
 /** True if `point` lies inside (or on) the shape centered at `center`. */
 export function contains(shape: Shape, center: Point, point: Point): boolean {
   const x = point.x - center.x;

@@ -42,7 +42,7 @@ await runTests({
   extensionDevelopmentPath: root,
   extensionTestsPath: path.join(outDir, 'index.js'),
   launchArgs: [
-    // Only this extension, so others (Copilot and the like) add no noise.
+    // Only this extension, so other extensions add no noise.
     '--disable-extensions',
     '--disable-workspace-trust',
     '--skip-welcome',

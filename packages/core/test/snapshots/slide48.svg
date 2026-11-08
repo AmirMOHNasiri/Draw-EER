@@ -18,9 +18,9 @@ text { font-family: 'Vazirmatn', sans-serif; fill: #000000; }
 <line class="line" x1="138.92" y1="446" x2="138.92" y2="402"/>
 <line class="line" x1="143.92" y1="446" x2="143.92" y2="402"/>
 <line class="line" x1="194.03" y1="490" x2="141.42" y2="446"/>
-<path class="line" d="M172.22,462.63 A7,7 0 0 1 163.23,473.37"/>
+<path class="line" d="M161.25,453.47 A7,7 0 0 1 152.27,464.2"/>
 <line class="line" x1="88.82" y1="490" x2="141.42" y2="446"/>
-<path class="line" d="M119.61,473.37 A7,7 0 0 1 110.63,462.63"/>
+<path class="line" d="M130.57,464.2 A7,7 0 0 1 121.59,453.47"/>
 </g>
 <g class="shapes">
 <g class="entity" data-id="entity:کارمند">
