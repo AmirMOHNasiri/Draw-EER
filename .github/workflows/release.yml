@@ -75,11 +75,13 @@ jobs:
 
       - name: Publish to the VS Code Marketplace
         working-directory: packages/vscode
-        run: npx vsce publish --oidc --skip-duplicate --packagePath "draw-eer-${GITHUB_REF_NAME#v}.vsix"
+        run: npx @vscode/vsce publish --oidc --skip-duplicate --packagePath "draw-eer-${GITHUB_REF_NAME#v}.vsix"
 
       - name: Publish to Open VSX
         working-directory: packages/vscode
-        run: npx ovsx publish --skip-duplicate "draw-eer-${GITHUB_REF_NAME#v}.vsix"
+        # The token goes through an environment variable, not straight into
+        # the command line, so it never appears in the generated script.
+        run: npx ovsx publish "draw-eer-${GITHUB_REF_NAME#v}.vsix" -p "$OVSX_PAT" --skip-duplicate
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
 

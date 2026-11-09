@@ -2,7 +2,7 @@
   "name": "draw-eer",
   "displayName": "Draw EER",
   "description": "Write ER and EER diagrams as text and see them live in classic Chen notation, as taught in database courses. Persian (right-to-left) names fully supported.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "license": "MIT",
   "publisher": "amirmohnasiri",

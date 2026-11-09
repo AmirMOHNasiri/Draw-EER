@@ -2,14 +2,39 @@
 # fonts, without source maps), the grammar, the language configuration, the
 # layout file schema, the icons, and README, CHANGELOG and LICENSE (copied in
 # by scripts/package.mjs). Everything else stays out.
+
+# Sources and build leftovers (dist/ holds the bundle).
 **/*.map
 **/*.ts
-.vscode-test/**
-node_modules/**
-out/**
-scripts/**
 src/**
-test/**
 webview/**
-icons/icon.svg
+scripts/**
 tsconfig.json
+icons/icon.svg
+
+# Tests, test VS Code downloads, renders and other outputs.
+test/**
+.vscode-test/**
+out/**
+**/*.vsix
+**/*.patch
+**/*.eer
+**/*.eer.layout.json
+**/snapshots/**
+**/fixtures/**
+
+# Dependencies (everything is bundled) and development configuration.
+node_modules/**
+.vscode/**
+.github/**
+**/.eslintrc*
+**/eslint.config.*
+**/.prettier*
+**/vitest.config.*
+**/.editorconfig
+**/.gitignore
+
+# Notes for the people (and tools) working on the code.
+**/CLAUDE.md
+.claude/**
+docs/**

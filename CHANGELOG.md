@@ -4,7 +4,11 @@ All notable changes to Draw EER are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
 
-## [0.1.0] - unreleased
+## [0.1.1] - 2026-11-09
+
+Packaging and release fixes; corrected changelog.
+
+## [0.1.0] - 2026-11-09
 
 The first release.
 
@@ -41,5 +45,11 @@ The first release.
   much longer than the rest (for example around «بستری» and «مربوط به» in a hospital
   diagram). Dragging the shapes closer fixes it, and the positions are kept. A layout search
   that moves several shapes at once is planned for 0.2.0.
+- When a shape has many attributes, the line to one of them can pass very close to another.
+  Dragging the attribute a little fixes it.
+- An aggregation whose members belong to a specialization hierarchy that another aggregation
+  also uses, or that holds more than one member of one hierarchy while also touching a second
+  hierarchy, is drawn correctly but less tidily: that hierarchy is not kept symmetric.
 
+[0.1.1]: https://github.com/AmirMOHNasiri/Draw-EER/releases/tag/v0.1.1
 [0.1.0]: https://github.com/AmirMOHNasiri/Draw-EER/releases/tag/v0.1.0
