@@ -198,6 +198,38 @@ function asLineObstacle(line: [Point, Point]): Placed {
   };
 }
 
+/**
+ * How far from the owner's center anything of its fan can reach, at most:
+ * the owner, the gap to it, the furthest distance and ring the search tries,
+ * and each attribute with its children fanned out beyond it, plus room for
+ * the widest clearance a line keeps (generous: it only decides what may be
+ * left out).
+ */
+function fanReach(owner: Shape, attributes: AttributeNode[], geometry: Geometry): number {
+  const extent = (a: AttributeNode): number => {
+    const { width, height } = geometry.get(a.id)!.shape;
+    const own = Math.hypot(width, height);
+    if (a.children.length === 0) return own;
+    const child = Math.max(...a.children.map(extent));
+    return (
+      own +
+      STYLE.attributeGap.nested +
+      Math.max(...QUICK.distances) +
+      Math.max(...QUICK.rings) +
+      child
+    );
+  };
+  const widest = Math.max(0, ...attributes.map(extent));
+  return (
+    Math.hypot(owner.width, owner.height) / 2 +
+    STYLE.attributeGap.fromOwner +
+    Math.max(...FULL.distances) +
+    Math.max(...FULL.rings) +
+    widest +
+    2 * (STYLE.lineClearance + STYLE.doubleGap)
+  );
+}
+
 /** Groups consecutive attributes of the same composite key into one unit. */
 export function toUnits(attributes: AttributeNode[]): Unit[] {
   const units: Unit[] = [];
@@ -231,7 +263,16 @@ export function placeAttributes(
   const obstacles = lines.map(asLineObstacle);
   for (const { line, clearance } of options.drawn ?? [])
     obstacles.push({ ...asLineObstacle(line), clearance });
+  // Shapes and attributes beyond anything this fan can reach cannot meet it:
+  // left out, they would only cost time (a repair checks every candidate
+  // spot against all of them).
+  const reach = fanReach(owner, attributes, geometry);
   for (const { center, shape, connector } of options.occupied ?? []) {
+    const size = Math.hypot(shape.width, shape.height) / 2;
+    const near = connector
+      ? distanceToSegment({ x: 0, y: 0 }, connector[0], connector[1])
+      : Math.hypot(center.x, center.y);
+    if (near - size > reach) continue;
     // A rectangle as the ellipse around it, which covers its corners.
     const covering: Shape =
       shape.kind === 'rect'
